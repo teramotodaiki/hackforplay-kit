@@ -16,12 +16,6 @@ $mode 	= filter_input(INPUT_GET, "mode");
 if(!isset($mode)){
 	$mode 	= $stage['Mode'];
 }
-if($mode === "replay"){
-	$code = $project['Data'];
-	$code = preg_replace("/\\\\/", "\\\\\\\\", $code);
-	$code = preg_replace("/\n/", "\\n", $code);
-	$code = preg_replace("/\"/", "\\\"", $code);
-}
 $retry 	= filter_input(INPUT_GET, "retry", FILTER_VALIDATE_BOOLEAN);
 ?>
 <!DOCTYPE html>
@@ -104,38 +98,6 @@ $retry 	= filter_input(INPUT_GET, "retry", FILTER_VALIDATE_BOOLEAN);
 	</script>
 	<script src="view.js" type="text/javascript" charset="utf-8"></script>
 	<!-- Modal -->
-	<div class="modal fade" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-	    		<div class="modal-header">
-			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			        <h4 class="modal-title" id="inputModalLabel">このステージについて入力してください</h4>
-		    	</div>
-			    <div class="modal-body">
-			    	<form>
-			        	<div class="form-group">
-			    			<img class="stage-thumbnail" src="" alt="" width="240" height="160">
-			        	</div>
-			        	<div class="form-group">
-			        		<label for="stage-name" class="control-label">ステージ名<small>（自由に決めてください）</small>:</label>
-			        		<input type="text" class="form-control" id="stage-name">
-			        		<p id="stage-name_alert" class="alert alert-danger">ステージ名を入力してください。</p>
-			        	</div>
-			        	<div class="form-group">
-			        		<label for="stage-explain" class="control-label">ステージの説明:</label>
-			        		<textarea class="form-control" id="stage-explain"></textarea>
-			        		<p id="stage-explain_alert" class="alert alert-danger" style="display:none;"></p>
-			        	</div>
-			        </form>
-			    </div>
-	    		<div class="modal-footer">
-	        		<p class="alert alert-warning">特定の個人を指すキーワードや暴言などを記入すると、削除されることがあります。</p>
-	        		<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-	       			<button type="button" class="btn btn-primary" id="publish-button" >投稿する</button>
-	    		</div>
-			</div>
-		</div>
-	</div>
 	<div class="modal fade" id="screenshotModal" tabindex="-1" role="dialog" aria-labelledby="screenshotModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -188,10 +150,6 @@ $retry 	= filter_input(INPUT_GET, "retry", FILTER_VALIDATE_BOOLEAN);
 						<a href="/s?id=<?php echo $next; ?>" style="display: block;" title="つぎのステージへ">
 							<img src="hackforplay/button_next.png" height="48" width="266" alt="">
 						</a>
-					<?php elseif($id == 106) : // last stage of tutirial ?>
-						<h3>クリアおめでとうございます！</h3>
-						<p>こんどは、あなたもステージを作ってみましょう</p>
-						<a href="/s?id=201" class="btn btn-success btn-lg" title="今すぐ作る"><h3>今すぐ作る</h3></a>
 					<?php endif; ?>
 					</div>
 				</div>

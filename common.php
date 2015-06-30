@@ -9,7 +9,7 @@ $stage['Src'] = 'kit/project_name/index.php';
 
 // この辺はキット開発中関係なし
 $stage['ID'] = '0';
-$stage['NextID'] = '0';
+$stage['NextID'] = NULL;
 $stage['Path'] = '';
 $stage['Mode'] = 'official';
 $stage['Thumbnail'] = '';
