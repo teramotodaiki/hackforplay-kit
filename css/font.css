@@ -1,0 +1,73 @@
+@charset "UTF-8";
+
+/* 使用するフォントや、文字の大きさなどを定義しています。 */
+
+/* フォント */
+body {
+	font-family: 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', メイリオ, Meiryo, Osaka, 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif;
+}
+
+/* 文字の色 */
+.nav .btn-link {
+	color: rgb(  0,  0,  0);
+	text-decoration: none;
+}
+
+.h4p_landing-header {
+	/*color: rgb( 48,128,240);*/
+	color: rgb(255,255,255);
+}
+
+.h4p_landing-main * {
+	color: rgb(255,255,255);
+}
+
+.h4p_item p,
+.h4p_item p a,
+.h4p_item p *,
+.h4p_info-datail p,
+.h4p_info-datail p a,
+.h4p_info-explain p {
+	color: rgb(160,160,160);
+	font-size: 13px;
+	text-decoration: none;
+}
+
+.h4p_item p a:hover,
+.h4p_info-datail p a:hover {
+	color: #23527c;
+	color: rgb( 35, 82,124);
+}
+
+.h4p_item .title a {
+	color: rgb( 83, 83, 83);
+	font-size: 20px;
+	line-height: 20px;
+	text-decoration: none;
+}
+
+.h4p_info-title,
+.h4p_info-explain p {
+	color: rgb(51, 51, 51);
+}
+
+.h4p_publish button.btn {
+	color: rgb(255,255,255);
+	font-size: 180%;
+}
+
+.h4p_publish p{
+	font-size: 60%;
+}
+
+.panel pre.panel-title {
+	font-size: 14px;
+}
+
+#frameModal .frameMap td {
+	text-align: center;
+	vertical-align: middle;
+	font: bold large sans-serif;
+	padding: 0;
+}
+

@@ -1,0 +1,65 @@
+@charset "utf-8";
+
+/* 要素や線の色、グラデーションを定義しています。 */
+
+/* 背景色　*/
+body {
+	background-color: rgb(220, 220, 220);
+}
+
+header,
+footer {
+	background-color: rgb(245, 245, 245);
+}
+
+header {
+	background-color: rgb(255, 255, 255);
+	background: -webkit-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: -moz-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: -o-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+}
+
+.h4p_info,
+.h4p_restaging {
+	background-color: rgb(255,255,255);
+}
+
+.h4p_clear {
+	background-color: rgb(196, 196, 191);;
+}
+
+#h4p_header-dropdown {
+	background-color: rgba(0,0,0,0);
+}
+
+.page-numbers .btn[disabled] {
+	background-color: rgb(108, 108, 108);
+	color: rgb(255,255,255);
+}
+
+#frameModal .frameMap table {
+	background-color: rgba(255,255,255,0.4);
+}
+
+/* 線の幅・色 */
+header.navbar {
+	border: none;
+}
+
+.h4p_info,
+.h4p_restaging,
+.h4p_mapTip {
+	border: 1px solid rgb(204, 204, 204);
+}
+
+#h4p_header-dropdown {
+	border-color: rgba(0,0,0,0);
+}
+
+/* 影の色 */
+header {
+	-webkit-box-shadow : 0 1px 2px rgba(0,0,0,.16);
+	-moz-box-shadow : 0 1px 2px rgba(0,0,0,.16);
+	box-shadow : 0 1px 2px rgba(0,0,0,.16);
+}
