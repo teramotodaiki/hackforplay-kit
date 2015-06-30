@@ -164,46 +164,6 @@ $(function(){
 				break;
 		}
 	})();
-	(function(){
-		// チュートリアル
-		var stage_id = getParam('id');
-		if(101 <= stage_id && stage_id <= 106){
-			// 改造ボタン非表示
-			$(".h4p_info-restaging>button").hide();
-		}
-		// ステージ改造のチュートリアル
-		if(201 <= stage_id && stage_id <= 206){
-			// この改造ステージを投稿する->次のステージへ
-			$(".h4p_publish button").text('次のステージへ')
-			.attr({
-				'data-toggle': '',
-				'data-target': ''
-			}).on('click', function() {
-				// sessionStorageに保管→EXTENDCODEに送られるように
-				jsEditor.save();
-				var code = jsEditor.getTextArea().value;
-				sessionStorage.setItem('extend_code', code);
-				alert_on_unload = false;
-				location.href = "?id=" + getParam('next') + "&mode=extend";
-			});
-		}
-	})();
-
-	// Twitter OAuthログイン
-	$('.login-with-twitter').on('mousedown', function(event) {
-		// clickイベントより先に呼び出されるので、色々仕込みができる
-
-		// restaging中ならrestaging_codeを保管する処理を行う
-		jsEditor.save();
-		var code = jsEditor.getTextArea().value;
-		if (code !== '') {
-
-			$(this).data('login_successed', '/s?id=' + getParam('id') + '&mode=restaging');
-			alert_on_unload = false; // 警告を出さない
-			sessionStorage.setItem('restaging_code', code);
-		}
-	});
-
 
 	function getParam(key){
 		return sessionStorage.getItem('stage_param_'+key) || '0';
