@@ -4,7 +4,7 @@
 $stage['Title'] = 'Title';
 $stage['Explain'] = 'This is a description of the stage.';
 $stage['Playcount'] = '9999';
-$stage['Src'] = '';
+$stage['Src'] = 'kit/project_name/index.php';
 
 
 // この辺はキット開発中関係なし
