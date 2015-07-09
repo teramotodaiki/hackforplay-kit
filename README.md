@@ -27,10 +27,14 @@ If you will add __new script__.js
     * ...
     * __new script__.js
 
-## 4. Modify `<script>` tag in `kit/{your project name}/index.php`
+## 4. Modify `<script>` tag in `kit/your project name/index.php`
 
 Load all scripts you needs.
 
-> ~~<script src="/s/lib/run.js" type="text/javascript" charset="utf-8"></script>~~
+```html
+<!-- before -->
+<script src="/s/lib/run.js" type="text/javascript" charset="utf-8"></script>
 
-> <script src="/s/lib/__new script__.js" type="text/javascript" charset="utf-8"></script>
+<!-- after -->
+<script src="/s/lib/__new script__.js" type="text/javascript" charset="utf-8"></script>
+```
