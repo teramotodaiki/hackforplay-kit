@@ -6,19 +6,31 @@ Developing restaging kit of hackforplay.
 ## 1. Add directory in `/kit` 
 
 Copy from `/kit/project_name` directory (and `index.php`)
-Then the directory names *project_name* as your project name.
+
+Then name the directory __your project name__.
 
 ## 2. Modify some settings of `/common.php`
 
-```php
-$stage['Title'] = 'Title'; // Title of your game.
-$stage['Explain'] = 'This is a description of the stage.'; // Description of your game.
-$stage['Playcount'] = '9999'; // Mostly neglect
-$stage['Src'] = 'kit/project_name/index.php'; // Change project_name into your project name.
-```
+> ~~$stage['Src'] = 'kit/project_name/index.php';~~
+
+> $stage['Src'] = 'kit/__your project name__/index.php';
+
 
 ## 3. Add javascript files in `libs/`
 
-## 4. Modify `<script>` tag in `kit/__your_project__/index.php
+If you will add __new script__.js
 
-Load scripts you needs.
+* hackforplay-kit/
+  * libs/
+    * hack.js
+    * run.js
+    * ...
+    * __new script__.js
+
+## 4. Modify `<script>` tag in `kit/{your project name}/index.php`
+
+Load all scripts you needs.
+
+> ~~<script src="/s/lib/run.js" type="text/javascript" charset="utf-8"></script>~~
+
+> <script src="/s/lib/__new script__.js" type="text/javascript" charset="utf-8"></script>
