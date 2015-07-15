@@ -23,7 +23,7 @@ if(!isset($mode)){
 		</script>
 		<script src="lib/enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/hack.js" type="text/javascript" charset="utf-8"></script>
-		<script src="lib/run.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/TheSurvive.js" type="text/javascript" charset="utf-8"></script>
 		<style type="text/css">
 		textarea.log {
 			color: #fff;
