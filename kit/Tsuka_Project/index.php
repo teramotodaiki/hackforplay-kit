@@ -22,8 +22,9 @@ if(!isset($mode)){
 		var __H4PENV__NEXT		= "<?php echo $next; ?>";
 		</script>
 		<script src="lib/enchant.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/ui.enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/hack.js" type="text/javascript" charset="utf-8"></script>
-		<script src="lib/run.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/TheSurvive.js" type="text/javascript" charset="utf-8"></script>
 		<style type="text/css">
 		textarea.log {
 			color: #fff;
