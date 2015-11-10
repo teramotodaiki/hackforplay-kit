@@ -21,6 +21,11 @@ if(!isset($mode)){
 		var __H4PENV__MODE		= "<?php echo $mode; ?>";
 		var __H4PENV__NEXT		= "<?php echo $next; ?>";
 		</script>
+
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+
 		<script src="lib/enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/ui.enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/hack.js" type="text/javascript" charset="utf-8"></script>

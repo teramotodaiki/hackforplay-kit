@@ -4,6 +4,15 @@
     math.js
 */
 
+function range(n)
+{
+    return Array.apply(null,
+    {
+        length: n
+    }).map(Number.call, Number);
+}
+
+
 
 Math.PI2 = Math.PI * 2;
 
@@ -13,6 +22,14 @@ var _Vec2 = function(x, y)
     this.x = x;
     this.y = y;
 }
+
+
+// 複製
+_Vec2.prototype.copy = function()
+{
+    return new _Vec2(this.x, this.y);
+}
+
 
 // 長さ
 _Vec2.prototype.length = function()

@@ -5,7 +5,6 @@
 */
 
 /*
-
 */
 
 
@@ -36,7 +35,6 @@ window.addEventListener('load', function()
 
     KeyBind(16, 'shift');
     KeyBind(90, 'z');
-
 
 
 
@@ -102,13 +100,16 @@ window.addEventListener('load', function()
                 _pad.scale(0.5);
             }
 
+
+            console.log(game._actualFps);
+
         }
 
 
 
 
 
-        var scene = game.rootScene;
+        scene = game.rootScene;
         scene.backgroundColor = '#fff';
 
 
@@ -139,12 +140,25 @@ window.addEventListener('load', function()
         AddHint('// text4');
 
 
-        /* var */
+        //----------// ここからステージ制作 //----------//
+
+
+
         player = new Player(20, 20);
         player.backgroundColor = '#f00';
 
+        player.locate(sceneSize.width / 2, sceneSize.height / 2);
 
         player.speed = 5;
+
+
+        barrage.speed = 3;
+
+
+
+        player.updateAttackBarrage();
+
+
 
         scene.addChild(player);
 

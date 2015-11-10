@@ -1,4 +1,3 @@
-
 var _pad = Vec2(0, 0);
 
 
@@ -11,13 +10,11 @@ var Size = function(width, height)
 
 var sceneSize = new Size();
 
-
 /*
 
 */
 
 
-var input;
 
 
 // キャラクター
@@ -31,7 +28,10 @@ var Character = enchant.Class.create(enchant.Sprite,
         this.pos = Vec2(0, 0);
 
 
-        this.spell ;
+        this.hp = null;
+
+
+        this.spell;
 
         // spell
         // this.spell =
@@ -42,6 +42,13 @@ var Character = enchant.Class.create(enchant.Sprite,
         // 移動速度
         this.speed = 1.0;
 
+    },
+
+    // set pos
+    locate: function(x, y)
+    {
+        this.pos.x = x;
+        this.pos.y = y;
     },
 
     // 座標を画面内に収める
@@ -80,7 +87,17 @@ var Character = enchant.Class.create(enchant.Sprite,
 
 
 
-var CreateClass = enchant.Class.create;
+// 敵キャラ
+var Enemy = enchant.Class.create(Character,
+{
+    initialize: function(width, height)
+    {
+        Character.call(this, width, height);
+
+    }
+});
+
+
 
 var Player = enchant.Class.create(Character,
 {
@@ -89,24 +106,48 @@ var Player = enchant.Class.create(Character,
         Character.call(this, width, height);
 
 
+        this.attackSpell;
 
     },
-    onenterframe: function()
+
+
+
+    // ◆初級◆ 通常攻撃を設定する
+    updateAttackBarrage: function()
     {
 
 
+        barrage.creator = this;
+
+        var spell = CreateSpell();
+
+        spell.name = '通常攻撃';
+
+        spell.addBarrage(barrage);
+
+        this.attackSpell = spell;
+
+
+
+
+    },
+
+
+    onenterframe: function()
+    {
 
         // 攻撃する
         if (input.z)
         {
-            this.spell.fire();
+            this.attackSpell.fire();
+        }
+        else
+        {
+            this.attackSpell.resetFrame();
         }
 
 
-
-
         this.vec = _pad;
-
 
 
         //		console.log('pos: ' + this.pos.x + ' / ' + this.pos.y)
