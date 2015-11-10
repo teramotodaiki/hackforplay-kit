@@ -144,7 +144,7 @@ window.addEventListener('load', function()
 
 
         scene = game.rootScene;
-        scene.backgroundColor = '#fff';
+        scene.backgroundColor = '#666';
 
 
         scene.addChild(pad);
@@ -189,7 +189,11 @@ window.addEventListener('load', function()
         barrage.speed = 3;
 
 
+        var enemy = new Enemy(20, 20);
 
+        enemy.locate(100, 200);
+
+        scene.addChild(enemy);
 
 
 
@@ -197,8 +201,9 @@ window.addEventListener('load', function()
 
 
 
-        scene.addChild(player);
+        player.compositeOperation = 'lighter';
 
+        scene.addChild(player);
 
 
     }

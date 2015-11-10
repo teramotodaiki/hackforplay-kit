@@ -15,14 +15,14 @@ var sceneSize = new Size();
 */
 
 
-
-
 // キャラクター
 var Character = enchant.Class.create(enchant.Sprite,
 {
     initialize: function(width, height)
     {
         enchant.Sprite.call(this, width, height);
+
+        this.type = 'character';
 
         // x, y
         this.pos = Vec2(0, 0);
@@ -93,6 +93,10 @@ var Enemy = enchant.Class.create(Character,
     initialize: function(width, height)
     {
         Character.call(this, width, height);
+
+        enemies.push(this);
+
+        this.backgroundColor = '#00f';
 
     }
 });
