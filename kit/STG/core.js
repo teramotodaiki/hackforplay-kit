@@ -1,7 +1,3 @@
-
-
-
-
 Math.PI2 = Math.PI * 2;
 
 console.log(Math.PI2);
@@ -27,14 +23,13 @@ _Vec2.prototype.normalize = function()
 
     var length = this.length();
 
-    if (length === 0)
+    // 無効値
+    if (length < 1e-5)
     {
         return this;
     }
 
-
     var _m = 1.0 / length;
-
 
     this.x *= _m;
     this.y *= _m;

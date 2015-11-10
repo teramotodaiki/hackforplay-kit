@@ -21,7 +21,6 @@ var ShotEvent = function()
 var Barrage = function()
 {
 
-
     this.events = [];
 
 
@@ -29,9 +28,6 @@ var Barrage = function()
 
 
 // Barrage.prototype
-
-
-
 
 var shotEvent = new ShotEvent();
 
@@ -45,6 +41,14 @@ window.addEventListener('load', function()
     var game = enchant.Core.instance;
 
     var input = game.input;
+
+
+    var KeyBind = function(keyCode, name)
+    {
+        game.keybind(16, name);
+    }
+
+    KeyBind(16, 'shift');
 
 
 
@@ -63,41 +67,34 @@ window.addEventListener('load', function()
     game.onload = function()
     {
 
+        var padMargin = 10;
 
         //アナログパッドの生成
         var pad = new APad();
-        pad.moveTo(0, 220);
+        pad.moveTo(0 + padMargin, 220 - padMargin);
 
-
-		console.log(pad);
 
         pad.onenterframe = function()
         {
             _pad.x = this.vx;
             _pad.y = this.vy;
 
-
-
+            // 必ず 0.0 ～ 1.0 の範囲
+            var aPadLength = _pad.length();
 
             // キー入力を APad に対応する
-            var keyList = [input.down, input.right, input.up, input.left];
+            var keys = [input.down, input.right, input.up, input.left];
 
-
-            // 方向キー
+            // 方向キー全ての入力
             var keyPad = Vec2(0, 0);
 
-            for (var index in keyList)
+            for (var index in keys)
             {
-                var key = keyList[index];
-
-                if (key)
+                if (keys[index])
                 {
                     // key[index] の方向
                     var angle = Math.PI2 / 4 * index;
-
-                    //var keyVec = Vec2(Math.sin(angle), Math.cos(angle));
                     var keyVec = Vec2(Math.sin(angle) | 0, Math.cos(angle) | 0);
-
 
                     keyPad.add(keyVec);
                 }
@@ -105,17 +102,20 @@ window.addEventListener('load', function()
             }
 
 
+            // APad に KeyPad を加算して正規化
+            _pad.add(keyPad).normalize();
 
-            _pad.add(keyPad);
 
 
-			_pad.normalize();
+            // 低速キー || APad の押し込みが少ない
+            if (input.shift || (pad.isTouched && aPadLength < 0.5))
+            {
+                _pad.scale(0.5);
+            }
 
-			console.log('key pad: ' + _pad.x + ' / ' + _pad.y);
+
 
         }
-
-
 
 
 
@@ -126,8 +126,6 @@ window.addEventListener('load', function()
 
 
         scene.addChild(pad);
-
-        console.log(pad);
 
 
 
@@ -154,27 +152,13 @@ window.addEventListener('load', function()
         AddHint('// text4');
 
 
-
-
-
-
-
-        //		console.log();
-
-
-
         var player = new Player(20, 20);
-
-
         player.backgroundColor = '#f00';
 
         scene.addChild(player);
 
 
 
-
-
-        // pad.isTouched == true
 
 
     }
