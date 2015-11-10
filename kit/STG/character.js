@@ -1,96 +1,3 @@
-Math.PI2 = Math.PI * 2;
-
-// Vec2
-var _Vec2 = function(x, y)
-{
-    this.x = x;
-    this.y = y;
-}
-
-// 長さ
-_Vec2.prototype.length = function()
-{
-    return Math.sqrt(this.x * this.x + this.y * this.y);
-}
-
-
-// 正規化
-_Vec2.prototype.normalize = function()
-{
-
-    var length = this.length();
-
-    // 無効値
-    if (length < 1e-5)
-    {
-        return this;
-    }
-
-    var _m = 1.0 / length;
-
-    this.x *= _m;
-    this.y *= _m;
-
-    return this;
-}
-
-// operator*= && operator/=
-_Vec2.prototype.scale = function(value)
-{
-    this.x *= value;
-    this.y *= value;
-    return this;
-}
-
-
-
-// operator+=
-_Vec2.prototype.add = function(vec)
-{
-    this.x += vec.x;
-    this.y += vec.y;
-    return this;
-}
-
-// operator-=
-_Vec2.prototype.sub = function(vec)
-{
-    this.x -= vec.x;
-    this.y -= vec.y;
-    return this;
-}
-
-
-var Vec2 = function(x, y)
-{
-    return new _Vec2(x, y);
-}
-
-
-var _Vec3 = function(x, y, z)
-{
-    this.x = x;
-    this.y = y;
-    this.z = z;
-}
-
-_Vec3.prototype.xy = function()
-{
-    return Vec2(x, y);
-}
-
-_Vec3.prototype.xz = function()
-{
-    return Vec2(x, z);
-}
-
-//
-/*
-var Vec3 = function(x, y, z)
-{
-	return new _Vec3(x, y, z);
-}
-*/
 
 var _pad = Vec2(0, 0);
 
@@ -105,6 +12,14 @@ var Size = function(width, height)
 var sceneSize = new Size();
 
 
+/*
+
+*/
+
+
+var input;
+
+
 // キャラクター
 var Character = enchant.Class.create(enchant.Sprite,
 {
@@ -115,6 +30,11 @@ var Character = enchant.Class.create(enchant.Sprite,
         // x, y
         this.pos = Vec2(0, 0);
 
+
+        this.spell ;
+
+        // spell
+        // this.spell =
 
         // 方向
         this.vec = Vec2(0, 0);
@@ -173,6 +93,17 @@ var Player = enchant.Class.create(Character,
     },
     onenterframe: function()
     {
+
+
+
+        // 攻撃する
+        if (input.z)
+        {
+            this.spell.fire();
+        }
+
+
+
 
         this.vec = _pad;
 

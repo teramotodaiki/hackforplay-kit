@@ -4,55 +4,40 @@
 
 */
 
-
 /*
 
 */
-var ShotEvent = function()
-{
 
-    // イベントの適用範囲
-    this.beginFrame = 0;
-    this.endFrame = 0;
-
-}
-
-
-var Barrage = function()
-{
-
-    this.events = [];
-
-
-}
 
 
 // Barrage.prototype
 
 var shotEvent = new ShotEvent();
 
-
-
-
 window.addEventListener('load', function()
 {
 
 
     var game = enchant.Core.instance;
+    console.log(game);
 
     sceneSize.width = game.width;
     sceneSize.height = game.height;
 
 
-    var input = game.input;
+    /* var */
+    input = game.input;
 
 
     var KeyBind = function(keyCode, name)
     {
-        game.keybind(16, name);
+        game.keybind(keyCode, name);
     }
 
     KeyBind(16, 'shift');
+    KeyBind(90, 'z');
+
+
 
 
 
@@ -154,12 +139,14 @@ window.addEventListener('load', function()
         AddHint('// text4');
 
 
-        /*var*/ player = new Player(20, 20);
+        /* var */
+        player = new Player(20, 20);
         player.backgroundColor = '#f00';
 
+
+        player.speed = 5;
+
         scene.addChild(player);
-
-
 
 
 

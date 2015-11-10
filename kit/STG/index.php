@@ -24,7 +24,10 @@ if(!isset($mode)){
 		<script src="lib/enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/ui.enchant.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/hack.js" type="text/javascript" charset="utf-8"></script>
-		<script src="kit/STG/core.js" type="text/javascript" charset="utf-8"></script>
+		<script src="kit/STG/math.js" type="text/javascript" charset="utf-8"></script>
+		<script src="kit/STG/barrage.js" type="text/javascript" charset="utf-8"></script>
+		<script src="kit/STG/character.js" type="text/javascript" charset="utf-8"></script>
+		<script src="kit/STG/math.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/main.js" type="text/javascript" charset="utf-8"></script>
 		<style type="text/css">
 		textarea.log {
