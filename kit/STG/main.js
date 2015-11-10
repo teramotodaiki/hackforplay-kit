@@ -40,6 +40,10 @@ window.addEventListener('load', function()
 
     var game = enchant.Core.instance;
 
+    sceneSize.width = game.width;
+    sceneSize.height = game.height;
+
+
     var input = game.input;
 
 
@@ -113,8 +117,6 @@ window.addEventListener('load', function()
                 _pad.scale(0.5);
             }
 
-
-
         }
 
 
@@ -146,13 +148,13 @@ window.addEventListener('load', function()
         // 魔道書の中身
         Hack.hint = '';
 
-        AddHint('// text1');
+        AddHint('player.speed = 1;');
         AddHint('// text2');
         AddHint('// text3');
         AddHint('// text4');
 
 
-        var player = new Player(20, 20);
+        /*var*/ player = new Player(20, 20);
         player.backgroundColor = '#f00';
 
         scene.addChild(player);

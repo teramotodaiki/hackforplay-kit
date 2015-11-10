@@ -1,8 +1,5 @@
 Math.PI2 = Math.PI * 2;
 
-console.log(Math.PI2);
-
-
 // Vec2
 var _Vec2 = function(x, y)
 {
@@ -97,6 +94,17 @@ var Vec3 = function(x, y, z)
 
 var _pad = Vec2(0, 0);
 
+
+var Size = function(width, height)
+{
+    this.width = width;
+    this.height = height;
+}
+
+
+var sceneSize = new Size();
+
+
 // キャラクター
 var Character = enchant.Class.create(enchant.Sprite,
 {
@@ -111,17 +119,26 @@ var Character = enchant.Class.create(enchant.Sprite,
         // 方向
         this.vec = Vec2(0, 0);
 
+        // 移動速度
         this.speed = 1.0;
-
 
     },
 
+    // 座標を画面内に収める
+    clampPos: function()
+    {
+        this.pos.x = this.pos.x < 0 ? 0 : this.pos.x > sceneSize.width ? sceneSize.width : this.pos.x;
+        this.pos.y = this.pos.y < 0 ? 0 : this.pos.y > sceneSize.height ? sceneSize.height : this.pos.y;
+    },
 
     // フレームの最後に実行
     _test: function()
     {
-        this.x = this.pos.x;
-        this.y = this.pos.y;
+        this.clampPos();
+
+        this.x = this.pos.x - this.width / 2;
+        this.y = this.pos.y - this.height / 2;
+
 
     },
 
@@ -143,13 +160,13 @@ var Character = enchant.Class.create(enchant.Sprite,
 
 
 
+var CreateClass = enchant.Class.create;
+
 var Player = enchant.Class.create(Character,
 {
     initialize: function(width, height)
     {
         Character.call(this, width, height);
-
-
 
 
 
