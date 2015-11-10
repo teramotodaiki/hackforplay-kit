@@ -1,11 +1,27 @@
-/*
+/* デバッグ用 */
+var debug = new function()
+{
+    this.values = [];
 
-	Hack.CreateEnchantBook
+    this.update = function()
+    {
+        $('#debug').val('');
 
-*/
+        var text = '';
+        for (var key in this.values)
+        {
+            text += key + ': ' + this.values[key] + '\n';
+        }
 
-/*
-*/
+        $('#debug').val(text);
+    }
+
+    this.set = function(name, text)
+    {
+        this.values[name] = text;
+    }
+
+};
 
 
 
@@ -51,8 +67,27 @@ window.addEventListener('load', function()
     }
 
 
+    game.addEventListener('enterframe', function()
+    {
+
+
+
+        // FPS
+        debug.set('fps', game._actualFps);
+
+
+
+
+
+        debug.update();
+    });
+
     game.onload = function()
     {
+
+
+
+
 
         var padMargin = 10;
 
@@ -101,7 +136,6 @@ window.addEventListener('load', function()
             }
 
 
-            console.log(game._actualFps);
 
         }
 
@@ -153,6 +187,9 @@ window.addEventListener('load', function()
 
 
         barrage.speed = 3;
+
+
+
 
 
 

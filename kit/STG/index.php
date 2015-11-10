@@ -43,6 +43,29 @@ if(!isset($mode)){
 			padding: 10px;
 			margin: 3px;
 		}
+
+
+		#debug {
+			position: absolute;
+			width: 30%;
+			height: 30%;
+			top: 70%;
+			left: 70%;
+			box-sizing: border-box;
+			border: none;
+			resize:none;
+			background: rgba(0, 0, 0, .8);
+			color: #0f0;
+			font-size: 1.2rem;
+		}
+
 		</style>
+
+
+
+		<textarea id="debug" readonly />
+
+
+
 	</body>
 </html>

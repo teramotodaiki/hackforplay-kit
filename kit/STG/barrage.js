@@ -199,7 +199,7 @@ Barrage.prototype.addShot = function()
 
         shot.speed = this.speed;
 
-        shot.angle = Vec2(0,0);
+        shot.angle = Vec2(0, 0);
 
         var angle = Math.PI2 / this.way * i;
 
