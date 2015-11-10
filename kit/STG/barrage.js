@@ -33,7 +33,11 @@
 
 var scene, input;
 
+// 敵キャラ
+var enemies = [];
 
+// プレイヤー
+var player;
 
 // 弾
 var Shot = enchant.Class.create(enchant.Sprite,
@@ -41,6 +45,11 @@ var Shot = enchant.Class.create(enchant.Sprite,
     initialize: function(creator)
     {
         Sprite.call(this, 24, 24);
+
+        //
+
+        this.compositeOperation = 'lighter';
+
 
         // 能力の使用者
         this.creator = creator;
@@ -52,7 +61,8 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.pos.x = creator.pos.x;
         this.pos.y = creator.pos.y;
 
-
+        // 仮
+        this.target = 'enemy';
 
         this.frame = 0;
         // this.image = shotTexture;
@@ -60,6 +70,9 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.backgroundColor = '#0f0';
 
         this.VecToPos();
+
+
+
 
     },
 
@@ -74,6 +87,17 @@ var Shot = enchant.Class.create(enchant.Sprite,
     remove: function()
     {
         scene.removeChild(this);
+    },
+
+    // 衝突
+    hit: function(target)
+    {
+
+        if(this.within(target))
+        {
+            this.remove();
+        }
+
     },
 
     // シンプルな弾制御
@@ -98,8 +122,29 @@ var Shot = enchant.Class.create(enchant.Sprite,
     onenterframe: function()
     {
 
+
         // 移動
         this.move();
+
+        // 敵を狙う（自機弾）
+        if (this.target === 'enemy')
+        {
+            var _this = this;
+            // 敵と衝突判定
+            enemies.forEach(function(enemy)
+            {
+
+                _this.hit(enemy);
+
+            });
+
+
+        }
+        // プレイヤーを狙う（敵弾）
+        else
+        {
+            this.hit(player);
+        }
 
         /*
         // スライム虐待
