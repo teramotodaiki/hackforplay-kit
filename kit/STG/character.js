@@ -82,7 +82,7 @@ var Character = enchant.Class.create(enchant.Sprite,
     {
         this.clampPos();
 
-                this.convertPos();
+        this.convertPos();
 
     },
 
@@ -151,7 +151,7 @@ var Enemy = enchant.Class.create(Character,
     __set_motion: function(name)
     {
 
-        Motion.Use(name,this);
+        Motion.Use(name, this);
     },
 
     // speed を考慮した TL の制御（仮）
@@ -184,7 +184,46 @@ var Player = enchant.Class.create(Character,
 
     },
 
+    // 通常攻撃スペルを設定する
+    setAttackSpell: function(name)
+    {
+        this.attackSpell = __Spell.Get(name);
 
+
+        // 弾幕の親になる
+        this.attackSpell.attributeAll(
+        {
+            creator: this
+        });
+
+
+
+    },
+
+
+    // 弾幕から通常攻撃を登録
+    __set_attackSpellFromBarrage: function(name)
+    {
+
+        var barrage = __Barrage.Get(name).attribute(
+        {
+            creator: this,
+        });
+
+
+        var spell = CreateSpell();
+        spell.addBarrage(barrage);
+
+        spell.name = 'w';
+
+
+        this.attackSpell = spell;
+    },
+
+    __set_attackSpell: function(name)
+    {
+        //        this.attackSpell = __Barrage.Get(name);
+    },
 
     // ◆初級◆ 通常攻撃を設定する
     updateAttackBarrage: function()
@@ -193,11 +232,12 @@ var Player = enchant.Class.create(Character,
 
         barrage.creator = this;
 
-        var spell = CreateSpell();
+        var spell = new Spell();
 
         spell.name = '通常攻撃';
 
         spell.addBarrage(barrage);
+
 
         this.attackSpell = spell;
 

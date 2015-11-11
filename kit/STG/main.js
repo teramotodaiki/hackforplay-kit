@@ -151,7 +151,6 @@ window.addEventListener('load', function()
 
 
 
-
         // 魔道書
         Hack.enchantBookIcon = Hack.createSprite(64, 64,
         {
@@ -194,6 +193,28 @@ window.addEventListener('load', function()
         {
             this.moveBy(30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(-30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(-15, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(0, 100, 180, enchant.Easing.QUAD_EASEINOUT);
         });
+
+
+
+
+        __Barrage.New('通常弾',
+        {
+            way: 10,
+        });
+
+
+        __Barrage.New('ホーミング弾',
+        {
+
+            way: 30,
+            speed: 30,
+
+        });
+
+        __Spell.Make('プレイヤースペル')('通常弾', 'ホーミング弾');
+
+
+        player.setAttackSpell('プレイヤースペル');
 
 
 

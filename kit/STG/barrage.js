@@ -200,6 +200,7 @@ var Barrage = function()
 
     this.speed = 3;
 
+    this.frame = 0;
 
     this.power = 1;
 
@@ -222,6 +223,14 @@ Barrage.prototype.addEvent = function(callback)
 
 }
 
+Barrage.prototype.attribute = function(object)
+{
+    for (var key in object)
+    {
+        this[key] = object[key];
+    }
+    return this;
+}
 
 
 
@@ -229,7 +238,6 @@ Barrage.prototype.addEvent = function(callback)
 // 弾を追加
 Barrage.prototype.addShot = function()
 {
-
 
 
     // 仮
@@ -294,6 +302,7 @@ var Spell = function()
     this.name = '';
     // 弾幕の識別に使用する値
     this.handleIndex = 0;
+
     this.barrages = [];
 
     this.frame = 0;
@@ -311,6 +320,26 @@ Spell.prototype.resetFrame = function()
 }
 
 
+// オブジェクトのプロパティをコピー
+Spell.prototype.attribute = function(object)
+{
+    for (var key in object)
+    {
+        this[key] = object[key];
+    }
+    return this;
+}
+
+// オブジェクトのプロパティを全ての弾幕にコピー
+Spell.prototype.attributeAll = function(object)
+{
+    this.barrages.forEach(function(barrage)
+    {
+        barrage.attribute(object);
+    });
+}
+
+
 
 // 技を生成する
 var CreateSpell = function()
@@ -324,6 +353,7 @@ Spell.prototype.addBarrage = function(barrage)
 {
     this.barrages.push(barrage);
 }
+
 
 
 // Barrage.update 弾を生成する
@@ -364,3 +394,79 @@ barrage.addEvent(function(status)
 {
     way: 10
 });
+
+
+
+var barrage_asset = {};
+
+var __Barrage = {
+
+    Get: function(name)
+    {
+        return barrage_asset[name];
+    },
+
+
+    New: function(name, property)
+    {
+
+        var barrage = barrage_asset[name] = new Barrage();
+
+        if (property)
+        {
+            barrage.attribute(property);
+        }
+
+
+        return barrage;
+    },
+
+
+
+}
+
+var spell_asset = {};
+
+var __Spell = {
+
+    // スペルを取得する
+    Get: function(name)
+    {
+        return spell_asset[name];
+    },
+
+    // 技を作成する
+    Make: function(name, property)
+    {
+
+
+        // Spell.Make('name')('b1', 'b2', 'b3');
+        // Spell.Make('name', { property: value })('b1', 'b2', 'b3');
+
+
+        var spell = spell_asset[name] = new Spell();
+
+
+        if (property)
+        {
+            spell.attribute(property);
+        }
+
+        return function()
+        {
+            for (var index in range(arguments.length))
+            {
+
+                spell.addBarrage(__Barrage.Get(arguments[index]));
+
+            }
+
+            return spell;
+
+        }
+
+    }
+
+
+
+}
