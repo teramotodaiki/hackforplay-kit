@@ -36,6 +36,10 @@ if(!isset($mode)){
 
 		<script src="kit/STG/character.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/math.js" type="text/javascript" charset="utf-8"></script>
+
+
+		<script src="kit/STG/_test.js" type="text/javascript" charset="utf-8"></script>
+
 		<script src="kit/STG/main.js" type="text/javascript" charset="utf-8"></script>
 		<style type="text/css">
 		textarea.log {

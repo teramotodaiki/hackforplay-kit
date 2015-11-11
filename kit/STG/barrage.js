@@ -377,7 +377,6 @@ Spell.prototype.statusRender = function()
 
 
 
-
 //
 
 barrage = CreateBarrage();
