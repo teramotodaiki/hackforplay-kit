@@ -148,6 +148,12 @@ var Enemy = enchant.Class.create(Character,
 
     },
 
+    __set_motion: function(name)
+    {
+
+        Motion.Use(name,this);
+    },
+
     // speed を考慮した TL の制御（仮）
     __speed: function() {
 

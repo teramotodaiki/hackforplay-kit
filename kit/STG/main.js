@@ -221,27 +221,16 @@ window.addEventListener('load', function()
             linear = enchant.Easing.LINEAR;
 
 
-        // とりあえず作ってみる
-        var ETL = new EasyTimeline();
+
+        // 移動モーションを作成
+        Motion.New('m-1').moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0).easing(linear).moveBy(20, 50)(2.0).moveBy(-20, 50)(2.0);
 
 
-        // メソッドチェーン
-        ETL.moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0);
-
-        // 普通に追加してみる
-        ETL.easing(linear);
-        ETL.moveBy(20, 50)(2.0);
-        ETL.moveBy(-20, 50)(2.0);
+        // 移動モーションを適用
+        e1.__set_motion('m-1');
+        e2.__set_motion('m-1');
 
 
-        // EasyTimeline を適用する関数
-        // ここら辺の処理はあとで使いやすいようにラップする
-        var SetMove = ETL.toTimeline();
-
-
-        // EasyTimeline を適用
-        SetMove(e1);
-        SetMove(e2);
 
 
     }

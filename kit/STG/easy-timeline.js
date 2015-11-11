@@ -107,3 +107,37 @@ EasyTimeline.prototype.toTimeline = function()
 
 
 }
+
+
+
+
+var easyTimelineList = {};
+
+
+var Motion =
+{
+    // 新しいモーションを作成
+    New: function(name)
+    {
+
+        var ETL = new EasyTimeline();
+
+        easyTimelineList[name] = (ETL);
+
+        return ETL;
+
+    },
+
+    // キャラクターに適用する
+    Use: function(name, target)
+    {
+
+        var a = easyTimelineList[name].toTimeline();
+
+        a(target);
+
+    }
+
+
+
+}
