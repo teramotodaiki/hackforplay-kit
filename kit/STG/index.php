@@ -31,6 +31,9 @@ if(!isset($mode)){
 		<script src="lib/hack.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/math.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/barrage.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="kit/STG/easy-timeline.js" type="text/javascript" charset="utf-8"></script>
+
 		<script src="kit/STG/character.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/math.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/STG/main.js" type="text/javascript" charset="utf-8"></script>

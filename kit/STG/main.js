@@ -33,7 +33,7 @@ window.addEventListener('load', function()
 {
 
 
-    var game = enchant.Core.instance;
+    game = enchant.Core.instance;
 
 
     sceneSize.width = game.width;
@@ -183,33 +183,65 @@ window.addEventListener('load', function()
         player.locate(sceneSize.width / 2, sceneSize.height / 2);
         player.speed = 5;
 
+        // プレイヤーの技を設定
+        barrage.speed = 3;
+        player.updateAttackBarrage();
+        scene.addChild(player);
 
 
-        // 移動パターンを登録する
+        // 移動パターンを登録する（旧式）
         MovePattern.Register('move1', function()
         {
-            this.moveBy(30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(-30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(-15, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(0, 100, 180,enchant.Easing.QUAD_EASEINOUT);
+            this.moveBy(30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(-30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(30, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(-15, 10, 30, enchant.Easing.QUAD_EASEINOUT).moveBy(0, 100, 180, enchant.Easing.QUAD_EASEINOUT);
         });
 
 
 
+        //----------// EasyTimeline のテスト //----------//
+
+
         // 敵を召喚
-        var enemy = new Enemy(20, 20);
-        enemy.locate(100, 200);
+        var e1 = new Enemy(20, 20);
+        var e2 = new Enemy(20, 20);
 
-        // 敵の移動パターンを設定
-        enemy.__set_move('move1');
-
-
-        // プレイヤーの技を設定
-        barrage.speed = 3;
-        player.updateAttackBarrage();
+        scene.addChild(e1);
+        scene.addChild(e2);
 
 
+        e1.speed = 1.5;
+        e2.speed = 3.0;
 
 
-        scene.addChild(enemy);
-        scene.addChild(player);
+        e1.locate(100, 50);
+        e2.locate(380, 50);
+
+
+        // とりあえず easing を短縮
+        var quad = enchant.Easing.QUAD_EASEINOUT,
+            linear = enchant.Easing.LINEAR;
+
+
+        // とりあえず作ってみる
+        var ETL = new EasyTimeline();
+
+
+        // メソッドチェーン
+        ETL.moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0);
+
+        // 普通に追加してみる
+        ETL.easing(linear);
+        ETL.moveBy(20, 50)(2.0);
+        ETL.moveBy(-20, 50)(2.0);
+
+
+        // EasyTimeline を適用する関数
+        // ここら辺の処理はあとで使いやすいようにラップする
+        var SetMove = ETL.toTimeline();
+
+
+        // EasyTimeline を適用
+        SetMove(e1);
+        SetMove(e2);
 
 
     }

@@ -52,11 +52,22 @@ var Character = enchant.Class.create(enchant.Sprite,
 
     },
 
+
+    // pos を x, y に
+    convertPos: function()
+    {
+        this.x = this.pos.x - this.width / 2;
+        this.y = this.pos.y - this.height / 2;
+    },
+
     // set pos
     locate: function(x, y)
     {
         this.pos.x = x;
         this.pos.y = y;
+
+        this.convertPos();
+
     },
 
     // 座標を画面内に収める
@@ -71,9 +82,7 @@ var Character = enchant.Class.create(enchant.Sprite,
     {
         this.clampPos();
 
-        this.x = this.pos.x - this.width / 2;
-        this.y = this.pos.y - this.height / 2;
-
+                this.convertPos();
 
     },
 
@@ -96,8 +105,7 @@ var Character = enchant.Class.create(enchant.Sprite,
 
 // 移動パターン
 var movePatterns = {};
-var MovePattern =
-{
+var MovePattern = {
 
     // 登録する
     Register: function(name, callback)
@@ -116,9 +124,6 @@ var MovePattern =
 
 
 
-
-
-
 // 敵キャラ
 var Enemy = enchant.Class.create(Character,
 {
@@ -128,8 +133,6 @@ var Enemy = enchant.Class.create(Character,
 
         enemies.push(this);
 
-        this.x = 300;
-        this.y = 100;
 
         this.backgroundColor = '#00f';
 
@@ -139,14 +142,25 @@ var Enemy = enchant.Class.create(Character,
     __set_move: function(name)
     {
         MovePattern.Use(name, this);
+
+
+        console.log(this.tl);
+
     },
 
+    // speed を考慮した TL の制御（仮）
+    __speed: function() {
+
+
+
+
+    },
 
     onenterframe: function()
     {
-        this.move();
+        // this.move();
 
-
+        this.__speed();
 
     }
 });

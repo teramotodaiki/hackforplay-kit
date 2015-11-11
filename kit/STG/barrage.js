@@ -31,7 +31,7 @@
 */
 
 
-var scene, input;
+var scene, input, game;
 
 // 敵キャラ
 var enemies = [];
@@ -93,7 +93,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
     hit: function(target)
     {
 
-        if(this.within(target))
+        if (this.within(target))
         {
             this.remove();
         }
