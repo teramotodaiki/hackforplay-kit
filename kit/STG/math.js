@@ -1,5 +1,3 @@
-
-
 /*
     math.js
 */
@@ -13,6 +11,28 @@ function range(n)
 }
 
 
+// Vec2 間の距離（比較用）
+var _distance = function(x1, y1)
+{
+    return function(x2, y2)
+    {
+        var x = x1 - x2;
+        var y = y1 - y2;
+        return Math.pow(x, 2) + Math.pow(y, 2);
+    }
+}
+
+
+// Vec2 間の距離
+var distance = function(x1, y1)
+{
+    return function(x2, y2)
+    {
+        return Math.sqrt(_distance(x1, y1)(x2, y2));
+    }
+}
+
+
 
 Math.PI2 = Math.PI * 2;
 
@@ -21,6 +41,34 @@ var _Vec2 = function(x, y)
 {
     this.x = x;
     this.y = y;
+}
+
+
+
+// 近い方の Vec2 を返す
+_Vec2.prototype.near = function(v1, v2)
+{
+    var distance = _distance(this.x, this.y);
+
+    var d1 = distance(v1.x, v1.y);
+    var d2 = distance(v2.x, v2.y);
+
+    return d1 < d2 ? v1 : v2;
+}
+
+
+// 方向
+_Vec2.prototype.angle = function(vec)
+{
+     return Math.atan2( this.x - vec.x,this.y - vec.y);
+}
+
+
+
+// 角度に
+_Vec2.prototype.toRadian = function()
+{
+    return Math.atan2(this.x, this.y);
 }
 
 

@@ -50,6 +50,9 @@ var Character = enchant.Class.create(enchant.Sprite,
         // 移動速度
         this.speed = 1.0;
 
+        character_list.push(this);
+
+
     },
 
 
@@ -134,6 +137,9 @@ var Enemy = enchant.Class.create(Character,
         enemies.push(this);
 
 
+        this.type = 'enemy';
+
+
         this.backgroundColor = '#00f';
 
     },
@@ -167,6 +173,10 @@ var Enemy = enchant.Class.create(Character,
         // this.move();
 
         this.__speed();
+
+        // TL を使用するので x, y から pos に逆輸入
+        this.pos.x = this.x;
+        this.pos.y = this.y;
 
     }
 });

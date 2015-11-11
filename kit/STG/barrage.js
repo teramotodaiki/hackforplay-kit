@@ -39,6 +39,30 @@ var enemies = [];
 // プレイヤー
 var player;
 
+
+// キャラクター管理
+var character_list = [];
+
+var CharacterList = {
+
+
+    Each: function(type, callback)
+    {
+
+        character_list.forEach(function(character)
+        {
+            if (character.type === type)
+            {
+                callback.call(character);
+            }
+        });
+    }
+
+
+}
+
+
+
 // 弾
 var Shot = enchant.Class.create(enchant.Sprite,
 {
@@ -185,6 +209,7 @@ var ShotEvent = function()
 var Barrage = function()
 {
 
+
     this.shots = [];
 
     this.events = [];
@@ -204,15 +229,38 @@ var Barrage = function()
 
     this.power = 1;
 
-    this.baseAngle = Math.PI;
+    // 軸
+    this.axisAngle = Math.PI;
 
-    this.addAngle = Math.PI / 300;
+    // 撃つ範囲角度
+    this.rangeAngle = Math.PI2;
+
+
+    // this.addAngle = Math.PI / 300;
 
     this.life = 300;
 
     this.creator = null;
 
+
+    this.__control = null;
+
+
+    // this.axis = Vec2(0, 0);
+
 }
+
+
+// 弾幕を自由に制御できる関数を設定
+Barrage.prototype.control = function(control)
+{
+
+    this.__control = control;
+
+    return this;
+}
+
+
 
 // イベント
 Barrage.prototype.addEvent = function(callback)
@@ -254,10 +302,17 @@ Barrage.prototype.addShot = function()
 
         shot.angle = Vec2(0, 0);
 
-        var angle = Math.PI2 / this.way * i;
+
+        var beginAngle = this.axisAngle - this.rangeAngle / 2;
+        var stepAngle = this.rangeAngle / this.way;
+        var angle = beginAngle + stepAngle * i;
+
+
 
         shot.angle.x = Math.sin(angle);
         shot.angle.y = Math.cos(angle);
+
+
 
         // scene.insertBefore(shot, player);
 
@@ -274,7 +329,13 @@ Barrage.prototype.addShot = function()
 // 弾幕を更新する
 Barrage.prototype.update = function()
 {
-    console.log(this.frame);
+
+    // 完全に自由な制御
+    if (this.__control)
+    {
+        this.__control.call(this);
+    }
+
 
 
     if (this.frame % this.createFrame === 0)

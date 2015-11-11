@@ -22,7 +22,6 @@ window.addEventListener('load', function()
 
 
 
-
     game.onload = function()
     {
 
@@ -51,16 +50,55 @@ window.addEventListener('load', function()
         __Barrage.New('通常弾',
         {
             way: 10,
+            speed: 5,
         });
 
 
         __Barrage.New('ホーミング弾',
         {
+            rangeAngle: Math.PI / 4,
+            createFrame: 8,
+            way: 8,
+            speed: 10,
+            target: 'enemy'
 
-            way: 30,
-            speed: 30,
+        }).control(function()
+        {
+
+            var target = null;
+            var creator = this.creator;
+
+            // 一番近い標的を見つける
+            CharacterList.Each(this.target, function()
+            {
+                if (!target)
+                {
+                    target = this;
+                }
+                else
+                {
+                    target = creator.pos.near(target, this);
+                }
+            });
+
+
+            // 標的がいない場合はとりあえず上に
+            if (!target)
+            {
+                this.axisAngle = Math.PI;
+            }
+            else
+            {
+                // 軸を標的に向ける
+                this.axisAngle = creator.pos.angle(target.pos) + Math.PI;
+
+
+            }
 
         });
+
+
+
 
         __Spell.Make('プレイヤースペル')('通常弾', 'ホーミング弾');
 
