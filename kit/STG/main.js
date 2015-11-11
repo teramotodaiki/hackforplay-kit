@@ -46,7 +46,6 @@ window.addEventListener('load', function()
         player.speed = 5;
 
 
-
         __Barrage.New('通常弾',
         {
             way: 10,
@@ -60,40 +59,16 @@ window.addEventListener('load', function()
             createFrame: 8,
             way: 8,
             speed: 10,
-            target: 'enemy'
+            targetType: 'enemy'
 
         }).control(function()
         {
 
-            var target = null;
-            var creator = this.creator;
-
             // 一番近い標的を見つける
-            CharacterList.Each(this.target, function()
-            {
-                if (!target)
-                {
-                    target = this;
-                }
-                else
-                {
-                    target = creator.pos.near(target, this);
-                }
-            });
+            var target = CharacterList.GetNear(this.creator, this.targetType);
 
-
-            // 標的がいない場合はとりあえず上に
-            if (!target)
-            {
-                this.axisAngle = Math.PI;
-            }
-            else
-            {
-                // 軸を標的に向ける
-                this.axisAngle = creator.pos.angle(target.pos) + Math.PI;
-
-
-            }
+            // 軸を標的の方向に
+            this.setAxisFromTarget(target);
 
         });
 

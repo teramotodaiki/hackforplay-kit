@@ -56,6 +56,32 @@ var CharacterList = {
                 callback.call(character);
             }
         });
+    },
+
+    // base に一番近い type のキャラクターを取得する
+    GetNear: function(base, type)
+    {
+
+        var target = null;
+        this.Each(type, function()
+        {
+
+            if (base !== this)
+            {
+
+                if (!target)
+                {
+                    target = this;
+                }
+                else
+                {
+                    target = base.pos.near(target, this);
+                }
+            }
+
+        });
+
+        return target;
     }
 
 
@@ -343,10 +369,17 @@ Barrage.prototype.update = function()
         this.addShot();
     }
 
-
     ++this.frame;
 }
 
+
+// target の方向に axisAngle を向ける
+Barrage.prototype.setAxisFromTarget = function(target)
+{
+
+    // 標的がいるなら軸を向け、いないならとりあえず上に
+    this.axisAngle = target ? this.creator.pos.angle(target.pos) + Math.PI : Math.PI;
+}
 
 
 
