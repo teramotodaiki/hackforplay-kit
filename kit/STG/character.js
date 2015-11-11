@@ -15,6 +15,14 @@ var sceneSize = new Size();
 */
 
 
+var EnumBlendMode = {
+    Add: 'lighter',
+
+};
+
+
+
+
 // キャラクター
 var Character = enchant.Class.create(enchant.Sprite,
 {
@@ -86,6 +94,30 @@ var Character = enchant.Class.create(enchant.Sprite,
 });
 
 
+// 移動パターン
+var movePatterns = {};
+var MovePattern =
+{
+
+    // 登録する
+    Register: function(name, callback)
+    {
+        movePatterns[name] = callback;
+    },
+
+    // 使用する
+    Use: function(name, target)
+    {
+        movePatterns[name].call(target.tl);
+    }
+
+};
+
+
+
+
+
+
 
 // 敵キャラ
 var Enemy = enchant.Class.create(Character,
@@ -96,7 +128,25 @@ var Enemy = enchant.Class.create(Character,
 
         enemies.push(this);
 
+        this.x = 300;
+        this.y = 100;
+
         this.backgroundColor = '#00f';
+
+    },
+
+    // 移動パターンを設定する
+    __set_move: function(name)
+    {
+        MovePattern.Use(name, this);
+    },
+
+
+    onenterframe: function()
+    {
+        this.move();
+
+
 
     }
 });

@@ -34,7 +34,7 @@ window.addEventListener('load', function()
 
 
     var game = enchant.Core.instance;
-    console.log(game);
+
 
     sceneSize.width = game.width;
     sceneSize.height = game.height;
@@ -177,32 +177,38 @@ window.addEventListener('load', function()
         //----------// ここからステージ制作 //----------//
 
 
-
+        // プレイヤーを召喚
         player = new Player(20, 20);
         player.backgroundColor = '#f00';
-
         player.locate(sceneSize.width / 2, sceneSize.height / 2);
-
         player.speed = 5;
 
 
-        barrage.speed = 3;
+
+        // 移動パターンを登録する
+        MovePattern.Register('move1', function()
+        {
+            this.moveBy(30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(-30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(30, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(-15, 10, 30,enchant.Easing.QUAD_EASEINOUT).moveBy(0, 100, 180,enchant.Easing.QUAD_EASEINOUT);
+        });
 
 
+
+        // 敵を召喚
         var enemy = new Enemy(20, 20);
-
         enemy.locate(100, 200);
 
-        scene.addChild(enemy);
+        // 敵の移動パターンを設定
+        enemy.__set_move('move1');
 
 
-
+        // プレイヤーの技を設定
+        barrage.speed = 3;
         player.updateAttackBarrage();
 
 
 
-        player.compositeOperation = 'lighter';
 
+        scene.addChild(enemy);
         scene.addChild(player);
 
 
