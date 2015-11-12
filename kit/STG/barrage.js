@@ -33,6 +33,43 @@
 
 var scene, input, game;
 
+
+
+
+
+var preload_textures = {};
+
+var preload_sources = [];
+
+preload_sources.push('hackforplay/enchantbook.png', 'enchantjs/x2/map2.png', 'hackforplay/dot_syuj.png', 'enchantjs/x2/icon0.png', 'enchantjs/font2.png', 'enchantjs/monster1.gif',
+    'dots_design/bg10_3.gif', 'dot_art_world/SC-Door-Entce03.png', 'rengoku-teien/asa_no_komorebi.mp3', 'etolier/01sougen.jpg');
+
+var Assets = {
+    Add: function(name, source)
+    {
+
+        preload_sources.push(source);
+
+        preload_textures[name] = source;
+
+    },
+
+    Preload: function()
+    {
+        game.preload(preload_sources);
+    },
+
+    Get: function(name)
+    {
+        return game.assets[preload_textures[name]];
+    }
+
+};
+
+
+
+
+
 // 敵キャラ
 var enemies = [];
 
@@ -92,11 +129,12 @@ var CharacterList = {
 // 弾
 var Shot = enchant.Class.create(enchant.Sprite,
 {
-    initialize: function(creator)
+    initialize: function(creator, size)
     {
-        Sprite.call(this, 24, 24);
+        Sprite.call(this, size, size);
 
-        //
+        this.size = size;
+
 
         this.compositeOperation = 'lighter';
 
@@ -114,10 +152,11 @@ var Shot = enchant.Class.create(enchant.Sprite,
         // 仮
         this.target = 'enemy';
 
-        this.frame = 0;
+        this.count = 0;
+
         // this.image = shotTexture;
 
-        this.backgroundColor = '#0f0';
+        // this.backgroundColor = '#0f0';
 
         this.VecToPos();
 
@@ -126,8 +165,12 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
     },
 
+    resize: function(size) {
+
+    },
+
     // pos を x, y に
-    VecToPos: function()
+        VecToPos: function()
     {
         this.x = this.pos.x - this.width / 2;
         this.y = this.pos.y - this.height / 2;
@@ -156,6 +199,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
 
         this.pos.add(this.angle.copy().scale(this.speed));
+
 
 
         // ベクトル使った方がイイかも
@@ -205,10 +249,10 @@ var Shot = enchant.Class.create(enchant.Sprite,
         }
         */
 
-        ++this.frame;
+        ++this.count;
 
         // 寿命
-        if (this.frame >= this.life)
+        if (this.count >= this.life)
         {
 
             this.remove();
@@ -234,6 +278,8 @@ var ShotEvent = function()
 
 var Barrage = function()
 {
+
+    this.textureName = 'shot-none';
 
 
     this.shots = [];
@@ -314,11 +360,20 @@ Barrage.prototype.addShot = function()
 {
 
 
+    var shotTexture = Assets.Get(this.textureName);
+    var shotSize = shotTexture.height;
+
+
     // 仮
     for (var i in range(this.way))
     {
 
-        var shot = new Shot(this.creator);
+
+
+
+
+
+        var shot = new Shot(this.creator, shotSize);
 
 
         // プロパティを追加
@@ -333,6 +388,8 @@ Barrage.prototype.addShot = function()
         var stepAngle = this.rangeAngle / this.way;
         var angle = beginAngle + stepAngle * i;
 
+
+        shot.image = Assets.Get(this.textureName);
 
 
         shot.angle.x = Math.sin(angle);
@@ -376,11 +433,9 @@ Barrage.prototype.update = function()
 // target の方向に axisAngle を向ける
 Barrage.prototype.setAxisFromTarget = function(target)
 {
-
     // 標的がいるなら軸を向け、いないならとりあえず上に
     this.axisAngle = target ? this.creator.pos.angle(target.pos) + Math.PI : Math.PI;
 }
-
 
 
 

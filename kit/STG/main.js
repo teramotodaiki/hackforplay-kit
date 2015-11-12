@@ -16,14 +16,17 @@ window.addEventListener('load', function()
     KeyBind(90, 'z');
 
 
-    game.preload(['hackforplay/enchantbook.png', 'enchantjs/x2/map2.png', 'hackforplay/dot_syuj.png', 'enchantjs/x2/icon0.png', 'enchantjs/font2.png', 'enchantjs/monster1.gif',
-        'dots_design/bg10_3.gif', 'dot_art_world/SC-Door-Entce03.png', 'rengoku-teien/asa_no_komorebi.mp3', 'etolier/01sougen.jpg'
-    ]);
+    Assets.Add('shot-none', 'tenonno-graphic/shot-none.png');
+    Assets.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
 
 
+
+    Assets.Preload();
 
     game.onload = function()
     {
+
+
 
         // Pad を生成する
         CreatePad();
@@ -48,14 +51,17 @@ window.addEventListener('load', function()
 
         __Barrage.New('通常弾',
         {
+            textureName: 'shot-normal',
             way: 10,
             speed: 5,
         });
 
 
+
+
         __Barrage.New('ホーミング弾',
         {
-            rangeAngle: Math.PI / 4,
+            rangeAngle: toRadian(10),
             createFrame: 8,
             way: 8,
             speed: 10,
@@ -112,10 +118,8 @@ window.addEventListener('load', function()
 
 
         // 移動モーションを適用
-        e1.__set_motion('m-1');
-        e2.__set_motion('m-1');
-
-
+        e1.setMotion('m-1');
+        e2.setMotion('m-1');
 
 
     }

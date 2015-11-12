@@ -11,6 +11,20 @@ function range(n)
 }
 
 
+var toRadian = function(angle)
+{
+    return angle * Math.PI / 180;
+}
+
+var toAngle = function(radian)
+{
+    return radian * 180 / Math.PI;
+}
+
+
+
+
+
 // Vec2 間の距離（比較用）
 var _distance = function(x1, y1)
 {
@@ -56,11 +70,23 @@ _Vec2.prototype.near = function(v1, v2)
     return d1 < d2 ? v1 : v2;
 }
 
+// 遠い方の Vec2 を返す
+_Vec2.prototype.far = function(v1, v2)
+{
+    var distance = _distance(this.x, this.y);
+
+    var d1 = distance(v1.x, v1.y);
+    var d2 = distance(v2.x, v2.y);
+
+    return d1 > d2 ? v1 : v2;
+}
+
+
 
 // 方向
 _Vec2.prototype.angle = function(vec)
 {
-     return Math.atan2( this.x - vec.x,this.y - vec.y);
+    return Math.atan2(this.x - vec.x, this.y - vec.y);
 }
 
 

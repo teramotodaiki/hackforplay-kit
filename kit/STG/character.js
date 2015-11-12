@@ -56,6 +56,8 @@ var Character = enchant.Class.create(enchant.Sprite,
     },
 
 
+
+
     // pos を x, y に
     convertPos: function()
     {
@@ -106,25 +108,6 @@ var Character = enchant.Class.create(enchant.Sprite,
 });
 
 
-// 移動パターン
-var movePatterns = {};
-var MovePattern = {
-
-    // 登録する
-    Register: function(name, callback)
-    {
-        movePatterns[name] = callback;
-    },
-
-    // 使用する
-    Use: function(name, target)
-    {
-        movePatterns[name].call(target.tl);
-    }
-
-};
-
-
 
 
 // 敵キャラ
@@ -144,39 +127,25 @@ var Enemy = enchant.Class.create(Character,
 
     },
 
-    // 移動パターンを設定する
-    __set_move: function(name)
+
+    // 移動処理を設定する
+    setMotion: function(name)
     {
-        MovePattern.Use(name, this);
-
-
-        console.log(this.tl);
-
-    },
-
-    __set_motion: function(name)
-    {
-
         Motion.Use(name, this);
     },
 
-    // speed を考慮した TL の制御（仮）
-    __speed: function() {
 
 
 
-
-    },
 
     onenterframe: function()
     {
         // this.move();
 
-        this.__speed();
 
-        // TL を使用するので x, y から pos に逆輸入
-        this.pos.x = this.x;
-        this.pos.y = this.y;
+        // TL を使用するから x, y から pos に逆輸入
+        this.pos.x = this.x + this.width / 2;
+        this.pos.y = this.y + this.height / 2;
 
     }
 });
