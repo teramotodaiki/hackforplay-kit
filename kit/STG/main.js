@@ -54,19 +54,23 @@ window.addEventListener('load', function()
             textureName: 'shot-normal',
             way: 10,
             speed: 5,
+            size: 20,
+        }).shotControl(function()
+        {
+
+            this.angle.add(2);
         });
-
-
 
 
         __Barrage.New('ホーミング弾',
         {
-            rangeAngle: toRadian(10),
+            rangeAngle: 10,
             createFrame: 8,
             way: 8,
             speed: 10,
-            targetType: 'enemy'
+            targetType: 'enemy',
 
+            size: 5,
         }).control(function()
         {
 
@@ -114,12 +118,13 @@ window.addEventListener('load', function()
 
 
         // 移動モーションを作成
-        Motion.New('m-1').moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0).easing(linear).moveBy(20, 50)(2.0).moveBy(-20, 50)(2.0);
-
+        Motion.New('m-1').moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0).easing(linear).moveBy(20, 50)(2.0).moveBy(-20, 50)(2.0).remove();
 
         // 移動モーションを適用
         e1.setMotion('m-1');
         e2.setMotion('m-1');
+
+
 
 
     }

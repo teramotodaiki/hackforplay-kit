@@ -1,9 +1,10 @@
 /* デバッグ用 */
-var debug = new function()
+var Debug =
 {
-    this.values = [];
+    values : [],
 
-    this.update = function()
+
+    Update: function()
     {
         $('#debug').val('');
 
@@ -14,9 +15,9 @@ var debug = new function()
         }
 
         $('#debug').val(text);
-    }
+    },
 
-    this.set = function(name, text)
+    Set : function(name, text)
     {
         this.values[name] = text;
     }
@@ -55,13 +56,14 @@ var InitializeGlobalVariable = function()
 
 
         // FPS
-        debug.set('fps', game._actualFps);
+        Debug.Set('fps', game._actualFps);
+
+        // Nodes
+        Debug.Set('nodes', scene.childNodes.length)
 
 
 
-
-
-        debug.update();
+        Debug.Update();
     });
 
 }
@@ -76,25 +78,25 @@ var EnchantBook = {
     {
 
 
-                // 魔道書
-                Hack.enchantBookIcon = Hack.createSprite(64, 64,
-                {
-                    image: game.assets['hackforplay/enchantbook.png'],
-                    defaultParentNode: game.rootScene,
-                    ontouchend: function()
-                    {
-                        Hack.openEditor();
-                    }
-                });
+        // 魔道書
+        Hack.enchantBookIcon = Hack.createSprite(64, 64,
+        {
+            image: game.assets['hackforplay/enchantbook.png'],
+            defaultParentNode: game.rootScene,
+            ontouchend: function()
+            {
+                Hack.openEditor();
+            }
+        });
 
 
 
-                // 魔道書の中身
-                Hack.hint = '';
+        // 魔道書の中身
+        Hack.hint = '';
 
     },
 
-     PushHint : function(text)
+    PushHint: function(text)
     {
         Hack.hint += text + '\n';
     }

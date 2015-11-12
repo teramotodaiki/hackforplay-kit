@@ -25,6 +25,7 @@ var toAngle = function(radian)
 
 
 
+
 // Vec2 間の距離（比較用）
 var _distance = function(x1, y1)
 {
@@ -82,11 +83,10 @@ _Vec2.prototype.far = function(v1, v2)
 }
 
 
-
 // 方向
 _Vec2.prototype.angle = function(vec)
 {
-    return Math.atan2(this.x - vec.x, this.y - vec.y);
+    return toAngle(Math.atan2(this.x - vec.x, this.y - vec.y));
 }
 
 
@@ -161,4 +161,44 @@ _Vec2.prototype.sub = function(vec)
 var Vec2 = function(x, y)
 {
     return new _Vec2(x, y);
+}
+
+
+
+function _Angle(value)
+{
+    this.value = value;
+}
+
+_Angle.prototype.add = function(value)
+{
+    this.value += value;
+    return this;
+}
+
+_Angle.prototype.sub = function(value)
+{
+    this.value -= value;
+    return this;
+}
+
+
+
+_Angle.prototype.toRadian = function()
+{
+    return this.value * Math.PI / 180;
+}
+
+_Angle.prototype.toVec2 = function()
+{
+    var radian = this.toRadian();
+    var x = Math.sin(radian);
+    var y = Math.cos(radian);
+    return Vec2(x, y);
+}
+
+
+var Angle = function(value)
+{
+    return new _Angle(value);
 }

@@ -1,5 +1,3 @@
-
-
 /*
 
     TL を簡単に扱えるようにする闇のクラス（仮）
@@ -26,6 +24,23 @@ var EasyTimeline = function()
 EasyTimeline.prototype.easing = function(value)
 {
     this._easing = value;
+    return this;
+}
+
+
+EasyTimeline.prototype.remove = function()
+{
+
+    this.events.push(
+    {
+
+        then: function()
+        {
+            this.scene.removeChild(this);
+        }
+
+    });
+
     return this;
 }
 
@@ -91,14 +106,28 @@ EasyTimeline.prototype.toTimeline = function()
 
         self.events.forEach(function(event)
         {
+
             // 今後の設計によっては削除するかも
-            var _event = $.extend({}, event);
+            var _event = $.extend(
+            {}, event);
 
 
-            _event.time = _event.time * game.fps * (1.0 / node.speed);
+            // then 系
+            if (event.then !== undefined)
+            {
+
+                timeline = timeline.then(event.then);
+
+            }
+            // tween 系
+            else
+            {
+                _event.time = _event.time * game.fps * (1.0 / node.speed);
+                timeline = timeline.tween(_event);
+
+            }
 
 
-            timeline = timeline.tween(_event);
 
         });
 
@@ -114,8 +143,7 @@ EasyTimeline.prototype.toTimeline = function()
 var easyTimelineList = {};
 
 
-var Motion =
-{
+var Motion = {
     // 新しいモーションを作成
     New: function(name)
     {

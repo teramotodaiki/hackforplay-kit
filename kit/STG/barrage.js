@@ -86,7 +86,7 @@ var CharacterList = {
     Each: function(type, callback)
     {
 
-        character_list.forEach(function(character)
+        scene.childNodes.forEach(function(character)
         {
             if (character.type === type)
             {
@@ -133,11 +133,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
     {
         Sprite.call(this, size, size);
 
-        this.size = size;
-
-
         this.compositeOperation = 'lighter';
-
 
         // 能力の使用者
         this.creator = creator;
@@ -145,41 +141,44 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.pos = Vec2(0, 0);
 
-
         this.pos.x = creator.pos.x;
         this.pos.y = creator.pos.y;
 
+
+        this.angle = Angle(0);
+
         // 仮
-        this.target = 'enemy';
+        this.targetType = 'enemy';
 
         this.count = 0;
 
-        // this.image = shotTexture;
+        this.spriteSize = size;
 
-        // this.backgroundColor = '#0f0';
+        this.__control = null;
 
-        this.VecToPos();
-
-
-
+        this.updatePos();
 
     },
 
-    resize: function(size) {
+    resize: function()
+    {
+        this.scaleX = this.scaleY = (this.size / this.spriteSize);
 
     },
 
-    // pos を x, y に
-        VecToPos: function()
+    // (pos) を (x, y) に反映する
+    updatePos: function()
     {
         this.x = this.pos.x - this.width / 2;
         this.y = this.pos.y - this.height / 2;
     },
 
+
     // 自身を削除する
     remove: function()
     {
         scene.removeChild(this);
+
     },
 
     // 衝突
@@ -196,67 +195,48 @@ var Shot = enchant.Class.create(enchant.Sprite,
     // シンプルな弾制御
     move: function()
     {
+        this.resize();
 
 
-        this.pos.add(this.angle.copy().scale(this.speed));
+        this.pos.add(this.angle.toVec2().scale(this.speed));
 
 
-
-        // ベクトル使った方がイイかも
-        /*
-        this.x += Math.sin(this.angle) * this.speed;
-        this.y += Math.cos(this.angle) * this.speed;
-        this.angle += this.addAngle;
-        */
-
-        this.VecToPos();
+        this.updatePos();
 
     },
 
     onenterframe: function()
     {
 
+        // 完全に自由な制御
+        if (this.__control)
+        {
+            this.__control.call(this);
+        }
+
+
 
         // 移動
         this.move();
 
-        // 敵を狙う（自機弾）
-        if (this.target === 'enemy')
-        {
-            var _this = this;
-            // 敵と衝突判定
-            enemies.forEach(function(enemy)
-            {
 
-                _this.hit(enemy);
+        var self = this;
 
-            });
-
-
-        }
-        // プレイヤーを狙う（敵弾）
-        else
-        {
-            this.hit(player);
-        }
-
-        /*
-        // スライム虐待
-        if (this.within(blueSlime))
+        // 攻撃対象に被弾判定
+        CharacterList.Each(this.targetType, function()
         {
 
-            this.remove();
-        }
-        */
+            self.hit(this);
 
-        ++this.count;
+        });
 
         // 寿命
-        if (this.count >= this.life)
+        if (this.count++ >= this.life)
         {
-
             this.remove();
         }
+
+
     }
 
 });
@@ -297,15 +277,18 @@ var Barrage = function()
 
     this.speed = 3;
 
+    this.size = 10;
+
     this.frame = 0;
 
     this.power = 1;
 
     // 軸
-    this.axisAngle = Math.PI;
+    this.axisAngle = 0;
 
     // 撃つ範囲角度
-    this.rangeAngle = Math.PI2;
+    this.rangeAngle = 360;
+
 
 
     // this.addAngle = Math.PI / 300;
@@ -316,6 +299,7 @@ var Barrage = function()
 
 
     this.__control = null;
+    this.__shotControl = null;
 
 
     // this.axis = Vec2(0, 0);
@@ -326,12 +310,16 @@ var Barrage = function()
 // 弾幕を自由に制御できる関数を設定
 Barrage.prototype.control = function(control)
 {
-
     this.__control = control;
-
     return this;
 }
 
+// 弾を自由に制御できる関数を設定
+Barrage.prototype.shotControl = function(control)
+{
+    this.__shotControl = control;
+    return this;
+}
 
 
 // イベント
@@ -369,10 +357,6 @@ Barrage.prototype.addShot = function()
     {
 
 
-
-
-
-
         var shot = new Shot(this.creator, shotSize);
 
 
@@ -383,6 +367,10 @@ Barrage.prototype.addShot = function()
 
         shot.angle = Vec2(0, 0);
 
+        shot.life = this.life;
+
+        shot.__control = this.__shotControl;
+
 
         var beginAngle = this.axisAngle - this.rangeAngle / 2;
         var stepAngle = this.rangeAngle / this.way;
@@ -392,9 +380,9 @@ Barrage.prototype.addShot = function()
         shot.image = Assets.Get(this.textureName);
 
 
-        shot.angle.x = Math.sin(angle);
-        shot.angle.y = Math.cos(angle);
+        shot.size = this.size;
 
+        shot.angle = Angle(angle - 180);
 
 
         // scene.insertBefore(shot, player);
@@ -434,7 +422,7 @@ Barrage.prototype.update = function()
 Barrage.prototype.setAxisFromTarget = function(target)
 {
     // 標的がいるなら軸を向け、いないならとりあえず上に
-    this.axisAngle = target ? this.creator.pos.angle(target.pos) + Math.PI : Math.PI;
+    this.axisAngle = target ? this.creator.pos.angle(target.pos) : 0;
 }
 
 
