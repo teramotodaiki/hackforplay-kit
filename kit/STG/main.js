@@ -130,17 +130,30 @@ window.addEventListener('load', function()
         });
 
 
-
-
         /*
             10 方向に 6 度の間隔を開けた 3 つの弾を放つ
         */
         __Barrage.New('10way-r3',
         {
             textureName: 'shot-normal',
-            way: 6,
+            way: 15,
+            createTime: 0.1,
+            speed: 5,
             repeat: 3,
-            repeatAngle: 6
+            repeatAngle: 3
+        }).control(function()
+        {
+
+
+
+            // 3 秒を超えたら way を変更してリスタート
+            if (this.time >= 3.0)
+            {
+                this.way = Random(5, 20);
+                this.Restart();
+            }
+
+
         });
 
 
@@ -161,7 +174,7 @@ window.addEventListener('load', function()
         var e1 = new Enemy(20, 20);
         var e2 = new Enemy(20, 20);
 
-        player.SetAttackSpell('player-spell');
+        // player.SetAttackSpell('player-spell');
 
 
         e1.SetSpell('10way-r3');

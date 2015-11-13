@@ -43,6 +43,10 @@ var Character = enchant.Class.create(enchant.Sprite,
 
         this.type = 'character';
 
+
+        this.barrage_count = {};
+
+
         // x, y
         this.pos = Vec2(0, 0);
 
@@ -139,6 +143,11 @@ var Enemy = enchant.Class.create(Character,
 
         this.count = 0;
 
+
+        this.spell = null;
+
+
+
     },
 
 
@@ -158,7 +167,10 @@ var Enemy = enchant.Class.create(Character,
         this.pos.y = this.y + this.height / 2;
 
 
-        this.spell.update(this);
+        // this.spell.counts = this.spellCounts;
+
+
+        this.spell.Update(this);
 
 
         this.count++;
@@ -167,34 +179,22 @@ var Enemy = enchant.Class.create(Character,
 });
 
 
-
+// スペルを登録する
 Enemy.prototype.SetSpell = function(name)
 {
-    //    this.spell = __Spell.Get(name);
 
     this.spell = __Spell.Get(name);
 
-    /*
-    // 複製する
-    this.spell = $.extend(
-    {}, __Spell.Get(name));
 
-
-    this.spell.barrages.forEach(function(barrage, i)
+    // barrage_count を初期化する
+    this.spell.barrages.forEach(function(barrage)
     {
-        barrage = $.extend(
-        {}, __Spell.Get(name).barrages[i]);
-    });
+        this.barrage_count[barrage.handle] = 0;
+    }, this);
 
-    // 弾幕の親になる
-    this.spell.attributeAll(
-    {
-        creator: this,
-        targetType: 'player'
-    });
 
-    */
 }
+
 
 
 var Player = enchant.Class.create(Character,
@@ -280,7 +280,7 @@ var Player = enchant.Class.create(Character,
             if (input.z)
             {
                 this.count = this.attackSpellCount++;
-                this.attackSpell.update(this);
+                this.attackSpell.Update(this);
             }
             else
             {

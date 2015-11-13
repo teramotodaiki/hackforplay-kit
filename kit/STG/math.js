@@ -22,6 +22,13 @@ var toAngle = function(radian)
 }
 
 
+// min から max の乱数を生成する
+function Random(min, max)
+{
+    return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+
 
 
 

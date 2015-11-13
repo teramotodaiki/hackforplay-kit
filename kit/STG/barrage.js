@@ -324,7 +324,12 @@ var Barrage = function()
 
     this.textureName = 'shot-none';
 
+
+    // 時間
     this.time = 0.0;
+    this.count = 0;
+
+
 
     this.shots = [];
 
@@ -332,6 +337,7 @@ var Barrage = function()
 
     // 識別番号
     this.handle = null;
+
 
     this.frame = 0;
 
@@ -349,8 +355,6 @@ var Barrage = function()
     this.speed = 3;
 
     this.size = 10;
-
-    this.count = 0;
 
     this.power = 1;
 
@@ -473,7 +477,7 @@ Barrage.prototype.addShot = function()
 
 
 
- angle -= (this.repeat -1 ) * this.repeatAngle / 2 ;
+        angle -= (this.repeat - 1) * this.repeatAngle / 2;
 
 
         var shotProperty = {
@@ -557,9 +561,42 @@ Barrage.prototype.addShot = function()
 
 }
 
-// 弾幕を更新する
-Barrage.prototype.update = function()
+
+
+
+Barrage.prototype.ShotControl = function(property)
 {
+    this.shots.forEach(function(shot)
+    {
+        shot.attribute(property);
+    });
+}
+
+
+Barrage.prototype.Restart = function()
+{
+    this.creator.barrage_count[this.handle] = 0;
+}
+
+
+
+
+// 弾幕を更新する
+Barrage.prototype.Update = function()
+{
+
+    // Spell ->
+    // set creator
+    // set count
+
+    this.time = CountToTime(this.count);
+
+
+
+
+
+    this.createFrame = TimeToCount(this.createTime);
+
 
     // 完全に自由な制御
     if (this.__control)
@@ -576,8 +613,6 @@ Barrage.prototype.update = function()
         this.addShot();
     }
 
-
-    this.time = CountToTime(this.count);
 
 }
 
@@ -598,9 +633,15 @@ var Spell = function()
     this.name = '';
 
     this.barrages = [];
-
+    this.counts = [];
 
 }
+
+Spell.prototype.CreateCount = function()
+{
+    return Array.apply(null, { length: this.barrages.length }).map(Boolean).map(Number);
+}
+
 
 
 // [[deprecated]]
@@ -651,17 +692,24 @@ Spell.prototype.pushBarrage = function(barrage)
     this.barrages.push(barrage);
 }
 
+
+
+
+
+
 // 更新する
-Spell.prototype.update = function(creator)
+Spell.prototype.Update = function(creator)
 {
 
-    this.barrages.forEach(function(barrage)
+    this.barrages.forEach(function(barrage, index)
     {
 
-        barrage.count = creator.count;
         barrage.creator = creator;
+        barrage.count = creator.barrage_count[barrage.handle]++;
 
-        barrage.update();
+
+        barrage.Update();
+
     });
 
 }
@@ -679,6 +727,8 @@ Spell.prototype.statusRender = function()
 
 var barrage_asset = {};
 
+var barrage_handle = 0;
+
 var __Barrage = {
 
     Get: function(name)
@@ -691,6 +741,10 @@ var __Barrage = {
     {
 
         var barrage = barrage_asset[name] = new Barrage();
+
+
+        barrage.handle = barrage_handle++;
+
 
         if (property)
         {
