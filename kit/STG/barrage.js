@@ -68,6 +68,18 @@ var Assets = {
 
 
 
+// 秒をフレームカウントに変換する
+var TimeToCount = function(time)
+{
+    return Math.round(time * game.fps);
+}
+
+// フレームカウントを病に変換する
+var CountToTime = function(count)
+{
+    return count / game.fps;
+}
+
 
 
 // 敵キャラ
@@ -124,8 +136,6 @@ var CharacterList = {
 
 }
 
-
-
 // 弾
 var Shot = enchant.Class.create(enchant.Sprite,
 {
@@ -135,9 +145,13 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.compositeOperation = 'lighter';
 
+        // 画面外に出た場合削除するか
+        this.outScreenRemove = true;
+
+        this.time = 0.0;
+
         // 能力の使用者
         this.creator = creator;
-
 
         this.pos = Vec2(0, 0);
 
@@ -156,8 +170,15 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.__control = null;
 
-        this.updatePos();
+        this.events = [];
 
+        this.updatePos();
+    },
+
+    // 色を変更する
+    Color: function(color)
+    {
+        this.frame = color;
     },
 
     resize: function()
@@ -207,6 +228,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
     onenterframe: function()
     {
+        var self = this;
 
         // 完全に自由な制御
         if (this.__control)
@@ -214,13 +236,32 @@ var Shot = enchant.Class.create(enchant.Sprite,
             this.__control.call(this);
         }
 
+        // イベントを実行する
+        this.events.forEach(function(event)
+        {
+            event.call(self);
+        });
+
+
 
 
         // 移動
         this.move();
 
 
-        var self = this;
+
+        // 画面外に出た場合
+        if (this.outScreenRemove)
+        {
+            if (this.x < 0 || this.x > scene.width || this.y < 0 || this.y > scene.height)
+            {
+                this.remove();
+
+                return;
+            }
+        }
+
+
 
         // 攻撃対象に被弾判定
         CharacterList.Each(this.targetType, function()
@@ -237,22 +278,21 @@ var Shot = enchant.Class.create(enchant.Sprite,
         }
 
 
+
+        this.time = CountToTime(this.count);
+
     }
 
 });
 
 
-
-
-
-
-var ShotEvent = function()
+Shot.prototype.attribute = function(object)
 {
-
-    // イベントの適用範囲
-    this.beginFrame = 0;
-    this.endFrame = 0;
-
+    for (var key in object)
+    {
+        this[key] = object[key];
+    }
+    return this;
 }
 
 
@@ -261,6 +301,7 @@ var Barrage = function()
 
     this.textureName = 'shot-none';
 
+    this.time = 0.0;
 
     this.shots = [];
 
@@ -273,13 +314,16 @@ var Barrage = function()
 
     this.createFrame = 30;
 
+    // 何秒で生成するか
+    this.createTime = 1.0;
+
     this.way = 3;
 
     this.speed = 3;
 
     this.size = 10;
 
-    this.frame = 0;
+    this.count = 0;
 
     this.power = 1;
 
@@ -288,8 +332,6 @@ var Barrage = function()
 
     // 撃つ範囲角度
     this.rangeAngle = 360;
-
-
 
     // this.addAngle = Math.PI / 300;
 
@@ -304,7 +346,41 @@ var Barrage = function()
 
     // this.axis = Vec2(0, 0);
 
+    this.shotEvents = [];
+
+    this.targetType = 'player';
+
 }
+
+
+Barrage.prototype.AddShotEvent = function(time, property)
+{
+    time *= game.fps;
+
+
+
+    this.shotEvents.push(function()
+    {
+
+        if (this.count <= time)
+        {
+
+
+            this.attribute(property)
+            {
+
+            }
+
+
+        }
+
+
+    });
+
+
+
+}
+
 
 
 // 弾幕を自由に制御できる関数を設定
@@ -372,6 +448,16 @@ Barrage.prototype.addShot = function()
         shot.__control = this.__shotControl;
 
 
+        shot.targetType = this.targetType;
+
+
+
+        this.shotEvents.forEach(function(event)
+        {
+            shot.events.push(event);
+        })
+
+
         var beginAngle = this.axisAngle - this.rangeAngle / 2;
         var stepAngle = this.rangeAngle / this.way;
         var angle = beginAngle + stepAngle * i;
@@ -408,13 +494,17 @@ Barrage.prototype.update = function()
     }
 
 
+    var count = TimeToCount(this.createTime) | 0;
 
-    if (this.frame % this.createFrame === 0)
+
+    if ((this.count++ % count) === 0)
     {
         this.addShot();
     }
 
-    ++this.frame;
+
+    this.time = CountToTime(this.count);
+
 }
 
 
@@ -427,31 +517,24 @@ Barrage.prototype.setAxisFromTarget = function(target)
 
 
 
-// 弾幕を生成する
-var CreateBarrage = function()
-{
-    return new Barrage();
-}
 
-
+// 弾幕を組み合わせてスペルを創造する
 var Spell = function()
 {
     this.name = '';
-    // 弾幕の識別に使用する値
-    this.handleIndex = 0;
 
     this.barrages = [];
 
-    this.frame = 0;
+
 }
 
-Spell.prototype.resetFrame = function()
+Spell.prototype.resetCount = function()
 {
-    this.frame = 0;
+    this.count = 0;
 
     this.barrages.forEach(function(barrage)
     {
-        barrage.frame = 0;
+        barrage.count = 0;
     });
 
 }
@@ -478,31 +561,37 @@ Spell.prototype.attributeAll = function(object)
 
 
 
-// 技を生成する
-var CreateSpell = function()
-{
-    return new Spell();
-}
-
-
 // 弾幕を追加する
 Spell.prototype.addBarrage = function(barrage)
+{
+
+    var barrage2 = $.extend(
+    {}, barrage);
+
+    this.barrages.push(barrage2);
+}
+
+// 弾幕を追加する
+Spell.prototype.pushBarrage = function(barrage)
 {
     this.barrages.push(barrage);
 }
 
-
-
-// Barrage.update 弾を生成する
-Spell.prototype.fire = function()
+// 更新する
+Spell.prototype.update = function(creator)
 {
 
     this.barrages.forEach(function(barrage)
     {
+
+        barrage.count = creator.count;
+        barrage.creator = creator;
+
         barrage.update();
     });
 
 }
+
 
 
 // 技の名前とか表示するやつ
@@ -511,25 +600,6 @@ Spell.prototype.statusRender = function()
     /* default */
 };
 
-
-
-
-//
-
-barrage = CreateBarrage();
-
-
-/*
-    かなり遊ぶ側の難易度が高い気がする
-    できればもっと簡略化したい（けど条件を文字列として eval するのは闇が深そう）
-*/
-barrage.addEvent(function(status)
-{
-    return status.frame > 100;
-},
-{
-    way: 10
-});
 
 
 
@@ -588,12 +658,12 @@ var __Spell = {
             spell.attribute(property);
         }
 
-        return function()
+        return function(Args___)
         {
             for (var index in range(arguments.length))
             {
 
-                spell.addBarrage(__Barrage.Get(arguments[index]));
+                spell.pushBarrage(__Barrage.Get(arguments[index]));
 
             }
 

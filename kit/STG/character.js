@@ -21,6 +21,17 @@ var EnumBlendMode = {
 };
 
 
+var Palette = {
+
+    Red: 0,
+    Green: 1,
+    Blue: 2,
+    Yellow: 3,
+    White: 6
+
+};
+
+
 
 
 // キャラクター
@@ -125,6 +136,9 @@ var Enemy = enchant.Class.create(Character,
 
         this.backgroundColor = '#00f';
 
+
+        this.count = 0;
+
     },
 
 
@@ -133,10 +147,6 @@ var Enemy = enchant.Class.create(Character,
     {
         Motion.Use(name, this);
     },
-
-
-
-
 
     onenterframe: function()
     {
@@ -147,9 +157,44 @@ var Enemy = enchant.Class.create(Character,
         this.pos.x = this.x + this.width / 2;
         this.pos.y = this.y + this.height / 2;
 
+
+        this.spell.update(this);
+
+
+        this.count++;
+
     }
 });
 
+
+
+Enemy.prototype.SetSpell = function(name)
+{
+    //    this.spell = __Spell.Get(name);
+
+    this.spell =  __Spell.Get(name);
+
+    /*
+    // 複製する
+    this.spell = $.extend(
+    {}, __Spell.Get(name));
+
+
+    this.spell.barrages.forEach(function(barrage, i)
+    {
+        barrage = $.extend(
+        {}, __Spell.Get(name).barrages[i]);
+    });
+
+    // 弾幕の親になる
+    this.spell.attributeAll(
+    {
+        creator: this,
+        targetType: 'player'
+    });
+
+    */
+}
 
 
 var Player = enchant.Class.create(Character,
@@ -158,6 +203,7 @@ var Player = enchant.Class.create(Character,
     {
         Character.call(this, width, height);
 
+        this.type = 'player';
 
         this.attackSpell;
 
@@ -229,14 +275,20 @@ var Player = enchant.Class.create(Character,
     onenterframe: function()
     {
 
-        // 攻撃する
-        if (input.z)
+
+        if (this.attackSpell)
         {
-            this.attackSpell.fire();
-        }
-        else
-        {
-            this.attackSpell.resetFrame();
+
+
+            // 攻撃する
+            if (input.z)
+            {
+                this.attackSpell.fire();
+            }
+            else
+            {
+                this.attackSpell.resetFrame();
+            }
         }
 
 

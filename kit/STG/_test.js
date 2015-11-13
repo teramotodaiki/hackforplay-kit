@@ -70,7 +70,6 @@ var InitializeGlobalVariable = function()
 
 
 
-
 // 魔道書
 var EnchantBook = {
 

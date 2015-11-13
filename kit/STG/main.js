@@ -58,14 +58,16 @@ window.addEventListener('load', function()
         }).shotControl(function()
         {
 
+
             this.angle.add(2);
         });
 
 
         __Barrage.New('ホーミング弾',
         {
+            textureName: 'shot-normal',
             rangeAngle: 10,
-            createFrame: 8,
+            createTime: 10.2,
             way: 8,
             speed: 10,
             targetType: 'enemy',
@@ -84,11 +86,34 @@ window.addEventListener('load', function()
 
 
 
+        __Barrage.New('テスト',
+        {
+            textureName: 'shot-normal',
+            createTime: 1,
+            way: 30,
+            rangeAngle: 340,
+        }).control(function()
+        {
+            // 弾を生成する度に 20 度追加する
+            if (this.count % this.createFrame === 0)
+            {
+                this.axisAngle += 20;
 
-        __Spell.Make('プレイヤースペル')('通常弾', 'ホーミング弾');
+
+            }
+        }).shotControl(function()
+        {
+
+            if (this.count % 20 === 0)
+            {
+                this.Color(this.frame + 1);
+            }
+
+        });
 
 
-        player.setAttackSpell('プレイヤースペル');
+
+        __Spell.Make('プレイヤースペル')('通常弾', 'ホーミング弾', 'テスト');
 
 
 
@@ -99,6 +124,14 @@ window.addEventListener('load', function()
         var e1 = new Enemy(20, 20);
         var e2 = new Enemy(20, 20);
 
+        //player.setAttackSpell('プレイヤースペル');
+        e1.SetSpell('プレイヤースペル');
+        e2.SetSpell('プレイヤースペル');
+
+
+        console.log(e1);
+        console.log(e2);
+
         scene.addChild(e1);
         scene.addChild(e2);
 
@@ -108,7 +141,7 @@ window.addEventListener('load', function()
 
 
         e1.locate(100, 50);
-        e2.locate(380, 50);
+        e2.locate(380, 150);
 
 
         // とりあえず easing を短縮
@@ -121,9 +154,8 @@ window.addEventListener('load', function()
         Motion.New('m-1').moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0).easing(linear).moveBy(20, 50)(2.0).moveBy(-20, 50)(2.0).remove();
 
         // 移動モーションを適用
-        e1.setMotion('m-1');
-        e2.setMotion('m-1');
-
+        // e1.setMotion('m-1');
+        // e2.setMotion('m-1');
 
 
 
