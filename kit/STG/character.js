@@ -217,9 +217,9 @@ var Player = enchant.Class.create(Character,
     SetAttackSpell: function(name)
     {
         this.attackSpell = __Spell.Get(name);
-
-
     },
+
+
 
 
     // 弾幕から通常攻撃を登録

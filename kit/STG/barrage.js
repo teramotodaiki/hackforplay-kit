@@ -143,7 +143,12 @@ var Shot = enchant.Class.create(enchant.Sprite,
     {
         Sprite.call(this, size, size);
 
+        this.type = 'shot';
+
+
+
         this.compositeOperation = 'lighter';
+
 
         // 画面外に出た場合削除するか
         this.outScreenRemove = true;
@@ -159,7 +164,10 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.pos.y = creator.pos.y;
 
 
+        // 移動方向
         this.angle = Angle(0);
+
+
 
         // 仮
         this.targetType = 'enemy';
@@ -172,7 +180,6 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.events = [];
 
-        this.updatePos();
     },
 
     // 色を変更する
@@ -192,6 +199,23 @@ var Shot = enchant.Class.create(enchant.Sprite,
     {
         this.x = this.pos.x - this.width / 2;
         this.y = this.pos.y - this.height / 2;
+
+
+
+        // 画面外に出た場合
+        if (this.outScreenRemove)
+        {
+            if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height)
+            {
+                this.remove();
+                return;
+            }
+        }
+
+
+
+
+
     },
 
 
@@ -199,7 +223,6 @@ var Shot = enchant.Class.create(enchant.Sprite,
     remove: function()
     {
         scene.removeChild(this);
-
     },
 
     // 衝突
@@ -216,18 +239,20 @@ var Shot = enchant.Class.create(enchant.Sprite,
     // シンプルな弾制御
     move: function()
     {
-        this.resize();
 
 
         this.pos.add(this.angle.toVec2().scale(this.speed));
 
 
-        this.updatePos();
-
     },
 
     onenterframe: function()
     {
+
+
+        this.resize();
+        this.updatePos();
+
         var self = this;
 
         // 完全に自由な制御
@@ -248,18 +273,6 @@ var Shot = enchant.Class.create(enchant.Sprite,
         // 移動
         this.move();
 
-
-
-        // 画面外に出た場合
-        if (this.outScreenRemove)
-        {
-            if (this.x < 0 || this.x > scene.width || this.y < 0 || this.y > scene.height)
-            {
-                this.remove();
-
-                return;
-            }
-        }
 
 
 
@@ -294,6 +307,16 @@ Shot.prototype.attribute = function(object)
     }
     return this;
 }
+
+
+// 初期化後に呼ぶ
+Shot.prototype.InitializeUpdate = function()
+{
+    this.updatePos();
+    this.resize();
+}
+
+
 
 
 var Barrage = function()
@@ -356,6 +379,15 @@ var Barrage = function()
 
 
     // 詳細設定
+
+
+    // creator から createPos 離れた場所に弾が生成される
+    this.createPos = 0;
+
+
+    // 並べる
+    this.repeat = 1;
+    this.repeatAngle = 0;
 
     // 横に並べる
     this.repeatX = 1;
@@ -431,15 +463,17 @@ Barrage.prototype.addShot = function()
 
 
     // 仮
-    for (var i in range(this.way))
+    for (var way in range(this.way))
     {
-
-
 
         // 弾の角度を算出
         var beginAngle = this.axisAngle - this.rangeAngle / 2;
         var stepAngle = this.rangeAngle / this.way;
-        var angle = beginAngle + stepAngle * i;
+        var angle = beginAngle + stepAngle * way;
+
+
+
+ angle -= (this.repeat -1 ) * this.repeatAngle / 2 ;
 
 
         var shotProperty = {
@@ -449,7 +483,6 @@ Barrage.prototype.addShot = function()
             life: this.life,
             __control: this.__shotControl,
             targetType: this.targetType,
-            angle: Angle(angle),
             image: Assets.Get(this.textureName),
             size: this.size,
 
@@ -471,32 +504,50 @@ Barrage.prototype.addShot = function()
 
         // 弾を登録する
 
-
-        // 横に並べる
-
-        for (var x in range(this.repeatX))
+        // ずらし配置みたいな
+        for (var repeat in range(this.repeat))
         {
 
-            // 弾を生成する
-            var shot = new Shot(this.creator, shotSize);
 
-            // プロパティを登録
-            shot.attribute(shotProperty);
-
-
-            var shotWidth = (this.repeatX - 1) * this.repeatSpaceX;
-            shot.pos.sub(Vec2(shotWidth / 2, 0));
+            // 横に並べる
+            for (var x in range(this.repeatX))
+            {
 
 
-            shot.pos.add(Vec2(this.repeatSpaceX * x, 0));
 
-            scene.addChild(shot);
-            this.shots.push(shot);
+                shotProperty.angle = Angle(angle);
 
+
+                // 弾を生成する
+                var shot = new Shot(this.creator, shotSize);
+
+                // プロパティを登録
+                shot.attribute(shotProperty);
+
+
+                var shotWidth = (this.repeatX - 1) * this.repeatSpaceX;
+                shot.pos.sub(Vec2(shotWidth / 2, 0));
+
+
+                shot.pos.add(Vec2(this.repeatSpaceX * x, 0));
+
+
+                // 使用者から距離を取る
+                shot.pos.add(shot.angle.toVec2().scale(this.createPos));
+
+                // 弾を登録する
+                shot.InitializeUpdate();
+                scene.addChild(shot);
+                this.shots.push(shot);
+
+
+            }
+
+
+            angle += this.repeatAngle;
 
 
         }
-
 
 
     }

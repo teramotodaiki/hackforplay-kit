@@ -20,7 +20,6 @@ window.addEventListener('load', function()
     Assets.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
 
 
-
     Assets.Preload();
 
     game.onload = function()
@@ -55,7 +54,9 @@ window.addEventListener('load', function()
         __Barrage.New('player-normal',
         {
             textureName: 'shot-normal',
+            createTime: 0.15,
             way: 1,
+            speed: 20,
             size: 20,
             targetType: 'enemy',
             axisAngle: 0,
@@ -63,7 +64,6 @@ window.addEventListener('load', function()
             repeatSpaceX: 50
         });
 
-        
 
 
         __Barrage.New('10way弾',
@@ -72,6 +72,7 @@ window.addEventListener('load', function()
             way: 10,
             speed: 5,
             size: 20,
+            createPos: 50
         }).shotControl(function()
         {
 
@@ -130,10 +131,27 @@ window.addEventListener('load', function()
 
 
 
+
+        /*
+            10 方向に 6 度の間隔を開けた 3 つの弾を放つ
+        */
+        __Barrage.New('10way-r3',
+        {
+            textureName: 'shot-normal',
+            way: 6,
+            repeat: 3,
+            repeatAngle: 6
+        });
+
+
+        __Spell.Make('10way-r3')('10way-r3');
+
+
         __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾', 'テスト');
-
-
         __Spell.Make('player-spell')('player-normal');
+
+
+
 
 
         //----------// EasyTimeline のテスト //----------//
@@ -146,15 +164,13 @@ window.addEventListener('load', function()
         player.SetAttackSpell('player-spell');
 
 
-        e1.SetSpell('プレイヤースペル');
+        e1.SetSpell('10way-r3');
+
         e2.SetSpell('プレイヤースペル');
 
 
-        console.log(e1);
-        console.log(e2);
-
         scene.addChild(e1);
-        scene.addChild(e2);
+        // scene.addChild(e2);
 
 
         e1.speed = 1.5;
