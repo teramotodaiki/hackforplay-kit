@@ -49,7 +49,24 @@ window.addEventListener('load', function()
         player.speed = 5;
 
 
-        __Barrage.New('通常弾',
+        /*
+            50px の間隔で 2 つの弾を 0.0 度に放つ
+        */
+        __Barrage.New('player-normal',
+        {
+            textureName: 'shot-normal',
+            way: 1,
+            size: 20,
+            targetType: 'enemy',
+            axisAngle: 0,
+            repeatX: 2,
+            repeatSpaceX: 50
+        });
+
+        
+
+
+        __Barrage.New('10way弾',
         {
             textureName: 'shot-normal',
             way: 10,
@@ -70,7 +87,7 @@ window.addEventListener('load', function()
             createTime: 10.2,
             way: 8,
             speed: 10,
-            targetType: 'enemy',
+            targetType: 'player',
 
             size: 5,
         }).control(function()
@@ -113,8 +130,10 @@ window.addEventListener('load', function()
 
 
 
-        __Spell.Make('プレイヤースペル')('通常弾', 'ホーミング弾', 'テスト');
+        __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾', 'テスト');
 
+
+        __Spell.Make('player-spell')('player-normal');
 
 
         //----------// EasyTimeline のテスト //----------//
@@ -124,7 +143,9 @@ window.addEventListener('load', function()
         var e1 = new Enemy(20, 20);
         var e2 = new Enemy(20, 20);
 
-        //player.setAttackSpell('プレイヤースペル');
+        player.SetAttackSpell('player-spell');
+
+
         e1.SetSpell('プレイヤースペル');
         e2.SetSpell('プレイヤースペル');
 

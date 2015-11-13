@@ -172,7 +172,7 @@ Enemy.prototype.SetSpell = function(name)
 {
     //    this.spell = __Spell.Get(name);
 
-    this.spell =  __Spell.Get(name);
+    this.spell = __Spell.Get(name);
 
     /*
     // 複製する
@@ -207,20 +207,16 @@ var Player = enchant.Class.create(Character,
 
         this.attackSpell;
 
+        this.count = 0;
+        this.attackSpellCount = 0;
+        this.bombSpellCount = 0;
+
     },
 
     // 通常攻撃スペルを設定する
-    setAttackSpell: function(name)
+    SetAttackSpell: function(name)
     {
         this.attackSpell = __Spell.Get(name);
-
-
-        // 弾幕の親になる
-        this.attackSpell.attributeAll(
-        {
-            creator: this
-        });
-
 
 
     },
@@ -276,20 +272,24 @@ var Player = enchant.Class.create(Character,
     {
 
 
+        // 通常攻撃
         if (this.attackSpell)
         {
-
 
             // 攻撃する
             if (input.z)
             {
-                this.attackSpell.fire();
+                this.count = this.attackSpellCount++;
+                this.attackSpell.update(this);
             }
             else
             {
-                this.attackSpell.resetFrame();
+                this.attackSpellCount = 0;
             }
         }
+
+
+
 
 
         this.vec = _pad;
@@ -302,8 +302,8 @@ var Player = enchant.Class.create(Character,
 
 
 
-
         this._test();
+
 
     }
 

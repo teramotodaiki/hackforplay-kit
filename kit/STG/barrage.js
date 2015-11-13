@@ -319,6 +319,10 @@ var Barrage = function()
 
     this.way = 3;
 
+
+
+
+
     this.speed = 3;
 
     this.size = 10;
@@ -350,36 +354,34 @@ var Barrage = function()
 
     this.targetType = 'player';
 
+
+    // 詳細設定
+
+    // 横に並べる
+    this.repeatX = 1;
+    this.repeatSpaceX = 0;
+
+    // 縦に並べる
+
+
 }
 
 
 Barrage.prototype.AddShotEvent = function(time, property)
 {
     time *= game.fps;
-
-
-
     this.shotEvents.push(function()
     {
-
         if (this.count <= time)
         {
-
-
             this.attribute(property)
-            {
-
-            }
-
-
+            {}
         }
-
-
     });
-
-
-
 }
+
+
+
 
 
 
@@ -433,48 +435,69 @@ Barrage.prototype.addShot = function()
     {
 
 
-        var shot = new Shot(this.creator, shotSize);
 
-
-        // プロパティを追加
-        // shot = $.extend(shot, this);
-
-        shot.speed = this.speed;
-
-        shot.angle = Vec2(0, 0);
-
-        shot.life = this.life;
-
-        shot.__control = this.__shotControl;
-
-
-        shot.targetType = this.targetType;
-
-
-
-        this.shotEvents.forEach(function(event)
-        {
-            shot.events.push(event);
-        })
-
-
+        // 弾の角度を算出
         var beginAngle = this.axisAngle - this.rangeAngle / 2;
         var stepAngle = this.rangeAngle / this.way;
         var angle = beginAngle + stepAngle * i;
 
 
-        shot.image = Assets.Get(this.textureName);
+        var shotProperty = {
 
 
-        shot.size = this.size;
+            speed: this.speed,
+            life: this.life,
+            __control: this.__shotControl,
+            targetType: this.targetType,
+            angle: Angle(angle),
+            image: Assets.Get(this.textureName),
+            size: this.size,
 
-        shot.angle = Angle(angle - 180);
+        };
 
 
-        // scene.insertBefore(shot, player);
+        // プロパティを追加
+        // shot = $.extend(shot, this);
 
-        scene.addChild(shot);
-        this.shots.push(shot);
+
+        /*
+        this.shotEvents.forEach(function(event)
+        {
+            shot.events.push(event);
+        })
+        */
+
+
+
+        // 弾を登録する
+
+
+        // 横に並べる
+
+        for (var x in range(this.repeatX))
+        {
+
+            // 弾を生成する
+            var shot = new Shot(this.creator, shotSize);
+
+            // プロパティを登録
+            shot.attribute(shotProperty);
+
+
+            var shotWidth = (this.repeatX - 1) * this.repeatSpaceX;
+            shot.pos.sub(Vec2(shotWidth / 2, 0));
+
+
+            shot.pos.add(Vec2(this.repeatSpaceX * x, 0));
+
+            scene.addChild(shot);
+            this.shots.push(shot);
+
+
+
+        }
+
+
 
     }
 
@@ -512,7 +535,7 @@ Barrage.prototype.update = function()
 Barrage.prototype.setAxisFromTarget = function(target)
 {
     // 標的がいるなら軸を向け、いないならとりあえず上に
-    this.axisAngle = target ? this.creator.pos.angle(target.pos) : 0;
+    this.axisAngle = target ? this.creator.pos.angle(target.pos) - 180 : 0;
 }
 
 
@@ -528,15 +551,15 @@ var Spell = function()
 
 }
 
+
+// [[deprecated]]
 Spell.prototype.resetCount = function()
 {
     this.count = 0;
-
     this.barrages.forEach(function(barrage)
     {
         barrage.count = 0;
     });
-
 }
 
 
