@@ -8,11 +8,6 @@ body {
 }
 
 /* 文字の色 */
-.nav .btn-link {
-	color: rgb(  0,  0,  0);
-	text-decoration: none;
-}
-
 .h4p_landing-header {
 	/*color: rgb( 48,128,240);*/
 	color: rgb(255,255,255);
@@ -56,11 +51,7 @@ body {
 	font-size: 180%;
 }
 
-.h4p_publish p{
-	font-size: 60%;
-}
-
-.panel pre.panel-title {
+.h4p_projectlist .caption pre {
 	font-size: 14px;
 }
 
@@ -71,3 +62,17 @@ body {
 	padding: 0;
 }
 
+.h4p_topic-comment .comment-header {
+	font-size: 110%;
+	font-weight: 600;
+}
+
+.paper-login-button {
+	color: rgba(0,0,0,0.4);
+	font-weight: 600;
+	box-shadow: 0px 1px 3px 1px rgba(0,0,0,0.3) inset;
+}
+
+.paper-login-button:hover {
+	color: rgba(0,0,0,0.2);
+}

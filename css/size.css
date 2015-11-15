@@ -5,7 +5,10 @@
 /* 全体の幅など、デバイスによって変化するサイズ */
 @media(max-width: 767px) {
 	.container {
-		width: 408px;
+		width: 100%;
+	}
+	.container.container-game {
+		width: 95%;
 	}
 	.h4p_stagelist {
 		width: 384px;
@@ -13,10 +16,13 @@
 }
 @media(min-width: 768px) {
 	.container {
-		width: 792px;
+		width: 768px;
 	}
 	.h4p_stagelist {
 		width: 768px;
+	}
+	.h4p_filtering-buttons a.btn {
+		height: 100px;
 	}
 }
 @media (min-width: 992px) {
@@ -41,11 +47,20 @@
 
 /* 全てのデバイスに共通したサイズ */
 /* 幅・高さ属性 */
+.width-fit {
+	width: 100%;
+}
+
+nav #img-usericon {
+	max-height: 40px;
+	margin: -10px 0px;
+}
+
 .h4p_item {
 	height: 384px;
 }
 
-.h4p_projectlist .panel-heading pre {
+.h4p_projectlist .caption pre {
 	height: 117px;
 }
 
@@ -63,13 +78,159 @@
 	height: 36px;
 }
 
-/* 間隔属性 */
-header {
-	padding: 5px 0;
+.h4p_topic-comment .panel-body .comment-header {
+	height: 60px;
 }
 
-.nav .btn-link {
-	padding: 6px 12px;
+.h4p_topic-comment .panel-body .comment-body {
+	height: 120px;
+}
+
+.h4p_topic-comment .panel-body .comment-footer {
+	height: 30px;
+}
+
+.comment-thumbnail .h4p_thumbnail {
+	max-height: 187px;
+}
+
+#frameModal .modal-content {
+	height: 400px;
+}
+
+#codeModal pre {
+	max-height: 400px;
+}
+
+.container-tab {
+	width: 60px;
+	margin-top: -20px;
+}
+
+.quest-item-entity,
+.kit-item-entity {
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	width: 320px;
+	height: 420px;
+
+	/*仮のマージン*/
+	margin-left: 60px;
+	margin-top: 20px;
+}
+
+.modal-arrow-entity img {
+	height: 39px;
+	width: auto;
+	margin: 84px 4px;
+}
+
+#questModal .ModalClose,
+#kitModal .ModalClose {
+	position: absolute;
+	width: 68px;
+	height: 68px;
+	right: 0px;
+	top: 0px;
+}
+
+.modal-thumbnail-entity,
+.modal-kit-entity {
+	max-width: 242px;
+}
+
+.type-button-wrapper {
+	max-width: 800px;
+}
+
+.type-button-wrapper .change-type-button {
+	max-width: 28%;
+	margin: 0 2%;
+}
+
+.dropdown.notification-icon .dropdown-menu {
+	width: 380px;
+}
+
+.dropdown.notification-icon .dropdown-menu a.notification-item-wrapper {
+	height: 84px;
+}
+
+.container-pavilion {
+	min-height: 600px;
+}
+
+.notification-scroll {
+	max-height: 300px;
+}
+
+.notification-order {
+	height: 2px;
+	width: 0%;
+	transition: width 2.0s ease-in-out;
+}
+
+.notification-end {
+	width: 100%;
+	height: 20px;
+}
+
+.notification-order.active {
+	height: 2px;
+	width: 99%;
+}
+
+/* 間隔属性 */
+.margin-top-lg {
+	margin-top: 40px;
+}
+
+.margin-bottom-lg {
+	margin-bottom: 40px;
+}
+
+.margin-left-lg {
+	margin-left: 40px;
+}
+
+.margin-right-lg {
+	margin-right: 40px;
+}
+
+.margin-top-sm {
+	margin-top: 10px;
+}
+
+.margin-bottom-sm {
+	margin-bottom: 10px;
+}
+
+.margin-left-sm {
+	margin-left: 10px;
+}
+
+.margin-right-sm {
+	margin-right: 10px;
+}
+
+.margin-right-lg {
+	margin-right: 40px;
+}
+
+.padding-all-sm {
+	padding: 10px;
+}
+
+.no-padding {
+	padding: 0;
+}
+
+nav .navbar-brand img {
+	margin-top: -15px;
+}
+
+nav #button-loginwithtwitter {
+	padding: 11px 0px;
 }
 
 .h4p_stagecontainer {
@@ -88,13 +249,8 @@ header {
 	padding: 0;
 }
 
-.navbar-brand {
-	padding: 0;
-}
-
 .h4p_item p,
-.h4p_info-datail p,
-#h4p_header-dropdown {
+.h4p_info-datail p {
 	margin: 0;
 	padding: 0;
 }
@@ -104,10 +260,17 @@ header {
 }
 
 .h4p_info,
-.h4p_restaging {
-	margin-top: 10px;
+.h4p_restaging,
+.h4p_my-comment {
 	padding-top: 15px;
 	padding-bottom: 20px;
+}
+
+.h4p_info,
+.h4p_restaging,
+.h4p_my-comment,
+.h4p_youtube-frame {
+	margin-top: 10px;
 }
 
 .h4p_clear-img {
@@ -149,10 +312,26 @@ header {
 	padding-right: 1px;
 }
 
-.h4p_restaging_button button,
-.h4p_publish button{
+.h4p_restaging_button button {
+	border-radius: 0px 0px 0px 6px;
+}
+
+.h4p_save_button button {
+	border-radius: 0px 0px 6px 0px;
+}
+
+.h4p_publish button,
+button.h4p_open-project {
 	border-top-left-radius: 0px;
 	border-top-right-radius: 0px;
+}
+
+.h4p_restaging_button {
+	padding-right: 0px;
+}
+
+.h4p_save_button {
+	padding-left: 0px;
 }
 
 .h4p_mapTip {
@@ -164,6 +343,25 @@ header {
 	margin: 0 8px;
 }
 
+.h4p_topic-comment {
+	min-height: 270px;
+	width: 100%;
+	padding-top: 15px;
+}
+
+.h4p_topic-comment .panel-body {
+	margin: 0;
+}
+
+.comment-item-padding {
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.comment-body p {
+	margin-bottom: 0;
+}
+
 input[name="challenge"] {
 	margin-top: 8px;
 }
@@ -173,3 +371,50 @@ footer {
 	padding-bottom: 25px;
 }
 
+.h4p_projectlist img {
+	padding: 9px 9px 0px 9px;
+}
+
+button.h4p_open-project {
+	margin: -9px 0px 6px 0px;
+}
+
+.container-game {
+	margin-top: -20px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.container-game>.row {
+	margin: 0;
+}
+
+.quest-item-entity,
+.kit-item-entity {
+	padding: 32px 40px;
+}
+
+.quest-item-entity .item-achievement,
+.kit-item-entity .item-achievement {
+	margin-left: -14px;
+}
+
+.quest-item-entity .item-article {
+	margin: -64px 0px 0px 32px;
+}
+.kit-item-entity .item-article {
+	margin: -32px 0px 0px 32px;
+}
+
+#questModal .body-part-1 p,
+#kitModal .body-part-1 p {
+	margin: 5px 0;
+}
+
+.dropdown.notification-icon .dropdown-menu a.notification-item-wrapper {
+	padding: 6px 6px;
+}
+
+.notification-item-wrapper .notification-item-article {
+	margin-left: -15px;
+}

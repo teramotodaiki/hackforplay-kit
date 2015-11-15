@@ -3,16 +3,16 @@
 /* 要素や線の色、グラデーションを定義しています。 */
 
 /* 背景色　*/
-body {
+body,
+.container-game {
 	background-color: rgb(220, 220, 220);
 }
 
-header,
 footer {
 	background-color: rgb(245, 245, 245);
 }
 
-header {
+nav.navbar {
 	background-color: rgb(255, 255, 255);
 	background: -webkit-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
 	background: -moz-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
@@ -21,16 +21,13 @@ header {
 }
 
 .h4p_info,
-.h4p_restaging {
+.h4p_restaging,
+.h4p_my-comment {
 	background-color: rgb(255,255,255);
 }
 
 .h4p_clear {
 	background-color: rgb(196, 196, 191);;
-}
-
-#h4p_header-dropdown {
-	background-color: rgba(0,0,0,0);
 }
 
 .page-numbers .btn[disabled] {
@@ -42,14 +39,39 @@ header {
 	background-color: rgba(255,255,255,0.4);
 }
 
+.h4p_filtering-buttons a.btn {
+	color: rgb(255, 255, 255);
+	opacity: 0.65;
+}
+
+.h4p_filtering-buttons a.btn.disabled {
+	opacity: 0.9;
+}
+
+.h4p_game,
+.h4p_credit {
+	background-color: black;
+	color: white;
+}
+
+.notification-state-unread {
+	background-color: rgba(255, 59,111,0.4);
+	transition: background-color 0.2s ease-in;
+}
+
+.notification-state-unread.opened {
+	background-color: rgba(255, 59,111,0.05);
+}
+
 /* 線の幅・色 */
-header.navbar {
+nav.navbar {
 	border: none;
 }
 
 .h4p_info,
 .h4p_restaging,
-.h4p_mapTip {
+.h4p_mapTip,
+.h4p_my-comment {
 	border: 1px solid rgb(204, 204, 204);
 }
 
@@ -57,9 +79,60 @@ header.navbar {
 	border-color: rgba(0,0,0,0);
 }
 
+.h4p_filtering-buttons {
+	border-radius: 6px;
+	border: 16px solid rgb(255,255,255);
+}
+
+.btn-restage {
+	color: #fff !important;
+	background-color: #362f3c;
+}
+.btn-retry {
+	color: #fff !important;
+	background-color: #ff837b;
+}
+.btn-restage:hover {
+	background-color: #28232d;
+}
+.btn-retry:hover {
+	background-color: #d26c66;
+}
+
+.notification-item-wrapper {
+	color: #333;
+	border-bottom: 1px solid #adadad;
+}
+
+.notification-item-wrapper:hover {
+	color: #333;
+	background-color: #f5f5f5;
+}
+
+.notification-order {
+	background-color: #05d8ff;
+}
+
+.notification-end {
+	background-color: #f5f5f5;
+	background: linear-gradient(#f5f5f5, #ffffff);
+}
+
 /* 影の色 */
 header {
 	-webkit-box-shadow : 0 1px 2px rgba(0,0,0,.16);
 	-moz-box-shadow : 0 1px 2px rgba(0,0,0,.16);
 	box-shadow : 0 1px 2px rgba(0,0,0,.16);
+}
+
+.h4p_filtering-buttons a.btn {
+	-webkit-box-shadow: 0 0 6px 1px rgba(0,0,0,0.2) inset;
+	-moz-box-shadow: 0 0 6px 1px rgba(0,0,0,0.2) inset;
+	box-shadow: 0 0 6px 1px rgba(0,0,0,0.2) inset;
+}
+
+.h4p_filtering-buttons a.btn.disabled {
+	-webkit-box-shadow: 0 0 10px 2px rgba(0,0,0,0.4) inset;
+	-moz-box-shadow: 0 0 10px 2px rgba(0,0,0,0.4) inset;
+	box-shadow: 0 0 10px 2px rgba(0,0,0,0.4) inset;
 }

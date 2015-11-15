@@ -1,0 +1,77 @@
+
+.landingpage {
+	margin-top: -20px;
+}
+
+/* デバイスによって変化するサイズ */
+@media (max-width: 767px) {
+	.h4p_landing-main {	width: 100%; }
+	.l-1 { height: 432px; }
+}
+@media (min-width: 768px) {
+	.h4p_landing-main {	width: 768px; }
+	.l-1 { height: 432px; }
+}
+@media (min-width: 768px) {
+	.h4p_landing-main {	width: 768px; }
+	.l-1 { height: 504px; }
+}
+@media (min-width: 1280px) {
+	.h4p_landing-main { width: 1024px; }
+	.l-1 { height: 576px; }
+}
+@media (min-width: 1680px) {
+	.h4p_landing-main { width: 1024px; }
+	.l-1 { height: 576px; }
+}
+@media (min-width: 1681px) {
+	.h4p_landing-main {	width: 1440px; }
+	.l-1 { height: 810px; }
+}
+
+.bg {
+	display: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+}
+
+.l-1>div {
+	background-size: cover;
+}
+
+.h4p_landing {
+	position: relative;
+	background-color: rgb(255, 255, 255);
+	background: -webkit-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: -moz-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: -o-linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+	background: linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255) 80%, rgb(245, 245, 245) 100%);
+}
+
+.h4p_landing-main {
+	position: relative;
+	height: 100%;
+	margin: 0 auto;
+}
+
+.h4p_landing-header>.bg {
+	position: relative;
+	margin: 0 auto;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.h4p_landing-footer a {
+	vertical-align: middle;
+}
+
+.btn-bg {
+	display: none;
+	position: relative;
+	z-index: 10;
+}
+
+.l-1 .h4p_landing-header { height: 56%; }
+.l-1 .h4p_landing-footer { height: 44%; }
