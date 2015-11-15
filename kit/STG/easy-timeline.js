@@ -45,6 +45,50 @@ EasyTimeline.prototype.remove = function()
 }
 
 
+/*
+
+
+
+*/
+
+
+
+EasyTimeline.prototype.MoveBy = function(x, y)
+{
+    var self = this;
+
+    return function(time)
+    {
+        var event = {
+            sign_x: 1,
+            sign_y: 1,
+
+            /*
+                x, y . this === character
+            */
+
+            x: function()
+            {
+                return this.x + x * event.sign_x;
+            },
+
+            y: function()
+            {
+                return this.y + y * event.sign_y;
+            },
+
+            time: time,
+            easing: self._easing,
+
+        };
+
+        self.events.push(event);
+        return self;
+    }
+
+}
+EasyTimeline.prototype.Move = EasyTimeline.prototype.MoveBy;
+
 
 EasyTimeline.prototype.moveBy = function(x, y)
 {
@@ -93,6 +137,26 @@ EasyTimeline.prototype.moveTo = function(x, y)
 
 
 
+
+
+// Timeline を左右反転する
+EasyTimeline.prototype.MirrorX = function()
+{
+
+    this.events.forEach(function(event)
+    {
+
+        // 符号を反転する
+        if (event.sign_x !== undefined)
+        {
+            event.sign_x *= -1;
+        }
+    });
+
+
+}
+
+
 // Timeline に変換する
 EasyTimeline.prototype.toTimeline = function()
 {
@@ -111,6 +175,11 @@ EasyTimeline.prototype.toTimeline = function()
             var _event = $.extend(
             {}, event);
 
+
+            if (event.create_method !== undefined)
+            {
+                event.create_method();
+            }
 
             // then 系
             if (event.then !== undefined)
@@ -153,8 +222,12 @@ var Motion = {
         easyTimelineList[name] = (ETL);
 
         return ETL;
+    },
+
+    Mirror: function() {
 
     },
+
 
     // キャラクターに適用する
     Use: function(name, target)

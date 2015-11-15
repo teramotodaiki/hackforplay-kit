@@ -119,6 +119,8 @@ _Vec2.prototype.length = function()
 }
 
 
+
+
 // 正規化
 _Vec2.prototype.normalize = function()
 {
@@ -165,6 +167,7 @@ _Vec2.prototype.sub = function(vec)
 }
 
 
+
 var Vec2 = function(x, y)
 {
     return new _Vec2(x, y);
@@ -189,6 +192,17 @@ _Angle.prototype.sub = function(value)
     return this;
 }
 
+
+_Angle.prototype.ToVec2 = function()
+{
+    var radian = this.ToRadian();
+    return Vec2(Math.sin(radian), Math.cos(radian));
+}
+
+_Angle.prototype.ToRadian = function()
+{
+    return this.value * Math.PI / 180;
+}
 
 
 _Angle.prototype.toRadian = function()

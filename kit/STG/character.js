@@ -43,21 +43,13 @@ var Character = enchant.Class.create(enchant.Sprite,
 
         this.type = 'character';
 
-
+        this.collision_size = 15.0;
         this.barrage_count = {};
 
 
         // x, y
         this.pos = Vec2(0, 0);
 
-
-        this.hp = null;
-
-
-        this.spell;
-
-        // spell
-        // this.spell =
 
         // 方向
         this.vec = Vec2(0, 0);
@@ -141,7 +133,17 @@ var Enemy = enchant.Class.create(Character,
         this.backgroundColor = '#00f';
 
 
+        this.hp = 10;
+
+
         this.count = 0;
+
+
+        // 攻撃開始時間
+        this.attack_begin_time = 0.0;
+
+        // 攻撃回数
+        this.attack_loop_count = 10;
 
 
         this.spell = null;
@@ -161,6 +163,7 @@ var Enemy = enchant.Class.create(Character,
     {
         // this.move();
 
+        this.time = CountToTime(this.count);
 
         // TL を使用するから x, y から pos に逆輸入
         this.pos.x = this.x + this.width / 2;
@@ -170,7 +173,14 @@ var Enemy = enchant.Class.create(Character,
         // this.spell.counts = this.spellCounts;
 
 
-        this.spell.Update(this);
+        // 攻撃する
+        if (this.spell && this.attack_begin_time <= this.time)
+        {
+
+            this.spell.Update(this);
+
+        }
+
 
 
         this.count++;
@@ -195,6 +205,21 @@ Enemy.prototype.SetSpell = function(name)
 
 }
 
+// 被弾
+Enemy.prototype.Damage = function(damage)
+{
+
+    console.log('hp: ' + this.hp);
+
+    this.hp -= damage;
+
+
+    if (this.hp <= 0)
+    {
+        this.remove();
+    }
+
+}
 
 
 var Player = enchant.Class.create(Character,
@@ -211,12 +236,30 @@ var Player = enchant.Class.create(Character,
         this.attackSpellCount = 0;
         this.bombSpellCount = 0;
 
+
+        this.escape_count = 0;
+        this.escape_time = 0.0;
+
     },
 
     // 通常攻撃スペルを設定する
     SetAttackSpell: function(name)
     {
+
+
+
+        // this.spell = __Spell.Get(name);
+
+
         this.attackSpell = __Spell.Get(name);
+
+
+        // barrage_count を初期化する
+        this.attackSpell.barrages.forEach(function(barrage)
+        {
+            this.barrage_count[barrage.handle] = 0;
+        }, this);
+
     },
 
 
@@ -272,6 +315,9 @@ var Player = enchant.Class.create(Character,
     {
 
 
+
+
+
         // 通常攻撃
         if (this.attackSpell)
         {
@@ -279,12 +325,12 @@ var Player = enchant.Class.create(Character,
             // 攻撃する
             if (input.z)
             {
-                this.count = this.attackSpellCount++;
+                console.log('z');
                 this.attackSpell.Update(this);
             }
             else
             {
-                this.attackSpellCount = 0;
+                this.attackSpell.ResetCount(this);
             }
         }
 
@@ -305,6 +351,18 @@ var Player = enchant.Class.create(Character,
         this._test();
 
 
+        this.escape_time = CountToTime(this.escape_count++);
+        Debug.Set('escape-time', this.escape_time.toFixed(2));
+
+
     }
 
 });
+
+
+// 被弾
+Player.prototype.Damage = function(damage)
+{
+    this.escape_count = 0;
+    this.hp -= damage;
+}
