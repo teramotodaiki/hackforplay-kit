@@ -18,10 +18,9 @@ $(function(){
 	// ゲームフレームを横幅基本で3:2にする
 	var width = $(".h4p_game").width();
 	// frame.phpを経由して、getParam('src')のページをincludeさせる
-	var gameSrc = encodeURIComponent(getParam('src'));
 	$(".h4p_game").height(width/1.5)
 		.children('iframe').attr({
-			'src': 'frame.php?file=' + gameSrc + '&path=' + getParam('path') + '&next=' + getParam('next') + '&mode=' + getParam('mode'),
+			'src': getParam('src'),
 			'width': width,
 			'height': width/1.5
 		});

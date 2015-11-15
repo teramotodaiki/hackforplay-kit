@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title> {Title} - HackforPlay</title>
+</head>
+<body>
+	<script src="lib/jquery-1.11.3.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor/lib/codemirror.js" type="text/javascript"></script>
+	<script src="editor/mode/javascript/javascript.js" type="text/javascript"></script>
+	<script src="editor/addon/edit/closebrackets.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap.css">
+	<link rel="stylesheet" href="editor/lib/codemirror.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">
+	<link rel="stylesheet" type="text/css" href="css/font.css">
+	<link rel="stylesheet" type="text/css" href="css/size.css">
+	<link rel="stylesheet" type="text/css" href="css/system.css">
+	<style type="text/css" media="screen">
+		.CodeMirror {
+		  top: 0px;
+		  left: 0px;
+		  background-color: rgb(245,245,245);
+		}
+	</style>
+	<header class="navbar navbar-static-top">
+		<div class="container container-game">
+			<div class="navbar-header">
+		     	<a class="navbar-brand" title="ハックフォープレイ" href="/?rewrite=no">
+		        	<img alt="hackforplay" src="/logo.png">
+		     	</a>
+		    </div>
+		    <nav class="collapse navbar-collapse">
+		    	<ul class="nav navbar-nav">
+		    		<li><a class="btn btn-link navbar-btn" title="トップに戻る">トップに戻る</a></li>
+		    		<li><a class="btn btn-link navbar-btn" title="改造ステージ一覧へ">改造ステージ一覧へ</a></li>
+		    		<li><a class="btn btn-link navbar-btn" title="この人が作った他のステージ">この人が作った他のステージ</a></li>
+		    		<li><a class="btn btn-link navbar-btn" title="新着ステージ">新着ステージ</a></li>
+		    		<li><a class="btn btn-link navbar-btn" title="リソース">リソース</a></li>
+		    		<li><a class="btn btn-link navbar-btn" title="リファレンス">リファレンス</a></li>
+		    	</ul>
+		    	<ul class="nav navbar-nav navbar-right">
+		    		<li class="h4p_signin"><button type="button" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#signinModal">ログイン</button></li>
+					<li class="h4p_signin"><button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#authModal">会員登録</button></li>
+					<li class="h4p_signout">
+						<div class="dropdown">
+							<a id="h4p_header-dropdown" class="btn navbar-btn" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false" onfocus="this.blur();" >
+								<div data-toggle="tooltip" data-placement="bottom" title="マイページと設定">
+									<span class="h4p_own-nickname btn btn-link"></span>
+									<img class="img-circle h4p_own-thumbnail">
+								</div>
+							</a>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="h4p_header-dropdown">
+								<li role="presentation"><a href="/m" title="settings">マイページ</a></li>
+								<li role="presentation"><a href="/p" title="settings">設定</a></li>
+								<li role="presentation" class="divider"></li>
+								<li role="presentation" class="h4p_signout"><a href="javascript:void(0);" onclick="signout();">ログアウト</a></li>
+							</ul>
+						</div>
+					</li>
+		    	</ul>
+		    </nav>
+		</div>
+	</header>
+	<!-- Alert -->
+	<script type="text/javascript" charset="utf-8">
+	function showAlert (_class, _text) {
+		$('<div>').addClass('alert').addClass(_class).attr('role', 'alert').append(
+			$('<button>').addClass('close').attr({
+				'type' : 'button',
+				'data-dismiss': 'alert',
+				'aria-label': 'Close'
+			}).append(
+				$('<span>').attr('aria-hidden', 'true').html('&times;')
+			)
+		).append(
+			$('<span>').text(_text)
+		).appendTo('.h4p_alerts');
+
+		// アラートが見えるにスクロール
+		scrollToAnchor();
+	}
+	function screenShot () {
+		document.getElementsByTagName('iframe')[0].contentWindow.postMessage('screenShot()', '/');
+	}
+	function scrollToAnchor(){
+		var selector = arguments.length > 0 ? arguments[0] : '#scroll-anchor';
+		var top = $(selector).get(0).getBoundingClientRect().top;
+		window.scrollBy(0, top);
+	}
+	</script>
+	<script src="common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="view.js" type="text/javascript" charset="utf-8"></script>
+	<!-- Modal -->
+	<div class="modal fade" id="screenshotModal" tabindex="-1" role="dialog" aria-labelledby="screenshotModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+	    			<h4>右クリックで保存してください</h4>
+				</div>
+			    <div class="modal-body">
+			    	<img class="stage-thumbnail" src="" width="480" height="320" />
+			    </div>
+	    		<div class="modal-footer">
+	        		<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+	    		</div>
+			</div>
+		</div>
+	</div>
+	<!-- contents -->
+	<div class="container container-game">
+		<div class="row">
+			<div class="col-sm-12 h4p_restaging directly_floating_shadow">
+				<div class="row">
+					<div class="col-sm-12 h4p_restaging_editor">
+						<textarea name="restaging_code" value="// ステージ改造コードを書いて、このステージを改造してやろう!!"></textarea>
+					</div>
+					<div class="col-sm-12 h4p_restaging_button">
+						<button type="button" class="btn btn-block btn-lg btn-primary ignore-attendance" data-loading-text="保存中…">
+							<span>ステージ改造コードを実行</span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="scroll-anchor" class="col-sm-12"></div>
+			<div class="col-sm-12 h4p_alerts"></div>
+			<div class="col-sm-12 h4p_game" style="display:block">
+				<iframe src=""></iframe>
+			</div>
+			<div class="col-sm-12 h4p_clear text-center" style="display:none">
+				<div class="row">
+					<div class="col-sm-12">
+						<img class="h4p_clear-img" src="hackforplay/clear.png" height="320" width="480" alt="">
+					</div>
+					<div class="col-sm-12 h4p_clear-next">
+						<button type="button" class="btn btn-success btn-lg btn-block begin_restaging" title="改造する">このステージを改造する</button>
+						<a href="/r" class="btn btn-success btn-lg btn-block" title="改造ステージ一覧へ">
+							改造ステージ一覧へ
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 h4p_publish" style="display:none">
+				<button type="button" class="btn btn-block btn-lg btn-success" data-toggle="modal" data-target="#inputModal" data-loading-text="送信中...">
+					この改造ステージを投稿する
+				</button>
+				<a href="../r" title="もどる" class="h4p_publish-return btn btn-lg btn-block" style="display:none">もどる</a>
+			</div>
+			<div class="col-sm-12 col-xs-12 h4p_info">
+				<div class="row">
+					<div class="col-sm-6 col-xs-12 h4p_info-datail">
+						<p><h3 class="h4p_info-title">{Title}</h3></p>
+						<p><span>プレイ回数：<b>{Count}回</b></span></p>
+						<p><span><b>公式ステージ</b></span></p>
+					</div>
+					<div class="col-sm-3 col-xs-6 h4p_info-restaging">
+						<button type="button" class="btn btn-success btn-lg btn-block begin_restaging" title="改造する">改造する</button>
+					</div>
+					<div class="col-sm-3 col-xs-6 h4p_info-retry">
+						<a class="btn btn-primary btn-lg btn-block ignore-attendance" title="はじめから">はじめから</a>
+						<button style="display: none;" class="btn btn-primary btn-lg btn-block h4p_info-retry-button ignore-attendance" role="button" title="もう一度実行">もう一度実行</button>
+					</div>
+					<div class="col-sm-12 h4p_info-explain">
+						<p>{Explain}</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 panel panel-default h4p_while-restaging">
+				<div class="panel-body text-center">
+					<a class="btn btn-link btn-lg" title="Other Resources / 他の画像をみる">Other resources / 他の画像をみる</a>
+				</div>
+			</div>
+			<div class="col-sm-6 panel panel-default h4p_while-restaging">
+				<div class="panel-body text-center">
+					<a class="btn btn-link btn-lg" title="Reference / リファレンスを見る">Reference / リファレンスを見る</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
