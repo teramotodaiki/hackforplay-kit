@@ -1,6 +1,7 @@
 # hackforplay-kit
 Developing restaging kit of hackforplay.
 https://hackforplay.xyz/
+英語がおかしかったら、 Issue または PullRequest してください。
 
 You can run __without PHP__ in this version.
 
@@ -15,6 +16,7 @@ __Clone your desktop__ or __Download ZIP__ to start developing.
   * view.js
   * lib/
     * __enchant.js__
+    * __Hack.js__
   * kit/
     * rpg_hack_project
       * main.js
