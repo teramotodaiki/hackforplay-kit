@@ -18,6 +18,8 @@ window.addEventListener('load', function()
 
     Assets.Add('shot-none', 'tenonno-graphic/shot-none.png');
     Assets.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
+    Assets.Add('effect', 'tenonno-graphic/effect/effect.jpg');
+    Assets.Add('background', 'tenonno-graphic/background/dot-background.png');
 
 
     Assets.Preload();
@@ -25,6 +27,31 @@ window.addEventListener('load', function()
     game.onload = function()
     {
 
+        // 背景（仮）
+        var background = new Sprite(scene.width, scene.height);
+        var surface = background.image = new Surface(scene.width, scene.height);
+
+        background.scroll = 0.0;
+
+        background.onenterframe = function()
+        {
+
+            var texture = Assets.Get('background');
+
+            var ratio = texture.width / scene.width;
+
+            surface.draw(texture, 0, this.scroll * scene.height * ratio, scene.width, scene.height * ratio);
+            surface.draw(texture, 0, (this.scroll - 1.0) * scene.height * ratio, scene.width, scene.height * ratio);
+
+
+            if ((this.scroll += 0.01) >= 1.0)
+            {
+                this.scroll -= 1.0;
+            }
+
+        }
+
+        scene.addChild(background);
 
 
         // Pad を生成する
@@ -53,22 +80,20 @@ window.addEventListener('load', function()
         */
         __Barrage.New('player-normal',
         {
-            textureName: 'shot-normal',
-            createTime: 0.15,
+            texture_name: 'shot-normal',
+            create_time: 0.1,
             way: 1,
-            speed: 20,
-            size: 20,
-            targetType: 'enemy',
-            axisAngle: 0,
+            speed: 15,
+            size: 10,
+            target_type: 'enemy',
             repeatX: 2,
-            repeatSpaceX: 50
+            repeatSpaceX: 50,
+            power: 100
         });
-
-
 
         __Barrage.New('10way弾',
         {
-            textureName: 'shot-normal',
+            texture_name: 'shot-normal',
             way: 10,
             speed: 5,
             size: 20,
@@ -83,7 +108,7 @@ window.addEventListener('load', function()
 
         __Barrage.New('ホーミング弾',
         {
-            textureName: 'shot-normal',
+            texture_name: 'shot-normal',
             rangeAngle: 10,
             createTime: 10.2,
             way: 8,
@@ -104,9 +129,47 @@ window.addEventListener('load', function()
 
 
 
+
+
+        /*
+            Barrage.New('name', {}).Control(() => {}).ShotControl(() => {});
+        */
+
+
+        /*
+            target_type: 'enemy'
+            にすると同士討ちをするアレができる
+        */
+        __Barrage.New('自機狙い',
+        {
+            texture_name: 'shot-normal',
+            create_time: 0.1,
+            speed: 8,
+            way: 1,
+        }).control(function()
+        {
+
+            // 一番近い敵を狙う
+            this.AxisFromNearTarger();
+
+
+            if (this.time >= 2)
+            {
+                // this.speed += 1.1;
+            }
+
+            if(this.count % 30 === 0)
+            {
+                this.frame++;
+            }
+
+        });
+
+
+
         __Barrage.New('テスト',
         {
-            textureName: 'shot-normal',
+            texture_name: 'shot-normal',
             createTime: 1,
             way: 30,
             rangeAngle: 340,
@@ -115,7 +178,7 @@ window.addEventListener('load', function()
             // 弾を生成する度に 20 度追加する
             if (this.count % this.createFrame === 0)
             {
-                this.axisAngle += 20;
+                this.axis_angle += 20;
 
 
             }
@@ -135,26 +198,24 @@ window.addEventListener('load', function()
         */
         __Barrage.New('10way-r3',
         {
-            textureName: 'shot-normal',
+            texture_name: 'shot-normal',
             way: 15,
-            createTime: 0.1,
+            createTime: 0.5,
             speed: 5,
             repeat: 3,
             repeatAngle: 3
         }).control(function()
         {
 
-
-
             // 3 秒を超えたら way を変更してリスタート
-            if (this.time >= 3.0)
+            if (this.time >= this.createTime * 5 - 0.1)
             {
-                this.way = Random(5, 20);
+                this.way = Random(5, 100);
                 this.Restart();
             }
 
-
         });
+
 
 
         __Spell.Make('10way-r3')('10way-r3');
@@ -165,33 +226,12 @@ window.addEventListener('load', function()
 
 
 
+        __Spell.Make('自機狙い')('自機狙い');
+
+        player.SetAttackSpell('player-spell');
 
 
         //----------// EasyTimeline のテスト //----------//
-
-
-        // 敵を召喚
-        var e1 = new Enemy(20, 20);
-        var e2 = new Enemy(20, 20);
-
-        // player.SetAttackSpell('player-spell');
-
-
-        e1.SetSpell('10way-r3');
-
-        e2.SetSpell('プレイヤースペル');
-
-
-        scene.addChild(e1);
-        // scene.addChild(e2);
-
-
-        e1.speed = 1.5;
-        e2.speed = 3.0;
-
-
-        e1.locate(100, 50);
-        e2.locate(380, 150);
 
 
         // とりあえず easing を短縮
@@ -201,11 +241,82 @@ window.addEventListener('load', function()
 
 
         // 移動モーションを作成
-        Motion.New('m-1').moveBy(30, 30)(1.0).moveBy(-30, 30)(1.0).easing(quad).moveBy(50, 20)(1.0).moveBy(-50, 20)(1.0).easing(linear).moveBy(20, 50)(2.0).moveBy(-20, 50)(2.0).remove();
+        Motion.New('m-1').Move(30, 30)(1.0).Move(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
 
-        // 移動モーションを適用
-        // e1.setMotion('m-1');
-        // e2.setMotion('m-1');
+
+
+        /*
+        Stage.Make('ステージ',
+        {
+            1.0: function() {},
+            2.0: function() {},
+            3.0: function() {},
+        });
+        */
+
+
+        /*
+
+        Stage.Get('あああ').Chain(
+        {
+            //
+        }).AddEnemy(0,
+        {
+
+
+        }).AddEnemy(0,
+        {
+
+        }).AddEnemy(0,
+        {
+
+
+        });
+
+        */
+
+
+
+
+        Stage.Make('ステージ');
+
+
+
+        for (var i in Range(10))
+        {
+
+            Stage.Get('ステージ').AddEnemy(i,
+            {
+                pos: Vec2(scene.width / 10 * (i), 10),
+                spell: '自機狙い'
+            });
+        }
+
+
+        Stage.Get('ステージ').Chain(
+        {
+            // 1.0 秒
+        }).AddEvent(1.0, function()
+        {
+
+            console.log('wwwwwwww');
+
+
+            // 5.0 秒
+        }).AddEvent(5.0, function()
+        {
+
+
+            console.log('5 秒経過');
+
+        });
+
+
+        game.addEventListener('enterframe', function()
+        {
+            // 現在のステージを更新する
+            Stage.GetActive().Update();
+        });
 
 
 

@@ -11,6 +11,15 @@ function range(n)
 }
 
 
+function Range(n)
+{
+    return Array.apply(null,
+    {
+        length: n
+    }).map(Number.call, Number);
+}
+
+
 var toRadian = function(angle)
 {
     return angle * Math.PI / 180;

@@ -125,6 +125,8 @@ var CharacterList = {
         this.Each(type, function()
         {
 
+            //
+
             if (base !== this)
             {
 
@@ -152,8 +154,7 @@ var CharacterList = {
 
 var SpriteObject = enchant.Class.create(enchant.Sprite,
 {
-    initialize: function()
-    {
+    initialize: function() {
 
 
     }
@@ -176,9 +177,11 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.collision_size = 5.0;
 
 
+        // 自分に自分の弾が当たるか
+        this.hit_self = false;
 
 
-        this.compositeOperation = 'lighter';
+        // this.compositeOperation = 'lighter';
 
 
         // 画面外に出た場合削除するか
@@ -263,7 +266,14 @@ var Shot = enchant.Class.create(enchant.Sprite,
     {
 
 
-        if(Collision(this, target))
+        // 自滅を回避する
+        if (target === this.creator && !this.hit_self)
+        {
+            return;
+        }
+
+
+        if (Collision(this, target))
         {
 
 
@@ -380,7 +390,7 @@ var Barrage = function()
     this.power = 1;
 
     // 軸
-    this.axisAngle = 0;
+    this.axis_angle = 0;
 
     // 撃つ範囲角度
     this.rangeAngle = 360;
@@ -390,9 +400,10 @@ var Barrage = function()
 
     this.target_type = 'player';
 
+    // 自分に自分の弾が当たるか
+    this.hit_self = false;
 
     //----------// 内部で使用するメンバ //----------//
-
 
     // 時間
     this.time = 0.0;
@@ -521,7 +532,7 @@ Barrage.prototype.addShot = function()
     {
 
         // 弾の角度を算出
-        var beginAngle = this.axisAngle - this.rangeAngle / 2;
+        var beginAngle = this.axis_angle - this.rangeAngle / 2;
         var stepAngle = this.rangeAngle / this.way;
         var angle = beginAngle + stepAngle * way;
 
@@ -539,7 +550,9 @@ Barrage.prototype.addShot = function()
             target_type: this.target_type,
             image: Assets.Get(this.texture_name),
             size: this.size,
+            frame: this.frame,
 
+            hit_self: this.hit_self
         };
 
 
@@ -661,14 +674,20 @@ Barrage.prototype.Update = function()
 }
 
 
-// target の方向に axisAngle を向ける
-Barrage.prototype.setAxisFromTarget = function(target)
+// 一番近い敵を狙う
+Barrage.prototype.AxisFromNearTarger = function()
 {
-    // 標的がいるなら軸を向け、いないならとりあえず上に
-    this.axisAngle = target ? this.creator.pos.angle(target.pos) - 180 : 0;
+    this.AxisFromTarget(CharacterList.GetNear(this.creator, this.target_type));
 }
 
 
+
+// target の方向に axis_angle を向ける
+Barrage.prototype.AxisFromTarget = function(target)
+{
+    // 標的がいるなら軸を向け、いないならとりあえず上に
+    this.axis_angle = target ? this.creator.pos.angle(target.pos) : 0;
+}
 
 
 // 弾幕を組み合わせてスペルを創造する
@@ -677,7 +696,6 @@ var Spell = function()
     this.name = '';
 
     this.barrages = [];
-    this.counts = [];
 
 }
 
@@ -769,6 +787,24 @@ Spell.prototype.Update = function(creator)
 }
 
 
+Spell.prototype.Clone = function()
+{
+
+
+
+    var spell = new Spell();
+
+    spell.name = this.name;
+
+    // 闇の処理
+    this.barrages.forEach(function(barrage)
+    {
+        spell.barrages.push($.extend(
+        {}, barrage));
+    });
+
+    return spell;
+}
 
 // 技の名前とか表示するやつ
 Spell.prototype.statusRender = function()

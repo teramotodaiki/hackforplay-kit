@@ -12,9 +12,16 @@ var CreateEnemy = function(property)
     }
 
 
-    if(property.motion)
+    if (property.motion)
     {
         enemy.setMotion(property.motion);
+    }
+
+
+
+    if (property.spell)
+    {
+        enemy.SetSpell(property.spell);
     }
 
 
@@ -33,6 +40,10 @@ var _Stage = function()
     this.events = {};
 
     this.count = 0;
+
+
+    this.index = null;
+
 };
 
 
@@ -97,6 +108,12 @@ _Stage.prototype.AddEvent = function(time, event)
 _Stage.prototype.Attribute = Spell.prototype.attribute;
 
 var stage_asset = {};
+var active_stage = null;
+
+
+var stage_list = [];
+
+
 
 var Stage = {
 
@@ -105,11 +122,22 @@ var Stage = {
         return stage_asset[name];
     },
 
+    // 現在のステージを取得する
+    GetActive: function()
+    {
+        return active_stage;
+    },
+
+    // 次のステージに
+    Next: function()
+    {
+        return (active_stage = stage_list[active_stage.index + 1]);
+    },
+
     Make: function(name, property)
     {
 
-        stage = stage_asset[name] = new _Stage();
-
+        stage = active_stage = stage_asset[name] = new _Stage();
 
 
         if (property)
@@ -124,6 +152,9 @@ var Stage = {
             }
 
         }
+
+        stage.index = stage_list.length;
+        stage_list.push(stage);
     }
 
 

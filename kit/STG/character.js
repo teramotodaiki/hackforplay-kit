@@ -193,7 +193,7 @@ var Enemy = enchant.Class.create(Character,
 Enemy.prototype.SetSpell = function(name)
 {
 
-    this.spell = __Spell.Get(name);
+    this.spell =  __Spell.Get(name).Clone();
 
 
     // barrage_count を初期化する
