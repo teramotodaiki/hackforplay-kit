@@ -92,6 +92,51 @@ var Collision = function(o1, o2)
 
 
 
+var shot_material_asset = {};
+
+var ShotMaterial = {
+
+
+    New: function(name, property)
+    {
+        var material = shot_material_asset[name] = {};
+
+
+        (function()
+        {
+
+            this.name = 'material-' + name;
+
+            this.width = property.width;
+            this.height = property.height;
+
+            // 比率を計算する
+            this.scale_width = property.default_width === undefined ? 0 : property.default_width / this.width;
+            this.scale_height = property.default_height === undefined ? 0 : property.default_height / this.height;
+
+
+            this.collision_size = property.collision_size;
+
+
+        }).call(material);
+
+
+        // テクスチャを登録する
+        Assets.Add(material.name, property.source);
+
+    },
+
+    Get: function(name)
+    {
+        return shot_material_asset[name];
+    }
+
+};
+
+
+
+
+
 // 敵キャラ
 var enemies = [];
 
@@ -156,9 +201,14 @@ var SpriteObject = enchant.Class.create(enchant.Sprite,
 {
     initialize: function() {
 
+        this.pos = Vec2(0, 0);
 
+
+        this.Initialize();
     }
 });
+
+
 
 
 
@@ -166,15 +216,27 @@ var SpriteObject = enchant.Class.create(enchant.Sprite,
 // 弾
 var Shot = enchant.Class.create(enchant.Sprite,
 {
-    initialize: function(creator, size)
+    initialize: function(creator, material)
     {
-        Sprite.call(this, size, size);
+
+        if (!material)
+        {
+            console.log('マテリアルが存在しません');
+        }
+
+        Sprite.call(this, material.width, material.height);
+
+
+        this.image = Assets.Get(material.name);
+
+        this.material = material;
+
 
         this.type = 'shot';
 
+        this.collision_size = material.collision_size;
 
 
-        this.collision_size = 5.0;
 
 
         // 自分に自分の弾が当たるか
@@ -210,11 +272,15 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.count = 0;
 
-        this.spriteSize = size;
+
 
         this.__control = null;
 
         this.events = [];
+
+
+        this.scale_x = 1.0;
+        this.scale_y = 1.0;
 
     },
 
@@ -226,7 +292,11 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
     resize: function()
     {
-        this.scaleX = this.scaleY = (this.size / this.spriteSize);
+
+
+        this.scaleX = this.material.scale_width;
+        this.scaleY = this.material.scale_height;
+
 
     },
 
@@ -359,6 +429,7 @@ Shot.prototype.attribute = function(object)
 // 初期化後に呼ぶ
 Shot.prototype.InitializeUpdate = function()
 {
+
     this.updatePos();
     this.resize();
 }
@@ -435,6 +506,9 @@ var Barrage = function()
 
     this.shotEvents = [];
 
+
+    // 材質
+    this.material = 'normal';
 
 
     // 詳細設定
@@ -548,11 +622,12 @@ Barrage.prototype.addShot = function()
             life: this.life,
             __control: this.__shotControl,
             target_type: this.target_type,
-            image: Assets.Get(this.texture_name),
             size: this.size,
             frame: this.frame,
 
-            hit_self: this.hit_self
+            hit_self: this.hit_self,
+
+
         };
 
 
@@ -569,6 +644,10 @@ Barrage.prototype.addShot = function()
 
 
 
+        // 材質
+        var material = ShotMaterial.Get(this.material);
+
+
         // 弾を登録する
 
         // ずらし配置みたいな
@@ -581,12 +660,13 @@ Barrage.prototype.addShot = function()
             {
 
 
-
                 shotProperty.angle = Angle(angle);
 
 
+
                 // 弾を生成する
-                var shot = new Shot(this.creator, shotSize);
+                var shot = new Shot(this.creator, material);
+
 
                 // プロパティを登録
                 shot.attribute(shotProperty);

@@ -22,6 +22,21 @@ window.addEventListener('load', function()
     Assets.Add('background', 'tenonno-graphic/background/dot-background.png');
 
 
+
+
+    ShotMaterial.New('normal',
+    {
+        source: 'tenonno-graphic/shot-normal-min.png',
+        width: 32,
+        height: 32,
+        default_width: 15,
+        default_height: 15,
+        collision_size: 10,
+    });
+
+
+
+
     Assets.Preload();
 
     game.onload = function()
@@ -74,13 +89,12 @@ window.addEventListener('load', function()
         player.locate(sceneSize.width / 2, sceneSize.height / 2);
         player.speed = 5;
 
-
         /*
             50px の間隔で 2 つの弾を 0.0 度に放つ
         */
         __Barrage.New('player-normal',
         {
-            texture_name: 'shot-normal',
+            material: 'normal',
             create_time: 0.1,
             way: 1,
             speed: 15,
@@ -142,7 +156,7 @@ window.addEventListener('load', function()
         */
         __Barrage.New('自機狙い',
         {
-            texture_name: 'shot-normal',
+            material: 'normal',
             create_time: 0.1,
             speed: 8,
             way: 1,
@@ -158,7 +172,7 @@ window.addEventListener('load', function()
                 // this.speed += 1.1;
             }
 
-            if(this.count % 30 === 0)
+            if (this.count % 30 === 0)
             {
                 this.frame++;
             }
