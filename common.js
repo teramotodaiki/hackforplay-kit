@@ -5,4 +5,7 @@
 	};
 	s('src', "frame.html");
 	s('mode', "official");
+	s('game_mode', "official");
+	s('youtube', 'm2Qb2ryoUhs');
+
 })();
