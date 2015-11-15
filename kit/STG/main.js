@@ -23,8 +23,7 @@ window.addEventListener('load', function()
 
 
 
-
-    ShotMaterial.New('normal',
+    Material.New('normal',
     {
         source: 'tenonno-graphic/shot-normal-min.png',
         width: 32,
@@ -35,8 +34,6 @@ window.addEventListener('load', function()
     });
 
 
-
-
     Assets.Preload();
 
     game.onload = function()
@@ -45,9 +42,7 @@ window.addEventListener('load', function()
         // 背景（仮）
         var background = new Sprite(scene.width, scene.height);
         var surface = background.image = new Surface(scene.width, scene.height);
-
         background.scroll = 0.0;
-
         background.onenterframe = function()
         {
 
@@ -65,8 +60,9 @@ window.addEventListener('load', function()
             }
 
         }
-
         scene.addChild(background);
+
+        
 
 
         // Pad を生成する
@@ -105,9 +101,11 @@ window.addEventListener('load', function()
             power: 100
         });
 
+
+
         __Barrage.New('10way弾',
         {
-            texture_name: 'shot-normal',
+            material: 'normal',
             way: 10,
             speed: 5,
             size: 20,
@@ -115,14 +113,13 @@ window.addEventListener('load', function()
         }).shotControl(function()
         {
 
-
             this.angle.add(2);
         });
 
 
         __Barrage.New('ホーミング弾',
         {
-            texture_name: 'shot-normal',
+            material: 'normal',
             rangeAngle: 10,
             createTime: 10.2,
             way: 8,
@@ -167,10 +164,6 @@ window.addEventListener('load', function()
             this.AxisFromNearTarger();
 
 
-            if (this.time >= 2)
-            {
-                // this.speed += 1.1;
-            }
 
             if (this.count % 30 === 0)
             {
@@ -181,54 +174,29 @@ window.addEventListener('load', function()
 
 
 
-        __Barrage.New('テスト',
-        {
-            texture_name: 'shot-normal',
-            createTime: 1,
-            way: 30,
-            rangeAngle: 340,
-        }).control(function()
-        {
-            // 弾を生成する度に 20 度追加する
-            if (this.count % this.createFrame === 0)
-            {
-                this.axis_angle += 20;
-
-
-            }
-        }).shotControl(function()
-        {
-
-            if (this.count % 20 === 0)
-            {
-                this.Color(this.frame + 1);
-            }
-
-        });
-
 
         /*
             10 方向に 6 度の間隔を開けた 3 つの弾を放つ
         */
         __Barrage.New('10way-r3',
         {
-            texture_name: 'shot-normal',
+            material: 'normal',
             way: 15,
-            createTime: 0.5,
+            create_time: 0.5,
             speed: 5,
             repeat: 3,
             repeatAngle: 3
         }).control(function()
         {
-
-            // 3 秒を超えたら way を変更してリスタート
-            if (this.time >= this.createTime * 5 - 0.1)
+            // 生成する度に
+            if (this.CreateNow())
             {
-                this.way = Random(5, 100);
-                this.Restart();
+                this.axis_angle += 10;
+                this.NextColor();
             }
 
         });
+
 
 
 
@@ -245,7 +213,6 @@ window.addEventListener('load', function()
         player.SetAttackSpell('player-spell');
 
 
-        //----------// EasyTimeline のテスト //----------//
 
 
         // とりあえず easing を短縮
@@ -258,6 +225,12 @@ window.addEventListener('load', function()
         Motion.New('m-1').Move(30, 30)(1.0).Move(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
 
 
+        Motion.New('ボス登場').Move(0, 100)(1.0).Call('Active');
+
+
+        // 右から左に
+        Motion.New('RtoL').Move(-scene.width, 0)(2).remove();
+
 
         /*
         Stage.Make('ステージ',
@@ -269,67 +242,50 @@ window.addEventListener('load', function()
         */
 
 
-        /*
-
-        Stage.Get('あああ').Chain(
-        {
-            //
-        }).AddEnemy(0,
-        {
-
-
-        }).AddEnemy(0,
-        {
-
-        }).AddEnemy(0,
-        {
-
-
-        });
-
-        */
-
-
-
-
         Stage.Make('ステージ');
 
+
+        var boss = new Boss(30, 30);
+
+
+        boss.SetEntryMotion('ボス登場');
+
+        boss.locate(scene.width / 2, 0);
+
+        boss.AddSpell('10way-r3',
+        {
+            hp: 100
+        });
+
+        boss.SetDeathEvent(function()
+        {
+            Hack.gameclear();
+        })
 
 
         for (var i in Range(10))
         {
 
-            Stage.Get('ステージ').AddEnemy(i,
+            Stage.Get('ステージ').AddEnemy(i * 0.4,
             {
-                pos: Vec2(scene.width / 10 * (i), 10),
-                spell: '自機狙い'
+                pos: Vec2(scene.width, 20 + i * 20),
+                motion: 'RtoL',
+                spell: '自機狙い',
             });
+
         }
 
 
-        Stage.Get('ステージ').Chain(
-        {
-            // 1.0 秒
-        }).AddEvent(1.0, function()
-        {
-
-            console.log('wwwwwwww');
+        Stage.Get('ステージ').AddBossFromInstance(5, boss);
 
 
-            // 5.0 秒
-        }).AddEvent(5.0, function()
-        {
-
-
-            console.log('5 秒経過');
-
-        });
-
-
+        // 現在のステージを更新する
         game.addEventListener('enterframe', function()
         {
-            // 現在のステージを更新する
             Stage.GetActive().Update();
+
+            Debug.Set('stage-count', Stage.GetActive().count);
+
         });
 
 

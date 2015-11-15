@@ -94,8 +94,7 @@ var Collision = function(o1, o2)
 
 var shot_material_asset = {};
 
-var ShotMaterial = {
-
+var Material = {
 
     New: function(name, property)
     {
@@ -199,7 +198,8 @@ var CharacterList = {
 
 var SpriteObject = enchant.Class.create(enchant.Sprite,
 {
-    initialize: function() {
+    initialize: function()
+    {
 
         this.pos = Vec2(0, 0);
 
@@ -207,8 +207,6 @@ var SpriteObject = enchant.Class.create(enchant.Sprite,
         this.Initialize();
     }
 });
-
-
 
 
 
@@ -566,6 +564,13 @@ Barrage.prototype.shotControl = function(control)
 }
 
 
+
+// 生成する時間なら
+Barrage.prototype.CreateNow = function()
+{
+    return this.count % this.create_count === 0;
+}
+
 // イベント
 Barrage.prototype.addEvent = function(callback)
 {
@@ -645,7 +650,7 @@ Barrage.prototype.addShot = function()
 
 
         // 材質
-        var material = ShotMaterial.Get(this.material);
+        var material = Material.Get(this.material);
 
 
         // 弾を登録する
@@ -722,7 +727,10 @@ Barrage.prototype.Restart = function()
 }
 
 
-
+Barrage.prototype.NextColor = function()
+{
+    this.frame++;
+}
 
 // 弾幕を更新する
 Barrage.prototype.Update = function()
@@ -936,6 +944,12 @@ var __Spell = {
     // スペルを取得する
     Get: function(name)
     {
+
+        if (spell_asset[name] === undefined)
+        {
+            console.warn('スペル "' + name + '" は存在しません')
+        }
+
         return spell_asset[name];
     },
 

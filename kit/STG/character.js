@@ -140,10 +140,10 @@ var Enemy = enchant.Class.create(Character,
 
 
         // 攻撃開始時間
-        this.attack_begin_time = 0.0;
+        this.attack_begin_time = null;
 
         // 攻撃回数
-        this.attack_loop_count = 10;
+        this.attack_end_time = null;
 
 
         this.spell = null;
@@ -173,8 +173,10 @@ var Enemy = enchant.Class.create(Character,
         // this.spell.counts = this.spellCounts;
 
 
+
+
         // 攻撃する
-        if (this.spell && this.attack_begin_time <= this.time)
+        if (this.spell && (this.attack_begin_time === null || this.attack_begin_time <= this.time) && (this.attack_end_time === null || this.attack_end_time >= this.time))
         {
 
             this.spell.Update(this);
@@ -189,11 +191,17 @@ var Enemy = enchant.Class.create(Character,
 });
 
 
+Enemy.prototype.SetHP = function(hp)
+{
+    this.hp = this.maxHP = hp;
+}
+
+
 // スペルを登録する
 Enemy.prototype.SetSpell = function(name)
 {
 
-    this.spell =  __Spell.Get(name).Clone();
+    this.spell = __Spell.Get(name).Clone();
 
 
     // barrage_count を初期化する
@@ -220,6 +228,166 @@ Enemy.prototype.Damage = function(damage)
     }
 
 }
+
+
+
+var Boss = enchant.Class.create(Enemy,
+{
+    initialize: function(width, height)
+    {
+
+        Enemy.call(this, width, height);
+
+
+        // this.type = 'boss';
+
+        this.type = 'enemy';
+
+
+        this.entry_motion = false;
+
+        this.death_event = function() {}
+
+        this.spells = [];
+
+        this.active_spell_index = -1;
+
+        this.active = false;
+
+        this.death = false;
+
+    },
+    onenterframe: function()
+    {
+
+        if (this.death) return;
+
+        this.time = CountToTime(this.count);
+
+        // TL を使用するから x, y から pos に逆輸入
+        this.pos.x = this.x + this.width / 2;
+        this.pos.y = this.y + this.height / 2;
+
+
+        // 攻撃する
+        if (this.active)
+        {
+
+            if (this.spells[this.active_spell_index] === undefined)
+            {
+                console.error('スペルが存在しません');
+                console.error(this.spells);
+            }
+
+
+
+            this.spells[this.active_spell_index].Update(this);
+        }
+
+
+        this.count++;
+    }
+});
+
+Boss.prototype.Active = function()
+{
+    this.active = true;
+    this.NextSpell();
+}
+
+
+Boss.prototype.SetDeathEvent = function(event)
+{
+    this.death_event = event;
+}
+
+
+// スペルを追加する
+Boss.prototype.AddSpell = function(name, option)
+{
+
+
+    var spell = __Spell.Get(name).Clone();
+
+    if (option.hp)
+    {
+        spell.hp = option.hp;
+    }
+
+
+
+
+
+    // barrage_count を初期化する
+    spell.barrages.forEach(function(barrage)
+    {
+        this.barrage_count[barrage.handle] = 0;
+    }, this);
+
+
+    this.spells.push(spell);
+
+}
+
+
+Boss.prototype.GetActiveSpell = function()
+{
+    return this.spells[this.active_spell_index];
+}
+
+Boss.prototype.NextSpell = function()
+{
+    this.active_spell_index++;
+
+    // 全てのスペルを使用したら
+    if (this.spells.length <= this.active_spell_index)
+    {
+        throw '';
+    }
+    else
+    {
+        this.SetHP(this.GetActiveSpell().hp);
+    }
+
+}
+
+
+Boss.prototype.SetEntryMotion = function(name)
+{
+    this.entry_motion = true;
+
+    // motion を適用
+    Motion.Use(name, this);
+}
+
+Boss.prototype.Damage = function(damage)
+{
+
+
+    if (this.active)
+    {
+        this.hp -= damage;
+    }
+
+    // 次のスペルに
+    if (this.hp <= 0.0)
+    {
+
+        try
+        {
+            this.NextSpell();
+        }
+        //
+        catch (a)
+        {
+            this.death = true;
+            this.death_event();
+        }
+
+    }
+
+}
+
 
 
 var Player = enchant.Class.create(Character,

@@ -1,3 +1,70 @@
+// 東方みたいな HP ゲージ
+var HP = enchant.Class.create(enchant.Sprite,
+{
+    initialize: function(enemy)
+    {
+        Sprite.call(this, 100, 100);
+
+        this.enemy = enemy;
+        this.image = new Surface(this.width, this.height);
+
+
+        // 位置を更新する
+        this.updatePos = function()
+        {
+            this.x = this.enemy.x + (this.enemy.width - this.width) / 2;
+            this.y = this.enemy.y + (this.enemy.height - this.height) / 2;
+        }
+
+        this.updatePos();
+    },
+
+    onenterframe: function()
+    {
+
+        // 位置を合わせる
+        this.updatePos();
+
+
+        // HP を正規化
+        var hpNorm = this.enemy.hp / this.enemy.maxHP;
+
+
+
+        hpNorm *= Math.PI * 2;
+
+        // リファレンス見る気力なかったからそのまま使う
+        var ctx = this.image.context;
+        ctx.clearRect(0, 0, this.width, this.height);
+
+        // 円
+        ctx.beginPath();
+        ctx.arc(this.width / 2, this.height / 2, 40, 0, Math.PI * 2);
+
+        // 枠
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+
+        // 背景
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#999';
+        ctx.stroke();
+
+        // 対象が既に倒れているなら HP ゲージは表示しなくても OK
+        if (this.enemy.hp <= 0) return;
+
+        // HP ゲージ
+        ctx.beginPath();
+        ctx.arc(this.width / 2, this.height / 2, 40, -Math.PI / 2, -Math.PI / 2 - hpNorm, true);
+        ctx.strokeStyle = '#9ff';
+        ctx.stroke();
+
+    }
+});
+
+
+
 var CreateEnemy = function(property)
 {
 
@@ -44,32 +111,113 @@ var _Stage = function()
 
     this.index = null;
 
+    this.__boss = false;
+
+
 };
 
 
-_Stage.prototype.Update = function()
-
+// 既存のボスを追加する
+_Stage.prototype.AddBossFromInstance = function(time, boss)
 {
-
-    // イベントを処理する
-    if (this.events[this.count] !== undefined)
+    this.AddEvent(time, function()
     {
-        this.events[this.count].call(this);
-        console.log('stage: event');
-    }
+
+        this.__boss = true;
 
 
+        scene.addChild(boss);
+        scene.addChild(new HP(boss));
+    });
 
-    ++this.count;
-}
-
-// 整形用
-_Stage.prototype.Chain = function(_)
-{
     return this;
 }
 
 
+// ボスを追加する
+_Stage.prototype.AddBoss = function(time, property)
+{
+    this.AddEvent(time, function()
+    {
+        console.log('ボスを追加します');
+
+        var boss = new Boss(20, 20);
+
+
+        boss.SetHP(100);
+
+        scene.addChild(boss);
+
+        scene.addChild(new HP(boss));
+
+
+        this.__boss = true;
+
+
+        if (property.pos)
+        {
+            boss.locate(property.pos.x, property.pos.y);
+        }
+        if (property.motion)
+        {
+            boss.setMotion(property.motion);
+        }
+        if (property.spell)
+        {
+            boss.SetSpell(property.spell);
+        }
+
+        if (property.entry_motion)
+        {
+            boss.SetEntryMotion(property.entry_motion);
+        }
+
+
+
+
+        var self = this;
+
+        // ボスを倒したらカウントを再開
+        boss.death_event = function()
+        {
+            self.__boss = false;
+
+
+
+
+        }
+
+    });
+    return this;
+}
+
+_Stage.prototype.Update = function()
+{
+
+
+    // ボスが出現していない時はカウントを進める
+    if (!this.__boss)
+    {
+
+        // イベントを処理する
+        if (this.events[this.count] !== undefined)
+        {
+            this.events[this.count].call(this);
+            console.log('stage: event');
+        }
+
+        ++this.count;
+    }
+
+}
+
+
+
+// 整形用
+_Stage.prototype.Chain = function()
+{
+    return this;
+}
 
 
 // 敵を追加する
@@ -99,6 +247,22 @@ _Stage.prototype.AddEvent = function(time, event)
     else
     {
         console.log('Stage: イベントが重複しています');
+
+        // イベントを合成する
+
+        var _event = stage.events[count];
+
+        delete stage.events[count];
+
+        stage.events[count] = function()
+        {
+
+            _event.call(this);
+            event.call(this);
+
+        }
+
+
     }
 
     return this;
@@ -119,6 +283,12 @@ var Stage = {
 
     Get: function(name)
     {
+
+        if (stage_asset[name] === undefined)
+        {
+            console.warn('ステージ "' + name + '" は存在しません');
+        }
+
         return stage_asset[name];
     },
 
@@ -155,6 +325,8 @@ var Stage = {
 
         stage.index = stage_list.length;
         stage_list.push(stage);
+
+        return stage;
     }
 
 

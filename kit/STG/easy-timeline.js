@@ -28,6 +28,20 @@ EasyTimeline.prototype.easing = function(value)
 }
 
 
+// 関数を呼ぶ
+EasyTimeline.prototype.Call = function(name)
+{
+    this.events.push(
+    {
+        then: function()
+        {
+            this[name]();
+        }
+    });
+    return this;
+}
+
+
 EasyTimeline.prototype.remove = function()
 {
 
@@ -229,9 +243,16 @@ var Motion = {
     },
 
 
+
     // キャラクターに適用する
     Use: function(name, target)
     {
+
+        if(easyTimelineList[name] === undefined)
+        {
+            console.log(name + ' は存在しないモーションです');
+        }
+
 
         var a = easyTimelineList[name].toTimeline();
 
