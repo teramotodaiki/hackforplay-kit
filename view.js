@@ -94,44 +94,6 @@ $(function(){
 		}
 	});
 
-	// tag list view
-	$.post('../stage/getaglist.php', {
-
-	} , function(data, textStatus, xhr) {
-		switch (data) {
-			case '':
-			case 'parse-error':
-				$('.h4p_stage-tag-list').append('Sorry, But load failed // よみこみに しっぱいしました ごめんなさい');
-				break;
-			default:
-				var result = JSON.parse(data);
-
-				// 先頭が偏らないようランダムを加える (swap)
-				var headIndex = Math.random() * result.values.length >> 0;
-				var tmp = result.values[0];
-				result.values[0] = result.values[headIndex];
-				result.values[headIndex] = tmp;
-
-				result.values.forEach(function(item) {
-
-					$(this).append(
-						$('<label>').addClass('radio-inline').append(
-							$('<input>').attr({
-								'type': 'radio',
-								'name': 'comment-tag'
-							}).val(item.IdentifierString)
-						).append(
-							$('<p>').addClass('label').text(item.DisplayString).css('background-color', item.LabelColor)
-						)
-					);
-
-				}, $('.h4p_stage-tag-list'));
-
-				$('.h4p_stage-tag-list input').first().attr('checked', true);
-				break;
-		}
-	});
-
 	// leave comment then take
 	$('#commentModal').on('show.bs.modal', function () {
 		// canvas to image
@@ -184,35 +146,6 @@ $(function(){
 
 		$('.h4p_my-comment').addClass('hidden');
 
-		$.post('../stage/getmycommentbyid.php', {
-			'stageid' : getParam('id'),
-			'attendance-token' : sessionStorage.getItem('attendance-token')
-		} , function(data, textStatus, xhr) {
-
-			switch(data) {
-				case 'parse-error':
-				case '':
-					break;
-				case 'no-session':
-				case 'not-found':
-
-					sessionStorage.setItem('stage_param_comment', ''); // no-comment
-					break;
-				default:
-					var result = JSON.parse(data);
-
-					var $comment = $('.h4p_my-comment').removeClass('hidden');
-					$comment.find('.h4p_comment-trash').data('id', result.ID);
-					$comment.find('.comment-tag').text(result.Tags[0].DisplayString).css('background-color', result.Tags[0].LabelColor);
-					$comment.find('.comment-message').text(result.Message);
-					$comment.find('.comment-thumb').attr('src', result.Thumbnail);
-
-					sessionStorage.setItem('stage_param_comment', 'true'); // exist-comment
-					break;
-			}
-			if (callback)
-				callback();
-		});
 	}
 	getCommentTask();
 
@@ -389,22 +322,6 @@ $(function(){
 
 				function beginLog (successed, failed) {
 					// ロギングの開始をサーバーに伝え、トークンを取得する
-					$.post('../analytics/beginrestaginglog.php', {
-						'stage_id': getParam('id'),
-						'mode': getParam('mode'),
-						'level': getParam('level'),
-						'report': getParam('reporting_restaged')
-					}, function(data, textStatus, xhr) {
-						switch (data) {
-							case 'error':
-								if (failed) failed();
-								break;
-							default:
-								sessionStorage.setItem('restaginglog-token', data);
-								if (successed) successed();
-								break;
-						}
-					});
 				}
 				function updateLog (successed, failed) {
 					// ログをアップデートする
