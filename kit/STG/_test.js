@@ -30,8 +30,6 @@ var InitializeGlobalVariable = function()
 {
 
 
-
-
     game = enchant.Core.instance;
 
 
@@ -120,6 +118,7 @@ var CreatePad = function()
     //アナログパッドの生成
     var pad = new APad();
     pad.moveTo(0 + padMargin, 220 - padMargin);
+
 
 
     pad.onenterframe = function()
