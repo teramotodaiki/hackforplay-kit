@@ -91,6 +91,10 @@ window.addEventListener('load', function () {
 					behavior = value;
 				}
 			});
+			this.setTimeout(function () {
+				// 1 frame later, call this.onbecomeidle
+				this.behavior = BehaviorTypes.Idle;
+			}, 1);
 			var collisionFlag = null; // this.collisionFlag (Default:true)
 			Object.defineProperty(this, 'collisionFlag', {
 				get: function () {
@@ -141,6 +145,23 @@ window.addEventListener('load', function () {
 					return getter.call(this);
 				}
 			}
+		},
+		setTimeout: function (callback, wait) {
+			var target = this.age + Math.min(1, wait);
+			this.on('enterframe', function task () {
+				if (this.age === target) {
+					callback.call(this);
+					this.removeEventListener('enterframe', task);
+				}
+			});
+		},
+		setInterval: function (callback, interval) {
+			var current = this.age;
+			this.on('enterframe', function task () {
+				if ((this.age - current) % interval === 0) {
+					callback.call(this);
+				}
+			});
 		}
 	});
 
@@ -177,7 +198,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Dead, function () {
 				return [this.direction * 9 + 1, null];
 			});
-			this.behavior = BehaviorTypes.Idle;
 		},
 		onenterframe: function () {
 			if (this.behavior === BehaviorTypes.Idle) {
@@ -303,7 +323,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [6, 6, 6, 6, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4]);
 			this.setFrame(BehaviorTypes.Damaged, [4, 4, 4, 4, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Dead, [5, 5, 5, 5, 7, 7, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
@@ -316,7 +335,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [7, 7, 7, 6, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4]);
 			this.setFrame(BehaviorTypes.Damaged, [4, 4, 4, 4, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Dead, [5, 5, 5, 5, 7, 7, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
@@ -329,7 +347,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [6, 6, 6, 7, 7, 7, 7, 7, 5, 5, 5, 5, 4, 4, 4, 4]);
 			this.setFrame(BehaviorTypes.Damaged, [4, 4, 4, 4, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Dead, [5, 5, 5, 5, 7, 7, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
@@ -342,7 +359,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [9, 9, 9, 9, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 4, 4, 4, 4]);
 			this.setFrame(BehaviorTypes.Damaged, [4, 4, 4, 4, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Dead, [5, 5, 5, 5, 7, 7, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
@@ -355,7 +371,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [8, 8, 8, 8, 8, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
 			this.setFrame(BehaviorTypes.Damaged, [4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Dead, [2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
@@ -368,7 +383,6 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Attack, [5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5]);
 			this.setFrame(BehaviorTypes.Damaged, [7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6]);
 			this.setFrame(BehaviorTypes.Dead, [2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, -1, null]);
-			this.behavior = BehaviorTypes.Idle;
         }
     });
 
