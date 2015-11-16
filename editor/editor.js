@@ -1,7 +1,7 @@
 // Editor
 var game = window.parent;
 var jsEditor;
-var policy = "/";
+var policy = "*";
 
 window.addEventListener('click', function(e){
 	// クリック時、ゲームウィンドウにフォーカスを戻す
