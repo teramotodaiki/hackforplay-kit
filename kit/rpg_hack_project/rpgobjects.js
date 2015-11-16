@@ -18,6 +18,15 @@ window.addEventListener('load', function () {
 		// When someone will attack bs
 		// 攻撃されたとき
 	};
+	bs.onbecomeidle = function () {
+		// When behavior becomes BehaviorTypes.Idle
+		// まち状態になったとき
+	};
+	// 同様に BehaviorTypes が定義されているだけ、イベントが存在します。
+	bs.onbecomewalk = function () {};
+	bs.onbecomeattack = function () {};
+	bs.onbecomedamaged = function () {};
+	bs.onbecomedead = function () {};
 
 	 */
 
