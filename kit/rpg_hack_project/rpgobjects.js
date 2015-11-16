@@ -6,11 +6,15 @@ window.addEventListener('load', function () {
 
 	var bs = new BlueSlime();
 	bs.locate(5, 5);
-	bs.onenterplayer = function () {
+	bs.onplayerenter = function () {
 		// When player will step on bs
 		// プレイヤーが上に乗ったとき
 	};
-	bs.onleaveplayer = function () {
+	bs.onplayerestay = function () {
+		// When player still stay in bs
+		// プレイヤーが上に乗っている間
+	};
+	bs.onplayerexit = function () {
 		// When player will leave from bs
 		// プレイヤーが離れたとき
 	};
@@ -103,7 +107,8 @@ window.addEventListener('load', function () {
 				get: function () {
 					return collisionFlag !== null ? collisionFlag :
 						!(this.onplayerenter || this._listeners['playerenter'] ||
-						this.onplayerleave || this._listeners['playerleave']);
+						this.onplayerstay || this._listeners['playerstay'] ||
+						this.onplayerexit || this._listeners['playerexit']);
 				},
 				set: function (value) { collisionFlag = value; }
 			});
@@ -175,6 +180,7 @@ window.addEventListener('load', function () {
 			this.hp = 2;
 			this.atk = 1;
 			this.enteredStack = [];
+			this.on('enterframe', this.stayCheck);
 			var direction = 0;
 			Object.defineProperty(this, 'direction', {
 				get: function () { return direction; },
@@ -233,11 +239,6 @@ window.addEventListener('load', function () {
 			this.tl.moveBy(x * 32, y * 32, 12).then(function () {
 				this.behavior = BehaviorTypes.Idle;
 				this.moveTo(tx, ty);
-				// Dispatch playerleave Event
-				this.enteredStack.forEach(function (item) {
-					item.dispatchEvent(new Event('playerleave'));
-				});
-				this.enteredStack = [];
 				// Dispatch playerenter Event
 				RPGObject.collection.filter(function (item) {
 					return item.mapX === this.mapX  && item.mapY === this.mapY;
@@ -272,6 +273,17 @@ window.addEventListener('load', function () {
 					});
                 }
             }
+		},
+		stayCheck: function () {
+			this.enteredStack.forEach(function (item) {
+				if (item.mapX === this.mapX && item.mapY === this.mapY) {
+					item.dispatchEvent(new Event('playerstay'));
+				} else {
+					item.dispatchEvent(new Event('playerexit'));
+					var index = this.enteredStack.indexOf(item);
+					this.enteredStack.splice(index, 1);
+				}
+			}, this);
 		}
 	});
 
