@@ -220,7 +220,7 @@ var Enemy = enchant.Class.create(Character,
 
 Enemy.prototype.SetHP = function(hp)
 {
-    this.hp = this.maxHP = hp;
+    this.hp = this.hp_max = hp;
 }
 
 
@@ -273,6 +273,7 @@ var Player = enchant.Class.create(Character,
         this.attackSpellCount = 0;
         this.bombSpellCount = 0;
 
+        this.power = 10;
 
         this.escape_count = 0;
         this.escape_time = 0.0;
@@ -362,7 +363,7 @@ var Player = enchant.Class.create(Character,
             // 攻撃する
             if (input.z)
             {
-                console.log('z');
+                // console.log('z');
                 this.attackSpell.Update(this);
             }
             else

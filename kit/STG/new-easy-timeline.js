@@ -74,13 +74,15 @@ NewEasyTimeline.prototype.Loop = function()
 NewEasyTimeline.prototype.Call = function(name)
 {
 
-    this.events.push(function()
+    this.events.push(
     {
-        (function(target)
+        event: function()
         {
-            this[name]();
-        }).call(this.target);
-
+            (function(target)
+            {
+                this[name]();
+            }).call(this.target);
+        }
     });
 
     return this;
@@ -98,7 +100,6 @@ NewEasyTimeline.prototype.Next = function()
     console.log('event index: ' + this.event_index + ' / ' + this.events.length);
 
     var event = this.events[this.event_index];
-    console.log(event);
 
     // 最後まで再生した
     if (event === undefined)
@@ -154,8 +155,8 @@ NewEasyTimeline.prototype.Clone = function()
 
     this.events.forEach(function(event)
     {
-        clone.events.push($.extend(
-        {}, event));
+
+        clone.events.push(Clone(event));
     });
 
 
@@ -175,10 +176,6 @@ NewEasyTimeline.prototype.Use = function(target)
 
 NewEasyTimeline.prototype.Update = function(a)
 {
-
-    this.target = a;
-
-
 
     if (this.end) return;
 

@@ -39,7 +39,6 @@ var Boss = enchant.Class.create(Enemy,
         }
 
 
-
         if (this.death) return;
 
         this.time = CountToTime(this.count);
@@ -56,20 +55,20 @@ var Boss = enchant.Class.create(Enemy,
         if (this.entry_motion)
         {
             // 準備終了
-            if(this.timeline.end)
+            if (this.timeline.end)
             {
 
 
                 this.entry_motion = false;
 
+                // 戦闘モーションに移行
                 Motion.Use(this.GetActiveSpell().motion, this);
 
                 this.SetHP(this.GetActiveSpell().hp);
+                
             }
 
         }
-
-        console.log(this.active_spell_index);
 
 
 
@@ -153,13 +152,12 @@ Boss.prototype.NextSpell = function()
     // 全てのスペルを使用したら
     if (this.spells.length <= this.active_spell_index)
     {
+        console.log('死亡');
         this.death = true;
         this.death_event();
     }
     else
     {
-        this.SetHP(this.GetActiveSpell().hp);
-
 
         // 準備移動を登録
         this.entry_motion = true;
@@ -182,22 +180,24 @@ Boss.prototype.SetEntryMotion = function(name)
 Boss.prototype.Damage = function(damage)
 {
 
+    // 死体撃ち
+    if (this.death) return;
 
-    if (this.active)
+
+    if (!this.entry_motion)
     {
         this.hp -= damage;
-    }
 
-    // 次のスペルに
-    if (this.hp <= 0.0)
-    {
+        // 次のスペルに
+        if (this.hp <= 0.0)
+        {
 
-
-
-        this.NextSpell();
+            console.log('HP が 0.0 以下になりました');
+            this.NextSpell();
 
 
 
+        }
     }
 
 }

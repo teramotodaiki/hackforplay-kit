@@ -9,6 +9,16 @@ var ClassCreate = function(_super, property)
 }
 
 
+
+
+
+var Clone = function(object)
+{
+    return $.extend({}, object);
+}
+
+
+
 var SpriteObject = ClassCreate(enchant.Sprite,
 {
     initialize: function(width, height)

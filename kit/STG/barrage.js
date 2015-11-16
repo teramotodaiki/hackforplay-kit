@@ -191,7 +191,7 @@ var CharacterList = {
 
 
 
-var Create
+
 
 
 var SpriteObject = enchant.Class.create(enchant.Sprite,
@@ -247,7 +247,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
         this.time = 0.0;
 
-        this.power = 1;
+        this.power = null;
 
         // 能力の使用者
         this.creator = creator;

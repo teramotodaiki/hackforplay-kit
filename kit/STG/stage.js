@@ -16,6 +16,17 @@ var HP = enchant.Class.create(enchant.Sprite,
             this.y = this.enemy.y + (this.enemy.height - this.height) / 2;
         }
 
+
+        this.before_value = 0.0;
+
+
+        this.smooth_value = 10;
+
+
+        this.value = 0.0;
+
+        this.opacity = 0.0;
+
         this.updatePos();
     },
 
@@ -26,23 +37,59 @@ var HP = enchant.Class.create(enchant.Sprite,
         this.updatePos();
 
 
+        if (this.enemy.death)
+        {
+            return scene.removeChild(this);
+        }
+
+
+        var op = 1.0;
+
+        // 対象が準備中なら透過
+        if (this.enemy.entry_motion === true || this.enemy.death)
+        {
+            op = 0.0;
+        }
+
+
+        this.opacity = (this.opacity * this.smooth_value + op) / (this.smooth_value + 1);
+
+
         // HP を正規化
-        var hpNorm = this.enemy.hp / this.enemy.maxHP;
+        this.value = this.enemy.hp / this.enemy.hp_max;
+
+
+        if (isNaN(this.value))
+        {
+            this.value = 0.0;
+        }
+
+
+        // 簡易スムージング
+        this.value = (this.before_value * this.smooth_value + this.value) / (this.smooth_value + 1);
+
+        this.before_value = this.value;
+
+
+        var hpNorm = this.value * Math.PI2;
 
 
 
-        hpNorm *= Math.PI * 2;
+        (function() {
 
-        // リファレンス見る気力なかったからそのまま使う
+        }).call(this.image.context);
+
+
+
         var ctx = this.image.context;
         ctx.clearRect(0, 0, this.width, this.height);
 
         // 円
         ctx.beginPath();
-        ctx.arc(this.width / 2, this.height / 2, 40, 0, Math.PI * 2);
+        ctx.arc(this.width / 2, this.height / 2, 40, 0, Math.PI2);
 
         // 枠
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 8;
         ctx.strokeStyle = '#000';
         ctx.stroke();
 

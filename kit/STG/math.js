@@ -30,6 +30,11 @@ function Random(min, max)
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+function Random2(min, max)
+{
+    return min + Math.random() * (max - min);
+}
+
 
 // Vec2 間の距離（比較用）
 var _distance = function(x1, y1)

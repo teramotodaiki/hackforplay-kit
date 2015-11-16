@@ -287,6 +287,17 @@ window.addEventListener('load', function()
         });
 
 
+        boss.AddSpell('10way-r3',
+        {
+            name: '',
+            motion: 'ボス反復',
+            entry_motion: 'ボス登場',
+
+            hp: 100
+        });
+
+
+
         Stage.Get('ステージ').AddBossFromInstance(1, boss);
 
         /*
@@ -294,26 +305,6 @@ window.addEventListener('load', function()
         NET.MoveBy(-100, 30)(13).MoveBy(100, -30)(13).Loop();
         */
 
-
-
-        aaaaa = null;
-
-        ShowEnemy = function()
-        {
-            CharacterList.Each('enemy', function()
-            {
-
-                this.speed = 3;
-
-
-                // NET.Clone().Use(this);
-
-                aaaaa = this;
-
-
-
-            });
-        }
 
 
 
@@ -328,7 +319,7 @@ window.addEventListener('load', function()
 
 
 
-        EnchantBook.PushHint('ShowEnemy();');
+        EnchantBook.PushHint('1;');
 
 
 
