@@ -93,6 +93,17 @@ EasyTimeline.prototype.MoveBy = function(x, y)
 
             time: time,
             easing: self._easing,
+            default_time: time,
+            node: null,
+            onactiontick: function()
+            {
+
+                if (event.node)
+                {
+                    // console.log('speed :' + event.node.speed);
+                    // this.time = event.default_time * game.fps * (1.0 / event.node.speed);
+                }
+            }
 
         };
 
@@ -102,30 +113,6 @@ EasyTimeline.prototype.MoveBy = function(x, y)
 
 }
 EasyTimeline.prototype.Move = EasyTimeline.prototype.MoveBy;
-
-
-EasyTimeline.prototype.moveBy = function(x, y)
-{
-    var self = this;
-    return function(time)
-    {
-        self.events.push(
-        {
-            x: function()
-            {
-                return this.x + x;
-            },
-            y: function()
-            {
-                return this.y + y;
-            },
-            time: time,
-            easing: self._easing
-        });
-        return self;
-    }
-}
-
 
 
 
@@ -171,6 +158,20 @@ EasyTimeline.prototype.MirrorX = function()
 }
 
 
+EasyTimeline.prototype.Loop = function()
+{
+    this.events.push(
+    {
+        __method: function()
+        {
+            this.loop();
+        }
+    });
+    return this;
+}
+
+
+
 // Timeline に変換する
 EasyTimeline.prototype.toTimeline = function()
 {
@@ -180,7 +181,10 @@ EasyTimeline.prototype.toTimeline = function()
     return function(node)
     {
 
-        var timeline = node.tl;
+
+        var timeline = node.tl = new enchant.Timeline(node);
+
+
 
         self.events.forEach(function(event)
         {
@@ -189,7 +193,9 @@ EasyTimeline.prototype.toTimeline = function()
             var _event = $.extend(
             {}, event);
 
+            event.node = node;
 
+            //
             if (event.create_method !== undefined)
             {
                 event.create_method();
@@ -202,11 +208,20 @@ EasyTimeline.prototype.toTimeline = function()
                 timeline = timeline.then(event.then);
 
             }
+            // method 系
+            // TL のメソッドを直接実行する系
+            else if (event.__method !== undefined)
+            {
+                timeline = event.__method.call(timeline);
+            }
             // tween 系
             else
             {
                 _event.time = _event.time * game.fps * (1.0 / node.speed);
+
+
                 timeline = timeline.tween(_event);
+
 
             }
 
@@ -248,7 +263,7 @@ var Motion = {
     Use: function(name, target)
     {
 
-        if(easyTimelineList[name] === undefined)
+        if (easyTimelineList[name] === undefined)
         {
             console.log(name + ' は存在しないモーションです');
         }

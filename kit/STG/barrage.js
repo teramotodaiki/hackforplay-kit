@@ -441,36 +441,71 @@ var Barrage = function()
 
     //----------// ユーザーが使用するメンバ //----------//
 
-    this.texture_name = 'shot-none';
-
-
-    // 何秒で生成するか
+    // 何秒毎に生成するか
     this.create_time = 1.0;
 
     // way 方向に生成する
     this.way = 3;
 
-
+    // 速度
     this.speed = 3;
-
-    this.size = 10;
-
-
-    this.power = 1;
 
     // 軸
     this.axis_angle = 0;
 
-    // 撃つ範囲角度
-    this.rangeAngle = 360;
+    // 撃つ範囲
+    this.range_angle = 360;
 
-
+    // 消滅時間
     this.life = 300;
 
+    // 敵対タイプ
     this.target_type = 'player';
 
     // 自分に自分の弾が当たるか
     this.hit_self = false;
+
+    // 材質
+    this.material = 'normal';
+
+
+    // creator から createPos 離れた場所に弾が生成される
+    this.createPos = 0;
+
+    // 並べる
+    this.repeat = 1;
+    this.repeatAngle = 0;
+
+    // 横に並べる
+    this.repeatX = 1;
+    this.repeatSpaceX = 0;
+
+
+    //----------// 未実装 //----------//
+
+    // 生成タイプ
+    this.create_pos_type = 'relative';
+
+    // 縦に並べる
+    this.repeat_y = 1;
+    this.repeat_space_y = 0;
+
+
+    //----------// 廃止 //----------//
+
+
+    // this.material に変更
+    // this.texture_name = 'shot-none';
+
+
+    // material.width, height に変更
+    // 変更する場合は scale から
+    // this.size = 10;
+
+
+    // 生成者に依存
+    // this.power = 1;
+
 
     //----------// 内部で使用するメンバ //----------//
 
@@ -505,26 +540,10 @@ var Barrage = function()
     this.shotEvents = [];
 
 
-    // 材質
-    this.material = 'normal';
 
 
     // 詳細設定
 
-
-    // creator から createPos 離れた場所に弾が生成される
-    this.createPos = 0;
-
-
-    // 並べる
-    this.repeat = 1;
-    this.repeatAngle = 0;
-
-    // 横に並べる
-    this.repeatX = 1;
-    this.repeatSpaceX = 0;
-
-    // 縦に並べる
 
 
 
@@ -602,17 +621,14 @@ Barrage.prototype.addShot = function()
 {
 
 
-    var shotTexture = Assets.Get(this.texture_name);
-    var shotSize = shotTexture.height;
-
 
     // 仮
     for (var way in range(this.way))
     {
 
         // 弾の角度を算出
-        var beginAngle = this.axis_angle - this.rangeAngle / 2;
-        var stepAngle = this.rangeAngle / this.way;
+        var beginAngle = this.axis_angle - this.range_angle / 2;
+        var stepAngle = this.range_angle / this.way;
         var angle = beginAngle + stepAngle * way;
 
 
@@ -632,6 +648,7 @@ Barrage.prototype.addShot = function()
 
             hit_self: this.hit_self,
 
+            power: this.creator.power
 
         };
 
@@ -721,6 +738,7 @@ Barrage.prototype.ShotControl = function(property)
 }
 
 
+// [[deprecated]]
 Barrage.prototype.Restart = function()
 {
     this.creator.barrage_count[this.handle] = 0;
@@ -787,6 +805,7 @@ var Spell = function()
 
 }
 
+// [[deprecated]]
 Spell.prototype.CreateCount = function()
 {
     return Array.apply(null,
@@ -830,6 +849,7 @@ Spell.prototype.attributeAll = function(object)
 
 
 // 弾幕を追加する
+// [[deprecated]]
 Spell.prototype.addBarrage = function(barrage)
 {
 
@@ -875,10 +895,9 @@ Spell.prototype.Update = function(creator)
 }
 
 
+// 複製する
 Spell.prototype.Clone = function()
 {
-
-
 
     var spell = new Spell();
 
@@ -911,6 +930,12 @@ var __Barrage = {
 
     Get: function(name)
     {
+
+        if (barrage_asset[name] === undefined)
+        {
+            console.warn('弾幕 "' + name + '" は存在しません')
+        }
+
         return barrage_asset[name];
     },
 

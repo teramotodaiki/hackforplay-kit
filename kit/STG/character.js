@@ -60,6 +60,9 @@ var Character = enchant.Class.create(enchant.Sprite,
         character_list.push(this);
 
 
+        this.power = 1.0;
+
+
     },
 
 
@@ -149,13 +152,23 @@ var Enemy = enchant.Class.create(Character,
         this.spell = null;
 
 
+        this.motion_name = '';
+
 
     },
 
 
+    ReloadMotion: function()
+    { // tl.clear だとイベントが破棄されないっぽいから初期化（物理）
+        this.tl = new enchant.Timeline(this);
+    },
+
     // 移動処理を設定する
     setMotion: function(name)
     {
+        this.motion_name = name;
+
+
         Motion.Use(name, this);
     },
 
@@ -309,13 +322,9 @@ Boss.prototype.AddSpell = function(name, option)
 
     var spell = __Spell.Get(name).Clone();
 
-    if (option.hp)
-    {
-        spell.hp = option.hp;
-    }
 
-
-
+    // option を上書き
+    spell = $.extend(spell, option);
 
 
     // barrage_count を初期化する
@@ -342,11 +351,21 @@ Boss.prototype.NextSpell = function()
     // 全てのスペルを使用したら
     if (this.spells.length <= this.active_spell_index)
     {
-        throw '';
+        this.death = true;
+        this.death_event();
     }
     else
     {
         this.SetHP(this.GetActiveSpell().hp);
+
+        // tl.clear だとイベントが破棄されないっぽいから初期化（物理）
+        this.tl = new enchant.Timeline(this);
+
+        if (this.GetActiveSpell().motion)
+        {
+            this.setMotion(this.GetActiveSpell().motion);
+        }
+
     }
 
 }
@@ -373,16 +392,11 @@ Boss.prototype.Damage = function(damage)
     if (this.hp <= 0.0)
     {
 
-        try
-        {
-            this.NextSpell();
-        }
-        //
-        catch (a)
-        {
-            this.death = true;
-            this.death_event();
-        }
+
+
+        this.NextSpell();
+
+
 
     }
 

@@ -22,7 +22,6 @@ window.addEventListener('load', function()
     Assets.Add('background', 'tenonno-graphic/background/dot-background.png');
 
 
-
     Material.New('normal',
     {
         source: 'tenonno-graphic/shot-normal-min.png',
@@ -62,7 +61,6 @@ window.addEventListener('load', function()
         }
         scene.addChild(background);
 
-        
 
 
         // Pad を生成する
@@ -70,7 +68,6 @@ window.addEventListener('load', function()
 
         // 魔道書
         EnchantBook.Create();
-        EnchantBook.PushHint('player.speed = 1;');
 
 
 
@@ -120,7 +117,7 @@ window.addEventListener('load', function()
         __Barrage.New('ホーミング弾',
         {
             material: 'normal',
-            rangeAngle: 10,
+            range_angle: 10,
             createTime: 10.2,
             way: 8,
             speed: 10,
@@ -222,7 +219,7 @@ window.addEventListener('load', function()
 
 
         // 移動モーションを作成
-        Motion.New('m-1').Move(30, 30)(1.0).Move(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
+        Motion.New('m-1').MoveBy(30, 30)(1.0).MoveBy(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
 
 
         Motion.New('ボス登場').Move(0, 100)(1.0).Call('Active');
@@ -230,6 +227,10 @@ window.addEventListener('load', function()
 
         // 右から左に
         Motion.New('RtoL').Move(-scene.width, 0)(2).remove();
+
+
+        // loop に対応
+        Motion.New('ボス反復').MoveBy(-200, 0)(1).MoveBy(400,0)(2).Move(-200, 0)(1).Loop();
 
 
         /*
@@ -242,10 +243,12 @@ window.addEventListener('load', function()
         */
 
 
+
         Stage.Make('ステージ');
 
 
-        var boss = new Boss(30, 30);
+        /* var */
+        boss = new Boss(30, 30);
 
 
         boss.SetEntryMotion('ボス登場');
@@ -254,7 +257,8 @@ window.addEventListener('load', function()
 
         boss.AddSpell('10way-r3',
         {
-            hp: 100
+            hp: 100,
+            motion: 'ボス反復'
         });
 
         boss.SetDeathEvent(function()
@@ -287,6 +291,13 @@ window.addEventListener('load', function()
             Debug.Set('stage-count', Stage.GetActive().count);
 
         });
+
+
+        boss.speed = 10;
+
+        EnchantBook.PushHint('player.power = 1;');
+        EnchantBook.PushHint('boss.speed = 10;');
+
 
 
 
