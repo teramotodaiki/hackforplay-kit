@@ -216,6 +216,7 @@ window.addEventListener('load', function()
             linear = enchant.Easing.LINEAR;
 
 
+        /*
 
         // 移動モーションを作成
         Motion.New('m-1').MoveBy(30, 30)(1.0).MoveBy(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
@@ -231,7 +232,7 @@ window.addEventListener('load', function()
         // loop に対応
         Motion.New('ボス反復').MoveBy(-200, 0)(1).MoveBy(400, 0)(2).Move(-200, 0)(1).Loop();
 
-
+        */
         /*
         Stage.Make('ステージ',
         {
@@ -245,30 +246,54 @@ window.addEventListener('load', function()
 
 
 
-        Stage.Make('ステージ').AddEnemy(0,
+        Stage.Make('ステージ');
+        /*.AddEnemy(0,
+                {
+                    pos: Vec2(scene.width / 2, 100),
+                    // motion: 'RtoL',
+                    // spell: '自機狙い',
+                }).AddEnemy(0,
+                {
+                    pos: Vec2(scene.width / 2, 200),
+                    // motion: 'RtoL',
+                    // spell: '自機狙い',
+                }).AddEnemy(0,
+                {
+                    pos: Vec2(scene.width / 2, 0),
+                    // motion: 'RtoL',
+                    // spell: '自機狙い',
+                });
+
+
+                */
+        var boss = new Boss(30, 30);
+
+        boss.locate(scene.width / 2, 0);
+
+        Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(1.0);
+        Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
+
+
+
+
+
+        boss.AddSpell('10way-r3',
         {
-            pos: Vec2(scene.width / 2, 100),
-            // motion: 'RtoL',
-            // spell: '自機狙い',
-        }).AddEnemy(0,
-        {
-            pos: Vec2(scene.width / 2, 200),
-            // motion: 'RtoL',
-            // spell: '自機狙い',
-        }).AddEnemy(0,
-        {
-            pos: Vec2(scene.width / 2, 0),
-            // motion: 'RtoL',
-            // spell: '自機狙い',
+            name: '',
+            motion: 'ボス反復',
+            entry_motion: 'ボス登場',
+
+            hp: 100
         });
 
 
+        Stage.Get('ステージ').AddBossFromInstance(1, boss);
 
-
+        /*
         var NET = new NewEasyTimeline();
-
-
         NET.MoveBy(-100, 30)(13).MoveBy(100, -30)(13).Loop();
+        */
+
 
 
         aaaaa = null;
@@ -277,10 +302,11 @@ window.addEventListener('load', function()
         {
             CharacterList.Each('enemy', function()
             {
-                console.log(this);
 
-                this.speed = 0.2;
-                NET.Use(this);
+                this.speed = 3;
+
+
+                // NET.Clone().Use(this);
 
                 aaaaa = this;
 
@@ -303,7 +329,6 @@ window.addEventListener('load', function()
 
 
         EnchantBook.PushHint('ShowEnemy();');
-        EnchantBook.PushHint('aaaaa.speed = 0.2;');
 
 
 

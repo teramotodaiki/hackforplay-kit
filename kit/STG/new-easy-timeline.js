@@ -8,12 +8,12 @@ var NewEasyTimeline = function()
 
     this.event_index = 0;
 
-
+    // ループ再生
     this.loop = false;
-
 
     // 再生終了
     this.end = false;
+
 }
 
 NewEasyTimeline.prototype.MoveBy = function(x, y)
@@ -24,10 +24,10 @@ NewEasyTimeline.prototype.MoveBy = function(x, y)
     {
 
         var event = {
-            initialize: function()
+            initialize: function(target)
             {
-                this.x = this.value_x + self.target.pos.x;
-                this.y = this.value_y + self.target.pos.y;
+                this.x = this.value_x + target.pos.x;
+                this.y = this.value_y + target.pos.y;
             },
             value_x: x,
             value_y: y,
@@ -61,10 +61,12 @@ NewEasyTimeline.prototype.MoveTo = function(x, y)
 NewEasyTimeline.prototype.Loop = function()
 {
 
-
-    this.events.push(function()
+    this.events.push(
     {
-        this.loop = true;
+        event: function()
+        {
+            this.loop = true;
+        }
     });
 
 }
@@ -74,7 +76,7 @@ NewEasyTimeline.prototype.Call = function(name)
 
     this.events.push(function()
     {
-        (function()
+        (function(target)
         {
             this[name]();
         }).call(this.target);
@@ -88,10 +90,15 @@ NewEasyTimeline.prototype.Call = function(name)
 NewEasyTimeline.prototype.Next = function()
 {
 
+
     this.event_index++;
-    this.target.timeline_count = 0;
+    this.count = 0;
+
+
+    console.log('event index: ' + this.event_index + ' / ' + this.events.length);
 
     var event = this.events[this.event_index];
+    console.log(event);
 
     // 最後まで再生した
     if (event === undefined)
@@ -104,6 +111,10 @@ NewEasyTimeline.prototype.Next = function()
             this.event_index = -1;
             return this.Next();
         }
+        else
+        {
+            console.log('no loop');
+        }
 
 
         console.log('再生が終了しました');
@@ -112,13 +123,12 @@ NewEasyTimeline.prototype.Next = function()
     }
 
 
-    // 即時イベントなら
-    if (typeof event === 'function')
+    // 即時イベント
+    if (event.event !== undefined)
     {
-        event.call(this);
+        event.event.call(this);
         return this.Next();
     }
-
 
 
     // イベント開始時の座標を保持
@@ -128,26 +138,47 @@ NewEasyTimeline.prototype.Next = function()
     // 初期化
     if (event.initialize)
     {
-        event.initialize();
+        event.initialize(this.target);
     }
 
 }
 
+NewEasyTimeline.prototype.Clone = function()
+{
+
+    var clone = new NewEasyTimeline();
+
+    // clone = $.extend(clone, this);
+
+    clone.events = [];
+
+    this.events.forEach(function(event)
+    {
+        clone.events.push($.extend(
+        {}, event));
+    });
+
+
+    return clone;
+}
+
+
 NewEasyTimeline.prototype.Use = function(target)
 {
-    target.timeline = $.extend({}, this);
-    target.timeline_count = 0;
+    target.timeline = this;
 
-        this.target = target;
+    this.target = target;
     this.event_index = -1;
-    this.Next();
 
+    this.Next();
 }
 
 NewEasyTimeline.prototype.Update = function(a)
 {
 
     this.target = a;
+
+
 
     if (this.end) return;
 
@@ -158,15 +189,15 @@ NewEasyTimeline.prototype.Update = function(a)
     var move_count = TimeToCount(event.time / this.target.speed);
 
 
-    var x = (event.x - event._x) / move_count * this.target.timeline_count;
-    var y = (event.y - event._y) / move_count * this.target.timeline_count;
+    var x = (event.x - event._x) / move_count * this.count;
+    var y = (event.y - event._y) / move_count * this.count;
 
     this.target.pos.x = event._x + x;
     this.target.pos.y = event._y + y;
 
 
 
-    if (this.target.timeline_count++ > move_count)
+    if (this.count++ > move_count)
     {
 
         this.target.pos.x = event.x;
