@@ -49,6 +49,7 @@ window.addEventListener('load', function () {
     var game = enchant.Core.instance;
 
 	var __BehaviorTypes = {
+		None :      0,  // 無状態 (デフォルトではEventは発火されません)
 		Idle :		1,	// 立ち状態
 		Walk :		2,	// 歩き状態
 		Attack :	4,	// 攻撃状態
@@ -68,16 +69,26 @@ window.addEventListener('load', function () {
 				get: function () { return (this.y - this.offset.y) / 32 >> 0; }
 			});
 			this.getFrameOfBehavior = []; // BehaviorTypesをキーとしたgetterの配列
-			var behavior = BehaviorTypes.Idle;
+			// onbecome~ イベントで this.frame を更新するように
+			Object.keys(BehaviorTypes).forEach(function (item) {
+				this.on('become' + item.toLowerCase(), function () {
+					var key = BehaviorTypes[item];
+					var routine = this.getFrameOfBehavior[key];
+					if (routine) this.frame = routine.call(this);
+				});
+			}, this);
+			// このオブジェクトの behavior プロパティと、onbecome~イベントの発火
+			var behavior = BehaviorTypes.None;
 			Object.defineProperty(this, 'behavior', {
 				get: function () { return behavior; },
 				set: function (value) {
+					var append = value & ~behavior;
+					var type = Object.keys(BehaviorTypes).filter(function (item) {
+						return (BehaviorTypes[item] & append) > 0;
+					}).forEach(function (item) {
+						this.dispatchEvent( new Event( 'become' + item.toLowerCase() ) );
+					}, this);
 					behavior = value;
-					var type = Object.keys(BehaviorTypes).find(function (item) {
-						return (BehaviorTypes[item] & behavior) > 0;
-					});
-					this.dispatchEvent( new Event( 'become' + type.toLowerCase() ) );
-					this.frame = this.getFrame();
 				}
 			});
 			var collisionFlag = null; // this.collisionFlag (Default:true)
