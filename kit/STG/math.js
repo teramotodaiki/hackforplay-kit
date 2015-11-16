@@ -2,13 +2,6 @@
     math.js
 */
 
-function range(n)
-{
-    return Array.apply(null,
-    {
-        length: n
-    }).map(Number.call, Number);
-}
 
 
 function Range(n)
@@ -20,12 +13,12 @@ function Range(n)
 }
 
 
-var toRadian = function(angle)
+var ToRadian = function(angle)
 {
     return angle * Math.PI / 180;
 }
 
-var toAngle = function(radian)
+var ToAngle = function(radian)
 {
     return radian * 180 / Math.PI;
 }
@@ -36,10 +29,6 @@ function Random(min, max)
 {
     return min + Math.floor(Math.random() * (max - min + 1));
 }
-
-
-
-
 
 
 // Vec2 間の距離（比較用）
@@ -64,8 +53,9 @@ var distance = function(x1, y1)
 }
 
 
-
 Math.PI2 = Math.PI * 2;
+
+
 
 // Vec2
 var _Vec2 = function(x, y)
@@ -102,13 +92,13 @@ _Vec2.prototype.far = function(v1, v2)
 // 方向
 _Vec2.prototype.angle = function(vec)
 {
-    return toAngle(Math.atan2(this.x - vec.x, this.y - vec.y));
+    return ToAngle(Math.atan2(this.x - vec.x, this.y - vec.y));
 }
 
 
 
 // 角度に
-_Vec2.prototype.toRadian = function()
+_Vec2.prototype.ToRadian = function()
 {
     return Math.atan2(this.x, this.y);
 }
@@ -119,6 +109,13 @@ _Vec2.prototype.copy = function()
 {
     return new _Vec2(this.x, this.y);
 }
+
+// 複製
+_Vec2.prototype.Clone = function()
+{
+    return new _Vec2(this.x, this.y);
+}
+
 
 
 // 長さ
@@ -214,14 +211,14 @@ _Angle.prototype.ToRadian = function()
 }
 
 
-_Angle.prototype.toRadian = function()
+_Angle.prototype.ToRadian = function()
 {
     return this.value * Math.PI / 180;
 }
 
 _Angle.prototype.toVec2 = function()
 {
-    var radian = this.toRadian();
+    var radian = this.ToRadian();
     var x = Math.sin(radian);
     var y = Math.cos(radian);
     return Vec2(x, y);

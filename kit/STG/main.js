@@ -138,7 +138,6 @@ window.addEventListener('load', function()
 
 
 
-
         /*
             Barrage.New('name', {}).Control(() => {}).ShotControl(() => {});
         */
@@ -200,7 +199,7 @@ window.addEventListener('load', function()
         __Spell.Make('10way-r3')('10way-r3');
 
 
-        __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾', 'テスト');
+        __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾');
         __Spell.Make('player-spell')('player-normal');
 
 
@@ -230,7 +229,7 @@ window.addEventListener('load', function()
 
 
         // loop に対応
-        Motion.New('ボス反復').MoveBy(-200, 0)(1).MoveBy(400,0)(2).Move(-200, 0)(1).Loop();
+        Motion.New('ボス反復').MoveBy(-200, 0)(1).MoveBy(400, 0)(2).Move(-200, 0)(1).Loop();
 
 
         /*
@@ -244,43 +243,52 @@ window.addEventListener('load', function()
 
 
 
-        Stage.Make('ステージ');
 
 
-        /* var */
-        boss = new Boss(30, 30);
-
-
-        boss.SetEntryMotion('ボス登場');
-
-        boss.locate(scene.width / 2, 0);
-
-        boss.AddSpell('10way-r3',
+        Stage.Make('ステージ').AddEnemy(0,
         {
-            hp: 100,
-            motion: 'ボス反復'
+            pos: Vec2(scene.width / 2, 100),
+            // motion: 'RtoL',
+            // spell: '自機狙い',
+        }).AddEnemy(0,
+        {
+            pos: Vec2(scene.width / 2, 200),
+            // motion: 'RtoL',
+            // spell: '自機狙い',
+        }).AddEnemy(0,
+        {
+            pos: Vec2(scene.width / 2, 0),
+            // motion: 'RtoL',
+            // spell: '自機狙い',
         });
 
-        boss.SetDeathEvent(function()
+
+
+
+        var NET = new NewEasyTimeline();
+
+
+        NET.MoveBy(-100, 30)(13).MoveBy(100, -30)(13).Loop();
+
+
+        aaaaa = null;
+
+        ShowEnemy = function()
         {
-            Hack.gameclear();
-        })
-
-
-        for (var i in Range(10))
-        {
-
-            Stage.Get('ステージ').AddEnemy(i * 0.4,
+            CharacterList.Each('enemy', function()
             {
-                pos: Vec2(scene.width, 20 + i * 20),
-                motion: 'RtoL',
-                spell: '自機狙い',
-            });
+                console.log(this);
 
+                this.speed = 0.2;
+                NET.Use(this);
+
+                aaaaa = this;
+
+
+
+            });
         }
 
-
-        Stage.Get('ステージ').AddBossFromInstance(5, boss);
 
 
         // 現在のステージを更新する
@@ -293,10 +301,9 @@ window.addEventListener('load', function()
         });
 
 
-        boss.speed = 10;
 
-        EnchantBook.PushHint('player.power = 1;');
-        EnchantBook.PushHint('boss.speed = 10;');
+        EnchantBook.PushHint('ShowEnemy();');
+        EnchantBook.PushHint('aaaaa.speed = 0.2;');
 
 
 

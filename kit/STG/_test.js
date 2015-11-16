@@ -1,28 +1,3 @@
-/* デバッグ用 */
-var Debug =
-{
-    values : [],
-
-
-    Update: function()
-    {
-        $('#debug').val('');
-
-        var text = '';
-        for (var key in this.values)
-        {
-            text += key + ': ' + this.values[key] + '\n';
-        }
-
-        $('#debug').val(text);
-    },
-
-    Set : function(name, text)
-    {
-        this.values[name] = text;
-    }
-
-};
 
 
 

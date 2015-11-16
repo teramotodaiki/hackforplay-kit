@@ -31,9 +31,6 @@
 */
 
 
-var scene, input, game, player;
-
-
 
 var preload_textures = {};
 
@@ -194,6 +191,7 @@ var CharacterList = {
 
 
 
+var Create
 
 
 var SpriteObject = enchant.Class.create(enchant.Sprite,
@@ -623,7 +621,7 @@ Barrage.prototype.addShot = function()
 
 
     // 仮
-    for (var way in range(this.way))
+    for (var way in Range(this.way))
     {
 
         // 弾の角度を算出
@@ -673,12 +671,12 @@ Barrage.prototype.addShot = function()
         // 弾を登録する
 
         // ずらし配置みたいな
-        for (var repeat in range(this.repeat))
+        for (var repeat in Range(this.repeat))
         {
 
 
             // 横に並べる
-            for (var x in range(this.repeatX))
+            for (var x in Range(this.repeatX))
             {
 
 
@@ -997,7 +995,7 @@ var __Spell = {
 
         return function(Args___)
         {
-            for (var index in range(arguments.length))
+            for (var index in Range(arguments.length))
             {
 
                 spell.pushBarrage(__Barrage.Get(arguments[index]));

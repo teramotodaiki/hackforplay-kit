@@ -117,6 +117,11 @@ var Character = enchant.Class.create(enchant.Sprite,
 
 });
 
+Character.prototype.TEST_ALERT = function()
+{
+    alert('test');
+}
+
 
 
 
@@ -179,12 +184,20 @@ var Enemy = enchant.Class.create(Character,
         this.time = CountToTime(this.count);
 
         // TL を使用するから x, y から pos に逆輸入
+
+        /*
         this.pos.x = this.x + this.width / 2;
         this.pos.y = this.y + this.height / 2;
 
+        */
+
+        if (this.timeline !== undefined)
+        {
+            this.timeline.Update(this);
+            this.convertPos();
+        }
 
         // this.spell.counts = this.spellCounts;
-
 
 
 
@@ -202,6 +215,7 @@ var Enemy = enchant.Class.create(Character,
 
     }
 });
+
 
 
 Enemy.prototype.SetHP = function(hp)
