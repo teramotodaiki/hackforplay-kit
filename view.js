@@ -6,7 +6,7 @@ $(function(){
 		var game = $(".h4p_game>iframe").get(0);
 		if(	game !== undefined && game !== document.activeElement && focus_on_game){
 			var source = "refocus();";	// フォーカスを戻すメソッドをゲーム側で呼び出す
-			game.contentWindow.postMessage(source, '/');
+			game.contentWindow.postMessage(source, '*');
 		}
 	}, 100);
 	// テキストボックスにフォーカスがあるときはゲームにフォーカスしない
@@ -99,7 +99,7 @@ $(function(){
 		// canvas to image
 		var game = $(".h4p_game>iframe").get(0);
 		var source = "saveImage('thumbnail');";
-		game.contentWindow.postMessage(source, '/');
+		game.contentWindow.postMessage(source, '*');
 
 		$(this).find('#leave-comment').button('reset');
 	});
@@ -435,7 +435,7 @@ $(function(){
 						// リロード ごまかしのフェードイン
 						if (reload_timer) clearTimeout(reload_timer);
 						reload_timer = setTimeout(function() {
-							$(".h4p_game>iframe").hide().get(0).contentWindow.postMessage('window.location.reload();', '/');
+							$(".h4p_game>iframe").hide().get(0).contentWindow.postMessage('window.location.reload();', '*');
 							$('.h4p_game>iframe').fadeIn('slow');
 						}, 100);
 					}
@@ -494,7 +494,7 @@ $(function(){
 				// ゲームをリロード
 				if (!isExtendMode) {
 					// リロード
-					$('.h4p_game>iframe').get(0).contentWindow.postMessage('window.location.reload();', '/');
+					$('.h4p_game>iframe').get(0).contentWindow.postMessage('window.location.reload();', '*');
 				} else {
 					// Extendモード時はmode=restagingにしてリロード
 					sessionStorage.setItem('stage_param_game_mode', 'restaging');
@@ -533,7 +533,7 @@ $(function(){
 				}));
 
 				// サムネイルを生成
-				$('.h4p_game>iframe').get(0).contentWindow.postMessage("saveImage('updateProject');", '/');
+				$('.h4p_game>iframe').get(0).contentWindow.postMessage("saveImage('updateProject');", '*');
 
 			});
 
@@ -544,7 +544,7 @@ $(function(){
 			// 投稿時の設定
 			$('#inputModal').on('show.bs.modal', function () {
 				// サムネイルを生成
-				$(".h4p_game>iframe").get(0).contentWindow.postMessage("saveImage('thumbnail');", '/');
+				$(".h4p_game>iframe").get(0).contentWindow.postMessage("saveImage('thumbnail');", '*');
 			});
 
 			// 投稿
@@ -780,7 +780,7 @@ $(function(){
 					var paused = false, creditVisibility = true;
 					window.addEventListener('message', function(event) {
 						if (event.data === 'game_loaded' && creditVisibility) {
-							$('.container-game .h4p_game iframe').get(0).contentWindow.postMessage('game.pause()', '/');
+							$('.container-game .h4p_game iframe').get(0).contentWindow.postMessage('game.pause()', '*');
 							paused = true;
 						}
 					});
@@ -790,7 +790,7 @@ $(function(){
 						$('.container-game .h4p_game iframe').css('opacity', 1);
 						creditVisibility = false;
 						if (paused) {
-							$('.container-game .h4p_game iframe').get(0).contentWindow.postMessage('game.resume()', '/');
+							$('.container-game .h4p_game iframe').get(0).contentWindow.postMessage('game.resume()', '*');
 						}
 					}, 4000);
 				}
@@ -862,7 +862,7 @@ $(function(){
 
 	// ゲームフレームのリロード
 	$('.h4p_info-retry button').on('click', function() {
-		$(".h4p_game>iframe").get(0).contentWindow.postMessage('window.location.reload();', '/');
+		$(".h4p_game>iframe").get(0).contentWindow.postMessage('window.location.reload();', '*');
 	});
 
 	function getParam(key){
