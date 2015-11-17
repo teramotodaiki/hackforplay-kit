@@ -272,12 +272,13 @@ window.addEventListener('load', function () {
 			this.image = game.assets['enchantjs/x1.5/chara5.png'];
 			this.enteredStack = [];
 			this.on('enterframe', this.stayCheck);
+			this.on('walkend', this.enterCheck);
 			this.setFrame(BehaviorTypes.Idle, function () {
 				return [this.direction * 9 + 1];
 			});
 			this.setFrame(BehaviorTypes.Walk, function () {
 				var a = this.direction * 9, b = a + 1, c = a + 2;
-				return [a, a, a, a, b, b, b, b, c, c, c, c, b, b, b, b];
+				return [a, a, a, a, b, b, b, b, c, c, c, c, b, b, b, null];
 			});
 			this.setFrame(BehaviorTypes.Attack, function () {
 				var a = this.direction * 9 + 6, b = a + 1, c = a + 2;
@@ -302,36 +303,22 @@ window.addEventListener('load', function () {
 				var ver = hor ? 0 : game.input.down - game.input.up;
 				if (hor || ver) {
 					// Turn
-					this.direction = Hack.Vec2Dir({ x: hor, y: ver });
-					// Map Collision
-					if ( !Hack.map.hitTest((this.mapX + hor) * 32, (this.mapY + ver) * 32) &&
-						0 <= this.mapX + hor && this.mapX + hor < 15 && 0 <= this.mapY + ver && this.mapY + ver < 10) {
-						// RPGObject(s) Collision
-						if (RPGObject.collection.every(function (item) {
-							return !item.collisionFlag || item.mapX !== this.mapX + hor || item.mapY !== this.mapY + ver;
-						}, this)) {
-							this.walk(hor, ver);
-						}
-					}
+					this.forward = { x: hor, y: ver };
+					this.walk(1);
 				}
 			}
 		},
-		walk: function (x, y) {
-			this.behavior = BehaviorTypes.Walk;
-			var tx = this.x + x * 32, ty = this.y + y * 32;
-			this.tl.moveBy(x * 32, y * 32, 12).then(function () {
-				this.behavior = BehaviorTypes.Idle;
-				this.moveTo(tx, ty);
-				// Dispatch playerenter Event
-				RPGObject.collection.filter(function (item) {
-					return item.mapX === this.mapX  && item.mapY === this.mapY;
-				}, this).forEach(function (item) {
-					item.dispatchEvent(new Event('playerenter'));
-					this.enteredStack.push(item);
-				}, this);
-			});
+		enterCheck: function () {
+			// Dispatch playerenter Event
+			RPGObject.collection.filter(function (item) {
+				return item.mapX === this.mapX  && item.mapY === this.mapY;
+			}, this).forEach(function (item) {
+				item.dispatchEvent(new Event('playerenter'));
+				this.enteredStack.push(item);
+			}, this);
 		},
 		stayCheck: function () {
+			// Dispatch playerstay/playerexit Event
 			this.enteredStack.forEach(function (item) {
 				if (item.mapX === this.mapX && item.mapY === this.mapY) {
 					item.dispatchEvent(new Event('playerstay'));
