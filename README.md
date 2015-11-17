@@ -95,7 +95,9 @@ window.addEventListener('load', function () {
 > Modify `/frame.html`
 
 最初はこのようになっている部分があります
+
 > From,
+
 ```html 
 		<script src="kit/rpg_hack_project/restagingcode.js" type="text/javascript" charset="utf-8"></script>
 		<script src="kit/rpg_hack_project/main.js" type="text/javascript" charset="utf-8"></script>
@@ -103,9 +105,13 @@ window.addEventListener('load', function () {
 ```
 
 それを、このようにしてください
+
 ＊書かれていない２行は消します
+
 ＊あなたがつけたディレクトリ名、ファイル名を指定します
+
 > To,
+
 ```html 
 		<script src="kit/__your project name__/main.js" type="text/javascript" charset="utf-8"></script>
 ```
