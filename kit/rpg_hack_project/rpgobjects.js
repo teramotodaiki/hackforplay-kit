@@ -155,7 +155,7 @@ window.addEventListener('load', function () {
 			}
 		},
 		setTimeout: function (callback, wait) {
-			var target = this.age + Math.min(1, wait);
+			var target = this.age + Math.max(1, wait);
 			this.on('enterframe', function task () {
 				if (this.age === target) {
 					callback.call(this);
