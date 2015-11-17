@@ -160,21 +160,33 @@ window.addEventListener('load', function () {
 			return [];
 		},
 		setTimeout: function (callback, wait) {
-			var target = this.age + Math.max(1, wait);
-			this.on('enterframe', function task () {
-				if (this.age === target) {
+			var target = this.age + Math.max(1, wait), flag = true;
+			function task () {
+				if (this.age === target && flag) {
 					callback.call(this);
-					this.removeEventListener('enterframe', task);
+					stopTimeout();
 				}
-			});
+			}
+			function stopTimeout () {
+				flag = false;
+				this.removeEventListener(task);
+			}
+			this.on('enterframe', task);
+			return stopTimeout.bind(this);
 		},
 		setInterval: function (callback, interval) {
-			var current = this.age;
-			this.on('enterframe', function task () {
-				if ((this.age - current) % interval === 0) {
+			var current = this.age, flag = true;
+			function task () {
+				if ((this.age - current) % interval === 0 && flag) {
 					callback.call(this);
 				}
-			});
+			}
+			function stopInterval () {
+				flag = false;
+				this.removeEventListener(task);
+			}
+			this.on('enterframe', task);
+			return stopInterval.bind(this);
 		},
 		attack: function () {
 			this.behavior = BehaviorTypes.Attack;
