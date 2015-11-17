@@ -175,6 +175,32 @@ window.addEventListener('load', function () {
 					callback.call(this);
 				}
 			});
+		},
+		attack: function () {
+			this.behavior = BehaviorTypes.Attack;
+			var f = this.forward;
+			Hack.Attack.call(this, this.mapX + f.x, this.mapY + f.y, this.atk, f.x, f.y);
+			this.setTimeout(function () {
+				this.behavior = BehaviorTypes.Idle;
+			}, this.getFrame().length);
+		},
+		onattacked: function (event) {
+			if( (this.behavior & (BehaviorTypes.Damaged + BehaviorTypes.Dead)) === 0 ) {
+				if (typeof this.hp === 'number') {
+					this.hp -= event.damage;
+				}
+				if(this.hp <= 0){
+					this.behavior = BehaviorTypes.Dead;
+					this.setTimeout(function(){
+						this.behavior = BehaviorTypes.Idle;
+					}, this.getFrame().length);
+				}else{
+					this.behavior = BehaviorTypes.Damaged;
+					this.setTimeout(function(){
+						this.behavior = BehaviorTypes.Idle;
+					}, this.getFrame().length);
+				}
+            }
 		}
 	});
 
@@ -263,32 +289,6 @@ window.addEventListener('load', function () {
 				}, this);
 			});
 		},
-		attack: function () {
-			this.behavior = BehaviorTypes.Attack;
-			var len = this.getFrame().length;
-			this.tl.then(function () {
-				var v = Hack.Dir2Vec(this.direction);
-				Hack.Attack.call(this, this.mapX + v.x, this.mapY + v.y, this.atk, v.x, v.y);
-			}).delay(len).then(function () {
-				this.behavior = BehaviorTypes.Idle;
-			});
-		},
-		onattacked: function (event) {
-			if( (this.behavior & (BehaviorTypes.Damaged + BehaviorTypes.Dead)) === 0 ) {
-                this.hp -= event.damage;
-                if(this.hp > 0){
-                    this.behavior += BehaviorTypes.Damaged;
-					this.tl.delay(9).then(function () {
-						this.behavior = BehaviorTypes.Idle;
-					});
-                }else{
-					this.behavior = BehaviorTypes.Dead;
-					this.tl.fadeOut(10).then(function(){
-						Hack.gameover();
-					});
-                }
-            }
-		},
 		stayCheck: function () {
 			this.enteredStack.forEach(function (item) {
 				if (item.mapX === this.mapX && item.mapY === this.mapY) {
@@ -316,32 +316,6 @@ window.addEventListener('load', function () {
 			});
 			this.hp = 3;
 			this.atk = 1;
-		},
-		attack: function () {
-			this.behavior = BehaviorTypes.Attack;
-			var len = this.getFrame().length;
-			this.tl.then(function () {
-				var v = { x: this.direction, y: 0 };
-				Hack.Attack.call(this, this.mapX + v.x, this.mapY + v.y, this.atk, v.x, v.y);
-			}).delay(len).then(function () {
-				this.behavior = BehaviorTypes.Idle;
-			});
-		},
-		onattacked: function (event) {
-			if( (this.behavior & (BehaviorTypes.Damaged + BehaviorTypes.Dead)) === 0 ) {
-                this.hp -= event.damage;
-                if(this.hp > 0){
-                    this.behavior = BehaviorTypes.Damaged;
-                    this.tl.clear().delay(this.getFrame().length).then(function(){
-                        this.behavior = BehaviorTypes.Idle;
-                    });
-                }else{
-                    this.behavior = BehaviorTypes.Dead;
-                    this.tl.clear().delay(this.getFrame().length).then(function(){
-                        this.destroy();
-                    });
-                }
-            }
 		}
 	});
 
