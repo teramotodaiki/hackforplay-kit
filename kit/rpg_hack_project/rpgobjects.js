@@ -153,6 +153,7 @@ window.addEventListener('load', function () {
 					return getter.call(this);
 				}
 			}
+			return [];
 		},
 		setTimeout: function (callback, wait) {
 			var target = this.age + Math.max(1, wait);
