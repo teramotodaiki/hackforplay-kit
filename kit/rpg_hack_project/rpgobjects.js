@@ -203,9 +203,6 @@ window.addEventListener('load', function () {
 				}
 				if(this.hp <= 0){
 					this.behavior = BehaviorTypes.Dead;
-					this.setTimeout(function(){
-						this.behavior = BehaviorTypes.Idle;
-					}, this.getFrame().length);
 				}else{
 					this.behavior = BehaviorTypes.Damaged;
 					this.setTimeout(function(){
@@ -213,6 +210,11 @@ window.addEventListener('load', function () {
 					}, this.getFrame().length);
 				}
             }
+		},
+		onbecomedead: function () {
+			this.setTimeout(function () {
+				this.destroy();
+			}, this.getFrame().length);
 		},
 		walk: function (distance) {
 			var f = this.forward, d = typeof distance === 'number' ? Math.max(0, distance) : 1;
@@ -291,6 +293,7 @@ window.addEventListener('load', function () {
 			this.setFrame(BehaviorTypes.Dead, function () {
 				return [this.direction * 9 + 1, null];
 			});
+			this.on('becomedead', Hack.gameover);
 		},
 		onenterframe: function () {
 			if (this.behavior === BehaviorTypes.Idle) {
