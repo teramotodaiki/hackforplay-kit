@@ -265,6 +265,18 @@ window.addEventListener('load', function () {
 			});
 			this.hp = 3;
 			this.atk = 1;
+		},
+		setFrameD9: function (behavior, frame) {
+			var array = typeof frame === 'function' ? frame() : frame;
+
+			this.setFrame(behavior, function () {
+				var _array = [];
+				array.forEach(function (item, index) {
+					_array[index] = item >= 0 ? item + this.direction * 9 : item;
+				}, this);
+				console.log('processed!!', _array);
+				return _array;
+			});
 		}
     });
 
@@ -275,25 +287,12 @@ window.addEventListener('load', function () {
 			this.enteredStack = [];
 			this.on('enterframe', this.stayCheck);
 			this.on('walkend', this.enterCheck);
-			this.setFrame(BehaviorTypes.Idle, function () {
-				return [this.direction * 9 + 1];
-			});
-			this.setFrame(BehaviorTypes.Walk, function () {
-				var a = this.direction * 9, b = a + 1, c = a + 2;
-				return [a, a, a, a, b, b, b, b, c, c, c, c, b, b, b, null];
-			});
-			this.setFrame(BehaviorTypes.Attack, function () {
-				var a = this.direction * 9 + 6, b = a + 1, c = a + 2;
-				return [a, a, a, a, b, b, b, b, c, c, c, c, null];
-			});
-			this.setFrame(BehaviorTypes.Damaged, function () {
-				var a = this.direction * 9 + 2, b = -1;
-				return [a, b, b, b, a, a, a, b, b, b];
-			});
-			this.setFrame(BehaviorTypes.Dead, function () {
-				return [this.direction * 9 + 1, null];
-			});
 			this.on('becomedead', Hack.gameover);
+			this.setFrameD9(BehaviorTypes.Idle, [1]);
+			this.setFrameD9(BehaviorTypes.Walk, [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, null]);
+			this.setFrameD9(BehaviorTypes.Attack, [6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, null]);
+			this.setFrameD9(BehaviorTypes.Damaged, [2, -1, -1, -1, 2, 2, 2, -1, -1, -1]);
+			this.setFrameD9(BehaviorTypes.Dead, [1, null]);
 		},
 		onenterframe: function () {
 			if (this.behavior === BehaviorTypes.Idle) {
@@ -427,7 +426,12 @@ window.addEventListener('load', function () {
         initialize: function(){
 			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
-			this.frame = 1;
+			var _0 = 0, _1 = _0 + 1, _2 = _0 + 2;
+			this.setFrame(BehaviorTypes.Idle, [_1]);
+			this.setFrame(BehaviorTypes.Walk, [_0, _0, _0, _0, _1, _1, _1, _1, _2, _2, _2, _2, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Attack, [_0, _0, _2, _2, _1, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Damaged, [_2, -1, -1, -1, _2, _2, _2, -1, -1, -1]);
+			this.setFrame(BehaviorTypes.Dead, [_1, null]);
         }
     });
 
@@ -435,7 +439,12 @@ window.addEventListener('load', function () {
         initialize: function(){
 			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
-			this.frame = 7;
+			var _0 = 6, _1 = _0 + 1, _2 = _0 + 2;
+			this.setFrame(BehaviorTypes.Idle, [_1]);
+			this.setFrame(BehaviorTypes.Walk, [_0, _0, _0, _0, _1, _1, _1, _1, _2, _2, _2, _2, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Attack, [_0, _0, _2, _2, _1, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Damaged, [_2, -1, -1, -1, _2, _2, _2, -1, -1, -1]);
+			this.setFrame(BehaviorTypes.Dead, [_1, null]);
         }
     });
 
@@ -443,7 +452,12 @@ window.addEventListener('load', function () {
         initialize: function(){
 			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
-			this.frame = 4;
+			var _0 = 3, _1 = _0 + 1, _2 = _0 + 2;
+			this.setFrame(BehaviorTypes.Idle, [_1]);
+			this.setFrame(BehaviorTypes.Walk, [_0, _0, _0, _0, _1, _1, _1, _1, _2, _2, _2, _2, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Attack, [_0, _0, _2, _2, _1, _1, _1, _1, null]);
+			this.setFrame(BehaviorTypes.Damaged, [_2, -1, -1, -1, _2, _2, _2, -1, -1, -1]);
+			this.setFrame(BehaviorTypes.Dead, [_1, null]);
         }
     });
 
