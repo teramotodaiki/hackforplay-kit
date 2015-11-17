@@ -37,6 +37,7 @@ window.addEventListener('load', function () {
 	// Classes and Enums
 	Object.defineProperty(window, 'BehaviorTypes',	{ get: function () { return __BehaviorTypes; }	});
 	Object.defineProperty(window, 'RPGObject',		{ get: function () { return __RPGObject; }		});
+	Object.defineProperty(window, 'HumanBase',		{ get: function () { return __HumanBase; }		});
 	Object.defineProperty(window, 'Player',			{ get: function () { return __Player; }			});
 	Object.defineProperty(window, 'EnemyBase',		{ get: function () { return __EnemyBase; }		});
 	Object.defineProperty(window, 'BlueSlime',		{ get: function () { return __BlueSlime; }		});
@@ -112,6 +113,9 @@ window.addEventListener('load', function () {
 				},
 				set: function (value) { collisionFlag = value; }
 			});
+			// 初期化
+			this.direction = 0;
+			this.forward = { x: 0, y: 0 };
 
 			Hack.defaultParentNode.addChild(this);
 		},
@@ -174,14 +178,9 @@ window.addEventListener('load', function () {
 		}
 	});
 
-	var __Player = enchant.Class(RPGObject, {
-		initialize: function () {
-			RPGObject.call(this, 48, 48, -8, -12);
-			this.image = game.assets['enchantjs/x1.5/chara5.png'];
-			this.hp = 2;
-			this.atk = 1;
-			this.enteredStack = [];
-			this.on('enterframe', this.stayCheck);
+    var __HumanBase = enchant.Class(RPGObject, {
+		initialize: function (width, height, offsetX, offsetY) {
+			RPGObject.call(this, width, height, offsetX, offsetY);
 			var direction = 0;
 			Object.defineProperty(this, 'direction', {
 				get: function () { return direction; },
@@ -190,6 +189,21 @@ window.addEventListener('load', function () {
 					this.frame = [this.direction * 9 + (this.frame % 9)];
 				}
 			});
+			Object.defineProperty(this, 'forward', {
+				get: function () { return Hack.Dir2Vec(direction); },
+				set: function (value) { this.direction = Hack.Vec2Dir(value); }
+			});
+			this.hp = 3;
+			this.atk = 1;
+		}
+    });
+
+	var __Player = enchant.Class(HumanBase, {
+		initialize: function () {
+			HumanBase.call(this, 48, 48, -8, -12);
+			this.image = game.assets['enchantjs/x1.5/chara5.png'];
+			this.enteredStack = [];
+			this.on('enterframe', this.stayCheck);
 			this.setFrame(BehaviorTypes.Idle, function () {
 				return [this.direction * 9 + 1];
 			});
@@ -299,6 +313,10 @@ window.addEventListener('load', function () {
 				get: function () { return direction; },
 				set: function (value) { this.scaleX = -(direction = Math.sign(value)) * Math.abs(this.scaleX); }
 			});
+			Object.defineProperty(this, 'forward', {
+				get: function () { return { x: direction, y: 0 }; },
+				set: function (value) { this.direction = value.x; }
+			});
 			this.hp = 3;
 			this.atk = 1;
 		},
@@ -402,25 +420,25 @@ window.addEventListener('load', function () {
         }
     });
 
-	var __Boy = enchant.Class(RPGObject, {
+	var __Boy = enchant.Class(HumanBase, {
         initialize: function(){
-			RPGObject.call(this, 48, 48, -8, -18);
+			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
 			this.frame = 1;
         }
     });
 
-	var __Girl = enchant.Class(RPGObject, {
+	var __Girl = enchant.Class(HumanBase, {
         initialize: function(){
-			RPGObject.call(this, 48, 48, -8, -18);
+			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
 			this.frame = 7;
         }
     });
 
-	var __Woman = enchant.Class(RPGObject, {
+	var __Woman = enchant.Class(HumanBase, {
         initialize: function(){
-			RPGObject.call(this, 48, 48, -8, -18);
+			HumanBase.call(this, 48, 48, -8, -18);
 			this.image = game.assets['enchantjs/x1.5/chara0.png'];
 			this.frame = 4;
         }
