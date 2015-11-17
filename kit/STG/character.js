@@ -318,7 +318,6 @@ var Player = enchant.Class.create(Character,
 
         spell.name = 'w';
 
-
         this.attackSpell = spell;
     },
 

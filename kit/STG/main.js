@@ -93,8 +93,8 @@ window.addEventListener('load', function()
             speed: 15,
             size: 10,
             target_type: 'enemy',
-            repeatX: 2,
-            repeatSpaceX: 50,
+            repeat_x: 2,
+            repeat_space_x: 50,
             power: 100
         });
 
@@ -106,7 +106,7 @@ window.addEventListener('load', function()
             way: 10,
             speed: 5,
             size: 20,
-            createPos: 50
+            space: 50
         }).shotControl(function()
         {
 
@@ -121,7 +121,6 @@ window.addEventListener('load', function()
             createTime: 10.2,
             way: 8,
             speed: 10,
-            targetType: 'player',
 
             size: 5,
         }).control(function()
@@ -131,7 +130,7 @@ window.addEventListener('load', function()
             var target = CharacterList.GetNear(this.creator, this.targetType);
 
             // 軸を標的の方向に
-            this.setAxisFromTarget(target);
+            this.AxisFromTarget(target);
 
         });
 
@@ -181,22 +180,46 @@ window.addEventListener('load', function()
             create_time: 0.5,
             speed: 5,
             repeat: 3,
-            repeatAngle: 3
+            repeat_angle: 3,
         }).control(function()
         {
             // 生成する度に
+            /*
             if (this.CreateNow())
             {
                 this.axis_angle += 10;
                 this.NextColor();
             }
+            */
+
+        }).Random(
+        {
+
+            way: [1, 10],
+            speed: [5, 20],
 
         });
 
 
 
+        __Barrage.New('上から下',
+        {
+            material: 'normal',
+            way: 1,
+            axis_angle: 180,
+            create_time: 0.5,
+            speed: 5,
+            repeat_x: 10,
+            repeat_space_x: 480 / 10,
 
-        __Spell.Make('10way-r3')('10way-r3');
+            pos_type: 'absolute',
+            pos: [240, 0],
+
+        });
+
+
+
+        __Spell.Make('10way-r3')('10way-r3' /*, '上から下'*/ );
 
 
         __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾');
@@ -274,7 +297,11 @@ window.addEventListener('load', function()
         Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
 
 
+        Motion.New('ボス反復');
 
+        var CharacterGraphic = function() {
+
+        }
 
 
         boss.AddSpell('10way-r3',

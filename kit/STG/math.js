@@ -4,6 +4,7 @@
 
 
 
+
 function Range(n)
 {
     return Array.apply(null,
@@ -183,6 +184,17 @@ var Vec2 = function(x, y)
 {
     return new _Vec2(x, y);
 }
+
+
+Object.defineProperty(Array.prototype, 'ToVec2',
+{
+    value: function()
+    {
+        return Vec2(this[0], this[1]);
+    }
+});
+
+
 
 
 

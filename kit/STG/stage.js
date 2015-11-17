@@ -17,11 +17,15 @@ var HP = enchant.Class.create(enchant.Sprite,
         }
 
 
+        console.log(this.image);
+
+
         this.before_value = 0.0;
 
 
         this.smooth_value = 10;
 
+        this.canvas = new Canvas(this.image);
 
         this.value = 0.0;
 
@@ -74,37 +78,40 @@ var HP = enchant.Class.create(enchant.Sprite,
         var hpNorm = this.value * Math.PI2;
 
 
-
         (function() {
 
         }).call(this.image.context);
 
 
 
+
+
         var ctx = this.image.context;
-        ctx.clearRect(0, 0, this.width, this.height);
+
+        this.canvas.Clear();
 
         // 円
-        ctx.beginPath();
-        ctx.arc(this.width / 2, this.height / 2, 40, 0, Math.PI2);
+        this.canvas.ArcPath(this.width / 2, this.height / 2)(40)(Math.PI2);
+
 
         // 枠
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = '#fff';
         ctx.stroke();
 
         // 背景
         ctx.lineWidth = 4;
-        ctx.strokeStyle = '#999';
+        ctx.strokeStyle = '#444';
         ctx.stroke();
 
         // 対象が既に倒れているなら HP ゲージは表示しなくても OK
         if (this.enemy.hp <= 0) return;
 
+        ctx.lineWidth = 5;
         // HP ゲージ
         ctx.beginPath();
         ctx.arc(this.width / 2, this.height / 2, 40, -Math.PI / 2, -Math.PI / 2 - hpNorm, true);
-        ctx.strokeStyle = '#9ff';
+        ctx.strokeStyle = '#fff';
         ctx.stroke();
 
     }
