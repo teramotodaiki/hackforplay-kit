@@ -233,12 +233,15 @@ window.addEventListener('load', function () {
 				var frame = this.getFrame().length;
 				var stopInterval = this.setInterval(function () {
 					this.moveBy(move.x / frame, move.y / frame);
+					this.dispatchEvent(new Event('walkmove'));
 				}, 1);
 				this.setTimeout(function () {
 					this.moveTo(target.x, target.y);
 					this.behavior = BehaviorTypes.Idle;
 					stopInterval();
+					this.dispatchEvent(new Event('walkend'));
 				}, frame);
+				this.dispatchEvent(new Event('walkstart'));
 			}
 		}
 	});
