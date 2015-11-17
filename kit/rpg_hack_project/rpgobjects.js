@@ -213,6 +213,33 @@ window.addEventListener('load', function () {
 					}, this.getFrame().length);
 				}
             }
+		},
+		walk: function (distance) {
+			var f = this.forward, d = typeof distance === 'number' ? Math.max(0, distance) : 1;
+			var flag = null;
+			for (var i = 0; i < d; i++) {
+				var _x = this.mapX + f.x * d, _y = this.mapY + f.y * d;
+				// Map Collision
+				flag =	!Hack.map.hitTest(_x * 32, _y * 32) && 0 <= _x && _x < 15 && 0 <= _y && _y < 10;
+				// RPGObject(s) Collision
+				flag =	flag && RPGObject.collection.every(function (item) {
+					return !item.collisionFlag || item.mapX !== _x || item.mapY !== _y;
+				}, this);
+			}
+			if (flag) {
+				var move = { x: Math.round(f.x * 32 * d), y: Math.round(f.y * 32 * d) };
+				var target = { x: this.x + move.x, y: this.y + move.y };
+				this.behavior = BehaviorTypes.Walk;
+				var frame = this.getFrame().length;
+				var stopInterval = this.setInterval(function () {
+					this.moveBy(move.x / frame, move.y / frame);
+				}, 1);
+				this.setTimeout(function () {
+					this.moveTo(target.x, target.y);
+					this.behavior = BehaviorTypes.Idle;
+					stopInterval();
+				}, frame);
+			}
 		}
 	});
 
