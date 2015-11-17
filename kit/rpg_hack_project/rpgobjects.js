@@ -89,7 +89,7 @@ window.addEventListener('load', function () {
 				set: function (value) {
 					var append = value & ~behavior;
 					behavior = value;
-					var type = Object.keys(BehaviorTypes).filter(function (item) {
+					Object.keys(BehaviorTypes).filter(function (item) {
 						return (BehaviorTypes[item] & append) > 0;
 					}).forEach(function (item) {
 						// ignite 1 frame later
@@ -305,9 +305,6 @@ window.addEventListener('load', function () {
 	var __EnemyBase = enchant.Class(RPGObject, {
 		initialize: function (width, height, offsetX, offsetY) {
 			RPGObject.call(this, width, height, offsetX, offsetY);
-			Object.keys(BehaviorTypes).forEach(function (key) {
-				this.setFrame(key, [2, null]);
-			}, this);
 			var direction = -1; // -1: Left, 1: Right
 			Object.defineProperty(this, 'direction', {
 				get: function () { return direction; },
