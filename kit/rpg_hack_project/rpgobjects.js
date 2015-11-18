@@ -87,16 +87,19 @@ window.addEventListener('load', function () {
 			Object.defineProperty(this, 'behavior', {
 				get: function () { return behavior; },
 				set: function (value) {
-					var append = value & ~behavior;
-					behavior = value;
-					Object.keys(BehaviorTypes).filter(function (item) {
-						return (BehaviorTypes[item] & append) > 0;
-					}).forEach(function (item) {
-						// ignite 1 frame later
-						this.setTimeout(function () {
-							this.dispatchEvent( new Event( 'become' + item.toLowerCase() ) );
-						}, 1);
-					}, this);
+					if (value !== behavior) {
+						behavior = value;
+						Object.keys(BehaviorTypes).filter(function (item) {
+							// 最も大きい桁
+							var contain = behavior & BehaviorTypes[item];
+							return contain && behavior < contain * 2;
+						}).forEach(function (item) {
+							// On Becomeイベントを1フレーム後に発火
+							this.setTimeout(function () {
+								this.dispatchEvent( new Event( 'become' + item.toLowerCase() ) );
+							}, 1);
+						}, this);
+					}
 				}
 			});
 			this.setTimeout(function () {
@@ -204,9 +207,9 @@ window.addEventListener('load', function () {
 				if(this.hp <= 0){
 					this.behavior = BehaviorTypes.Dead;
 				}else{
-					this.behavior = BehaviorTypes.Damaged;
+					this.behavior |= BehaviorTypes.Damaged;
 					this.setTimeout(function(){
-						this.behavior = BehaviorTypes.Idle;
+						this.behavior &= ~BehaviorTypes.Damaged;
 					}, this.getFrame().length);
 				}
             }
