@@ -1,7 +1,7 @@
 // Editor
 var game = window.parent;
 var jsEditor;
-var policy = "*";
+var policy = "/";
 
 window.addEventListener('click', function(e){
 	// クリック時、ゲームウィンドウにフォーカスを戻す
@@ -52,9 +52,18 @@ window.onload = function(){
 				change.update(change.from, change.to, replaced, "");
 			}
 		}
+		if (change.origin == "+delete" && change.to.ch - change.from.ch == 1) {
+			var del = cm.doc.getRange(change.from, change.to);
+			if (del.match(/[,;=\(\)\[\]\']/g)) {
+				change.cancel();
+			}
+		}
 	});
 	jsEditor.on('change', function(cm, change) {
 		renderUI();
+		// 魔道書が書き換えられたことをゲーム側に伝える
+		var source = "if(window.editorTextChanged) editorTextChanged();";
+		game.postMessage(source, policy);
 	});
 };
 
@@ -71,6 +80,9 @@ function run(){
 	"e.tl.scaleTo(0, 1, 3, enchant.Easing.LINEAR);"+
 	"window.focus();";
 	game.postMessage(source, policy);
+
+	// 魔道書が閉じられたことをゲーム側に伝える
+	game.postMessage("if(window.editorWindowClosed) editorWindowClosed();", policy);
 	dispatchHackEvent('editend');
 }
 
@@ -80,6 +92,9 @@ function cls(){
 	"e.tl.scaleTo(0, 1, 7, enchant.Easing.BACK_EASEIN);"+
 	"window.focus();";
 	game.postMessage(source, policy);
+
+	// 魔道書が閉じられたことをゲーム側に伝える
+	game.postMessage("if(window.editorWindowClosed) editorWindowClosed();", policy);
 	dispatchHackEvent('editcancel');
 }
 
