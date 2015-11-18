@@ -274,7 +274,6 @@ window.addEventListener('load', function () {
 				array.forEach(function (item, index) {
 					_array[index] = item >= 0 ? item + this.direction * 9 : item;
 				}, this);
-				console.log('processed!!', _array);
 				return _array;
 			});
 		}
