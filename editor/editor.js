@@ -52,6 +52,12 @@ window.onload = function(){
 				change.update(change.from, change.to, replaced, "");
 			}
 		}
+		if (change.origin == "+delete" && change.to.ch - change.from.ch == 1) {
+			var del = cm.doc.getRange(change.from, change.to);
+			if (del.match(/[,;=\(\)\[\]\']/g)) {
+				change.cancel();
+			}
+		}
 	});
 	jsEditor.on('change', function(cm, change) {
 		renderUI();
