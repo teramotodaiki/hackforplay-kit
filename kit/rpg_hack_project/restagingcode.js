@@ -35,7 +35,7 @@ window.addEventListener('load', function () {
 "\n"+
 "\n"+
 "\t// ワープゆか\n"+
-"\tvar warp = new MapObject(93);\n"+
+"\tvar warp = new MapObject('Warp');\n"+
 "\twarp.locate(3, 3);\n"+
 "\t// When enter... ふまれたら...\n"+
 "\twarp.onplayerenter = function () {\n"+
