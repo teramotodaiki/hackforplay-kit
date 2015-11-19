@@ -212,8 +212,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
 
 
         // 移動方向
-        this.angle = Angle(0);
-
+        this.angle = 0;
 
 
         // 仮
@@ -228,8 +227,8 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.events = [];
 
 
-        this.scale_x = 1.0;
-        this.scale_y = 1.0;
+        this.Scale_x = 1.0;
+        this.Scale_y = 1.0;
 
     },
 
@@ -306,8 +305,7 @@ var Shot = enchant.Class.create(enchant.Sprite,
     move: function()
     {
 
-
-        this.pos.add(this.angle.toVec2().scale(this.speed));
+        this.pos.add(Angle(this.angle).ToVec2().Scale(this.speed));
 
 
     },

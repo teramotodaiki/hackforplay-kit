@@ -17,7 +17,8 @@ var HP = enchant.Class.create(enchant.Sprite,
         }
 
 
-        console.log(this.image);
+this.compositeOperation = 'lighter';
+
 
 
         this.before_value = 0.0;
@@ -126,18 +127,15 @@ var CreateEnemy = function(property)
 
     var enemy = new Enemy(20, 20);
 
-
     if (property.pos)
     {
-        enemy.locate(property.pos.x, property.pos.y);
+        enemy.locate(property.pos[0], property.pos[1]);
     }
-
 
     if (property.motion)
     {
         enemy.setMotion(property.motion);
     }
-
 
 
     if (property.spell)
@@ -178,7 +176,6 @@ _Stage.prototype.AddBossFromInstance = function(time, boss)
     {
 
         this.__boss = true;
-
 
         scene.addChild(boss);
         scene.addChild(new HP(boss));
@@ -330,7 +327,6 @@ var active_stage = null;
 
 
 var stage_list = [];
-
 
 
 var Stage = {

@@ -132,7 +132,7 @@ var CreatePad = function()
         // 低速キー || APad の押し込みが少ない
         if (input.shift || (pad.isTouched && aPadLength < 0.5))
         {
-            _pad.scale(0.5);
+            _pad.Scale(0.5);
         }
 
 

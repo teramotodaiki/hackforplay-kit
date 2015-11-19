@@ -32,8 +32,6 @@ var Palette = {
 };
 
 
-
-
 // キャラクター
 var Character = enchant.Class.create(enchant.Sprite,
 {
@@ -110,7 +108,7 @@ var Character = enchant.Class.create(enchant.Sprite,
 
 
         // 移動
-        this.pos.add(moveVec.scale(this.speed));
+        this.pos.add(moveVec.Scale(this.speed));
 
 
     },
@@ -225,11 +223,13 @@ Enemy.prototype.SetHP = function(hp)
 
 
 // スペルを登録する
-Enemy.prototype.SetSpell = function(name)
+Enemy.prototype.SetSpell = function(name, aaaaa)
 {
-
+    this.spell_name = name;
     this.spell = __Spell.Get(name).Clone();
 
+
+    if(aaaaa) return;
 
     // barrage_count を初期化する
     this.spell.barrages.forEach(function(barrage)
@@ -239,6 +239,20 @@ Enemy.prototype.SetSpell = function(name)
 
 
 }
+
+Enemy.prototype.ReloadSpell = function()
+{
+    if (this.spell_name && this.spell)
+    {
+        this.SetSpell(this.spell_name, true);
+
+        console.log('スペル "' + this.spell_name + '" を更新しました');
+    }
+}
+
+
+
+
 
 // 被弾
 Enemy.prototype.Damage = function(damage)

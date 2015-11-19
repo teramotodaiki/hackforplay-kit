@@ -4,7 +4,6 @@
 
 
 
-
 function Range(n)
 {
     return Array.apply(null,
@@ -31,10 +30,13 @@ function Random(min, max)
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+// Random の整数版
 function Random2(min, max)
 {
     return min + Math.random() * (max - min);
 }
+
+
 
 
 // Vec2 間の距離（比較用）
@@ -60,7 +62,6 @@ var distance = function(x1, y1)
 
 
 Math.PI2 = Math.PI * 2;
-
 
 
 // Vec2
@@ -110,11 +111,6 @@ _Vec2.prototype.ToRadian = function()
 }
 
 
-// 複製
-_Vec2.prototype.copy = function()
-{
-    return new _Vec2(this.x, this.y);
-}
 
 // 複製
 _Vec2.prototype.Clone = function()
@@ -154,7 +150,7 @@ _Vec2.prototype.normalize = function()
 }
 
 // operator*= && operator/=
-_Vec2.prototype.scale = function(value)
+_Vec2.prototype.Scale = function(value)
 {
     this.x *= value;
     this.y *= value;
@@ -196,19 +192,19 @@ Object.defineProperty(Array.prototype, 'ToVec2',
 
 
 
-
-
 function _Angle(value)
 {
     this.value = value;
 }
 
+// [[deprecated]]
 _Angle.prototype.add = function(value)
 {
     this.value += value;
     return this;
 }
 
+// [[deprecated]]
 _Angle.prototype.sub = function(value)
 {
     this.value -= value;
@@ -222,24 +218,13 @@ _Angle.prototype.ToVec2 = function()
     return Vec2(Math.sin(radian), Math.cos(radian));
 }
 
-_Angle.prototype.ToRadian = function()
-{
-    return this.value * Math.PI / 180;
-}
-
 
 _Angle.prototype.ToRadian = function()
 {
     return this.value * Math.PI / 180;
 }
 
-_Angle.prototype.toVec2 = function()
-{
-    var radian = this.ToRadian();
-    var x = Math.sin(radian);
-    var y = Math.cos(radian);
-    return Vec2(x, y);
-}
+
 
 
 var Angle = function(value)

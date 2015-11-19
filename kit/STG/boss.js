@@ -65,7 +65,7 @@ var Boss = enchant.Class.create(Enemy,
                 Motion.Use(this.GetActiveSpell().motion, this);
 
                 this.SetHP(this.GetActiveSpell().hp);
-                
+
             }
 
         }
@@ -112,12 +112,45 @@ Boss.prototype.SetDeathEvent = function(event)
 }
 
 
+
+Boss.prototype.UpdateSpell = function()
+{
+    var self = this;
+
+    this.spells.forEach(function(spell)
+    {
+        console.log('スペル "' + spell.__name + '" を更新しました');
+
+
+
+        spell = __Spell.Get(spell.__name).Clone();
+
+
+        // option を上書き
+        spell = $.extend(spell, spell.__option);
+
+
+        // barrage_count を初期化する
+        spell.barrages.forEach(function(barrage)
+        {
+
+            console.log('SP2: ' + barrage.speed);
+
+            this.barrage_count[barrage.handle] = 0;
+        }, self);
+
+    });
+
+}
+
+
 // スペルを追加する
 Boss.prototype.AddSpell = function(name, option)
 {
 
 
     var spell = __Spell.Get(name).Clone();
+
 
 
     // option を上書き
@@ -129,6 +162,10 @@ Boss.prototype.AddSpell = function(name, option)
     {
         this.barrage_count[barrage.handle] = 0;
     }, this);
+
+
+    spell.__name = name;
+    spell.__option = option;
 
 
     this.spells.push(spell);

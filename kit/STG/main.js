@@ -181,25 +181,54 @@ window.addEventListener('load', function()
             speed: 5,
             repeat: 3,
             repeat_angle: 3,
-        }).control(function()
-        {
-            // 生成する度に
-            /*
-            if (this.CreateNow())
-            {
-                this.axis_angle += 10;
-                this.NextColor();
-            }
-            */
-
+            pos_type: 'absolute'
         }).Random(
         {
+            axis_angle: [0, 360],
+            way: [6, 18],
+            speed: [5, 10],
+            color: [0, 7],
 
-            way: [1, 10],
-            speed: [5, 20],
+            pos_x: [0, 480],
+            pos_y: [100, 100],
+            target_type: [1, 1],
 
         });
 
+
+        __Barrage.New('aaaaaaaa',
+        {
+            material: 'normal',
+            way: 1,
+
+
+            // range_angle: 20,
+
+            create_time: 1.05,
+            speed: 5,
+        }).Random(
+        {
+
+
+        }).control(function()
+        {
+
+            this.AxisFromNearTarget();
+
+        }).shotControl(function()
+        {
+
+            this.angle += 2;
+
+            // this.angle += 2;
+
+
+        });
+
+
+        __Barrage.Get('aaaaaaaa').control(function() {
+
+        });
 
 
         __Barrage.New('上から下',
@@ -219,13 +248,15 @@ window.addEventListener('load', function()
 
 
 
-        __Spell.Make('10way-r3')('10way-r3' /*, '上から下'*/ );
+
+        __Spell.Make('10way-r3')('aaaaaaaa' /*, '上から下'*/ );
 
 
         __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾');
         __Spell.Make('player-spell')('player-normal');
 
 
+        __Spell.Make('U to B')('上から下');
 
         __Spell.Make('自機狙い')('自機狙い');
 
@@ -233,10 +264,6 @@ window.addEventListener('load', function()
 
 
 
-
-        // とりあえず easing を短縮
-        var quad = enchant.Easing.QUAD_EASEINOUT,
-            linear = enchant.Easing.LINEAR;
 
 
         /*
@@ -267,65 +294,49 @@ window.addEventListener('load', function()
 
 
 
+        Motion.New('不動');
+
+        __Barrage.New('弾幕２２',
+        {
+            way: 8,
+            speed: 5,
+
+        }).control(function()
+        {
 
 
-        Stage.Make('ステージ');
-        /*.AddEnemy(0,
-                {
-                    pos: Vec2(scene.width / 2, 100),
-                    // motion: 'RtoL',
-                    // spell: '自機狙い',
-                }).AddEnemy(0,
-                {
-                    pos: Vec2(scene.width / 2, 200),
-                    // motion: 'RtoL',
-                    // spell: '自機狙い',
-                }).AddEnemy(0,
-                {
-                    pos: Vec2(scene.width / 2, 0),
-                    // motion: 'RtoL',
-                    // spell: '自機狙い',
-                });
+            if (this.time >= 3)
+            {
+                this.color = 102;
+            }
+
+        });
 
 
-                */
-        var boss = new Boss(30, 30);
+        __Spell.Make('弾幕１')('弾幕２２');
 
-        boss.locate(scene.width / 2, 0);
 
+        Stage.Make('ステージ').AddEnemy(0,
+        {
+            pos: [240, 100],
+            spell: '弾幕１',
+            motion: '不動',
+        });
+
+        Stage.Get('ステージ').AddEnemy(5,
+        {
+            pos: [340, 100],
+            spell: '弾幕１',
+            motion: '不動',
+        });
+
+        //
         Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(1.0);
         Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
 
-
-        Motion.New('ボス反復');
-
-        var CharacterGraphic = function() {
-
-        }
+        ////////////////////////////////////////////////////
 
 
-        boss.AddSpell('10way-r3',
-        {
-            name: '',
-            motion: 'ボス反復',
-            entry_motion: 'ボス登場',
-
-            hp: 100
-        });
-
-
-        boss.AddSpell('10way-r3',
-        {
-            name: '',
-            motion: 'ボス反復',
-            entry_motion: 'ボス登場',
-
-            hp: 100
-        });
-
-
-
-        Stage.Get('ステージ').AddBossFromInstance(1, boss);
 
         /*
         var NET = new NewEasyTimeline();
@@ -345,10 +356,9 @@ window.addEventListener('load', function()
         });
 
 
-
-        EnchantBook.PushHint('1;');
-
-
+        EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");
+        EnchantBook.PushHint("b.speed = 20;");
+        EnchantBook.PushHint("__Spell.Reload();");
 
 
     }

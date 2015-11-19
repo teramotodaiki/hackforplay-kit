@@ -267,7 +267,7 @@ var Motion = {
 
         if (easyTimelineList[name] === undefined)
         {
-            console.log(name + ' は存在しないモーションです');
+            console.warn(name + ' は存在しないモーションです');
         }
 
 

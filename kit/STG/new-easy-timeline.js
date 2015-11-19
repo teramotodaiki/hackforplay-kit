@@ -157,6 +157,7 @@ NewEasyTimeline.prototype.Clone = function()
     {
 
         clone.events.push(Clone(event));
+
     });
 
 
@@ -191,7 +192,6 @@ NewEasyTimeline.prototype.Update = function(a)
 
     this.target.pos.x = event._x + x;
     this.target.pos.y = event._y + y;
-
 
 
     if (this.count++ > move_count)
