@@ -275,7 +275,7 @@ window.addEventListener('load', function () {
 			this.setFrame(behavior, function () {
 				var _array = [];
 				array.forEach(function (item, index) {
-					_array[index] = item >= 0 ? item + this.direction * 9 : item;
+					_array[index] = item !== null && item >= 0 ? item + this.direction * 9 : item;
 				}, this);
 				return _array;
 			});
