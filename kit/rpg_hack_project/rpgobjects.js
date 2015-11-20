@@ -238,6 +238,7 @@ window.addEventListener('load', function () {
 				var frame = this.getFrame().length;
 				var stopInterval = this.setInterval(function () {
 					this.moveBy(move.x / frame, move.y / frame);
+					this.moveTo(Math.round(this.x), Math.round(this.y));
 					this.dispatchEvent(new Event('walkmove'));
 				}, 1);
 				this.setTimeout(function () {
