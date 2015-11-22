@@ -69,6 +69,8 @@ window.addEventListener('load', function () {
 "\t};\n"+
 "\n"+
 "\tHack.maps = [];\n"+
+"\n"+
+"\t// room1\n"+
 "\tHack.maps['room1'] = new RPGMap(32, 32);\n"+
 "\tHack.maps['room1'].imagePath = 'enchantjs/x2/map1.gif';\n"+
 "\tHack.maps['room1'].bmap.loadData([\n"+
@@ -96,6 +98,7 @@ window.addEventListener('load', function () {
 "\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]\n"+
 "\t];\n"+
 "\n"+
+"\t// room1\n"+
 "\tHack.maps['room2'] = new RPGMap(32, 32);\n"+
 "\tHack.maps['room2'].imagePath = 'enchantjs/x2/map1.gif';\n"+
 "\tHack.maps['room2'].bmap.loadData([\n"+
