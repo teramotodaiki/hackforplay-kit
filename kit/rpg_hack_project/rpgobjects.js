@@ -232,12 +232,12 @@ window.addEventListener('load', function () {
 			var _x = this.mapX + f.x * s, _y = this.mapY + f.y * s;
 
 			// Map Collision
-			var flag =	!Hack.map.hitTest(_x * 32, _y * 32) && 0 <= _x && _x < 15 && 0 <= _y && _y < 10;
+			var mapHit = Hack.map.hitTest(_x * 32, _y * 32) || 0 > _x || _x > 14 || 0 > _y || _y > 9;
 			// RPGObject(s) Collision
-			flag =	flag && RPGObject.collection.every(function (item) {
-				return !item.collisionFlag || item.mapX !== _x || item.mapY !== _y;
-			}, this);
-			if (flag) {
+			var hits = RPGObject.collection.filter(function (item) {
+				return item.collisionFlag && item.mapX === _x && item.mapY === _y;
+			});
+			if (!mapHit && !hits.length) {
 				this.behavior = BehaviorTypes.Walk;
 				this.dispatchEvent(new Event('walkstart'));
 				var move = { x: Math.round(f.x * 32 * s), y: Math.round(f.y * 32 * s) };
@@ -260,6 +260,11 @@ window.addEventListener('load', function () {
 						}, 1);
 					}
 				}, frame);
+			} else {
+				var e = new Event('collided');
+				e.map = mapHit;
+				e.hits = hits;
+				this.dispatchEvent(e);
 			}
 		}
 	});
