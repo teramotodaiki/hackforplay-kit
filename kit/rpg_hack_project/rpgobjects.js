@@ -191,20 +191,18 @@ window.addEventListener('load', function () {
 			this.on('enterframe', task);
 			return stopInterval.bind(this);
 		},
-		attack: function (count) {
+		attack: function (count, continuous) {
 			var c = typeof count === 'number' ? count >> 0 : 1;
-			this.behavior = BehaviorTypes.Attack;
 			var f = this.forward;
+			if (continuous) {
+				this.frame = [];
+				this.frame = this.getFrame();
+			} else this.behavior = BehaviorTypes.Attack;
 			Hack.Attack.call(this, this.mapX + f.x, this.mapY + f.y, this.atk, f.x, f.y);
 			this.setTimeout(function () {
-				this.behavior = BehaviorTypes.Idle;
-				if (count > 1) {
-					this.setTimeout(function () {
-						if (this.behavior === BehaviorTypes.Idle) {
-							this.attack(count - 1);
-						}
-					}, 1);
-				}
+				// next step
+				if (count > 1) this.attack(count - 1, true);
+				else this.behavior = BehaviorTypes.Idle;
 			}, this.getFrame().length);
 		},
 		onattacked: function (event) {
