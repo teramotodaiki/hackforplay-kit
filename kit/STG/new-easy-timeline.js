@@ -158,6 +158,7 @@ NewEasyTimeline.prototype.Clone = function()
 
         clone.events.push(Clone(event));
 
+
     });
 
 

@@ -12,7 +12,6 @@ var Enemy = enchant.Class.create(Character,
 
         this.type = 'enemy';
 
-
         this.backgroundColor = '#00f';
 
 

@@ -1,3 +1,4 @@
+
 var Boss = enchant.Class.create(Enemy,
 {
     initialize: function(width, height)
@@ -13,7 +14,7 @@ var Boss = enchant.Class.create(Enemy,
 
         this.entry_motion = true;
 
-        this.death_event = function() {}
+        // this.death_event = function() {}
 
         this.spells = [];
 
@@ -191,7 +192,9 @@ Boss.prototype.NextSpell = function()
     {
         console.log('死亡');
         this.death = true;
-        this.death_event();
+
+        this.EventTrigger('death');
+        // this.death_event();
     }
     else
     {

@@ -1,8 +1,6 @@
 // 東方みたいな HP ゲージ
-var HP = enchant.Class.create(enchant.Sprite,
-{
-    initialize: function(enemy)
-    {
+var HP = enchant.Class.create(enchant.Sprite, {
+    initialize: function (enemy) {
         Sprite.call(this, 100, 100);
 
         this.enemy = enemy;
@@ -10,15 +8,13 @@ var HP = enchant.Class.create(enchant.Sprite,
 
 
         // 位置を更新する
-        this.updatePos = function()
-        {
+        this.updatePos = function () {
             this.x = this.enemy.x + (this.enemy.width - this.width) / 2;
             this.y = this.enemy.y + (this.enemy.height - this.height) / 2;
         }
 
 
-this.compositeOperation = 'lighter';
-
+        this.compositeOperation = 'lighter';
 
 
         this.before_value = 0.0;
@@ -35,15 +31,13 @@ this.compositeOperation = 'lighter';
         this.updatePos();
     },
 
-    onenterframe: function()
-    {
+    onenterframe: function () {
 
         // 位置を合わせる
         this.updatePos();
 
 
-        if (this.enemy.death)
-        {
+        if (this.enemy.death) {
             return scene.removeChild(this);
         }
 
@@ -51,8 +45,7 @@ this.compositeOperation = 'lighter';
         var op = 1.0;
 
         // 対象が準備中なら透過
-        if (this.enemy.entry_motion === true || this.enemy.death)
-        {
+        if (this.enemy.entry_motion === true || this.enemy.death) {
             op = 0.0;
         }
 
@@ -64,8 +57,7 @@ this.compositeOperation = 'lighter';
         this.value = this.enemy.hp / this.enemy.hp_max;
 
 
-        if (isNaN(this.value))
-        {
+        if (isNaN(this.value)) {
             this.value = 0.0;
         }
 
@@ -79,7 +71,7 @@ this.compositeOperation = 'lighter';
         var hpNorm = this.value * Math.PI2;
 
 
-        (function() {
+        (function () {
 
         }).call(this.image.context);
 
@@ -120,26 +112,22 @@ this.compositeOperation = 'lighter';
 
 
 
-var CreateEnemy = function(property)
-{
+var CreateEnemy = function (property) {
 
     console.log('敵を追加します');
 
     var enemy = new Enemy(20, 20);
 
-    if (property.pos)
-    {
+    if (property.pos) {
         enemy.locate(property.pos[0], property.pos[1]);
     }
 
-    if (property.motion)
-    {
+    if (property.motion) {
         enemy.setMotion(property.motion);
     }
 
 
-    if (property.spell)
-    {
+    if (property.spell) {
         enemy.SetSpell(property.spell);
     }
 
@@ -153,8 +141,7 @@ var CreateEnemy = function(property)
 
 
 
-var _Stage = function()
-{
+var _Stage = function () {
 
     this.events = {};
 
@@ -170,10 +157,8 @@ var _Stage = function()
 
 
 // 既存のボスを追加する
-_Stage.prototype.AddBossFromInstance = function(time, boss)
-{
-    this.AddEvent(time, function()
-    {
+_Stage.prototype.AddBossFromInstance = function (time, boss) {
+    this.AddEvent(time, function () {
 
         this.__boss = true;
 
@@ -186,10 +171,8 @@ _Stage.prototype.AddBossFromInstance = function(time, boss)
 
 
 // ボスを追加する
-_Stage.prototype.AddBoss = function(time, property)
-{
-    this.AddEvent(time, function()
-    {
+_Stage.prototype.AddBoss = function (time, property) {
+    this.AddEvent(time, function () {
         console.log('ボスを追加します');
 
         var boss = new Boss(20, 20);
@@ -205,21 +188,17 @@ _Stage.prototype.AddBoss = function(time, property)
         this.__boss = true;
 
 
-        if (property.pos)
-        {
+        if (property.pos) {
             boss.locate(property.pos.x, property.pos.y);
         }
-        if (property.motion)
-        {
+        if (property.motion) {
             boss.setMotion(property.motion);
         }
-        if (property.spell)
-        {
+        if (property.spell) {
             boss.SetSpell(property.spell);
         }
 
-        if (property.entry_motion)
-        {
+        if (property.entry_motion) {
             boss.SetEntryMotion(property.entry_motion);
         }
 
@@ -229,8 +208,7 @@ _Stage.prototype.AddBoss = function(time, property)
         var self = this;
 
         // ボスを倒したらカウントを再開
-        boss.death_event = function()
-        {
+        boss.death_event = function () {
             self.__boss = false;
 
 
@@ -242,17 +220,14 @@ _Stage.prototype.AddBoss = function(time, property)
     return this;
 }
 
-_Stage.prototype.Update = function()
-{
+_Stage.prototype.Update = function () {
 
 
     // ボスが出現していない時はカウントを進める
-    if (!this.__boss)
-    {
+    if (!this.__boss) {
 
         // イベントを処理する
-        if (this.events[this.count] !== undefined)
-        {
+        if (this.events[this.count] !== undefined) {
             this.events[this.count].call(this);
             console.log('stage: event');
         }
@@ -265,18 +240,15 @@ _Stage.prototype.Update = function()
 
 
 // 整形用
-_Stage.prototype.Chain = function()
-{
+_Stage.prototype.Chain = function () {
     return this;
 }
 
 
 // 敵を追加する
-_Stage.prototype.AddEnemy = function(time, enemy)
-{
+_Stage.prototype.AddEnemy = function (time, enemy) {
 
-    this.AddEvent(time, function()
-    {
+    this.AddEvent(time, function () {
         CreateEnemy(enemy);
     });
 
@@ -285,18 +257,15 @@ _Stage.prototype.AddEnemy = function(time, enemy)
 
 
 // イベントを追加する
-_Stage.prototype.AddEvent = function(time, event)
-{
+_Stage.prototype.AddEvent = function (time, event) {
 
     var count = TimeToCount(time);
 
-    if (stage.events[count] === undefined)
-    {
+    if (stage.events[count] === undefined) {
         stage.events[count] = event;
     }
     // 多分ないだろうけど time が小さすぎて count が重複した場合
-    else
-    {
+    else {
         console.log('Stage: イベントが重複しています');
 
         // イベントを合成する
@@ -305,8 +274,7 @@ _Stage.prototype.AddEvent = function(time, event)
 
         delete stage.events[count];
 
-        stage.events[count] = function()
-        {
+        stage.events[count] = function () {
 
             _event.call(this);
             event.call(this);
@@ -331,11 +299,9 @@ var stage_list = [];
 
 var Stage = {
 
-    Get: function(name)
-    {
+    Get: function (name) {
 
-        if (stage_asset[name] === undefined)
-        {
+        if (stage_asset[name] === undefined) {
             console.warn('ステージ "' + name + '" は存在しません');
         }
 
@@ -343,29 +309,24 @@ var Stage = {
     },
 
     // 現在のステージを取得する
-    GetActive: function()
-    {
+    GetActive: function () {
         return active_stage;
     },
 
     // 次のステージに
-    Next: function()
-    {
+    Next: function () {
         return (active_stage = stage_list[active_stage.index + 1]);
     },
 
-    Make: function(name, property)
-    {
+    Make: function (name, property) {
 
         stage = active_stage = stage_asset[name] = new _Stage();
 
 
-        if (property)
-        {
+        if (property) {
 
             // 時間をカウントに変換する
-            for (var key in property)
-            {
+            for (var key in property) {
 
                 stage.AddEvent(key, property[key]);
 

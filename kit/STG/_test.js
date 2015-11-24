@@ -118,14 +118,14 @@ var CreatePad = function()
                 var angle = Math.PI2 / 4 * index;
                 var keyVec = Vec2(Math.sin(angle) | 0, Math.cos(angle) | 0);
 
-                keyPad.add(keyVec);
+                keyPad.Add(keyVec);
             }
 
         }
 
 
         // APad に KeyPad を加算して正規化
-        _pad.add(keyPad).normalize();
+        _pad.Add(keyPad).Normalize();
 
 
 

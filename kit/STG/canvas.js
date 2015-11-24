@@ -15,6 +15,13 @@ Canvas.prototype.Clear = function()
 }
 
 
+Canvas.prototype.Stroke = function(color)
+{
+
+    
+}
+
+
 Canvas.prototype.ArcPath = function(x, y)
 {
     var context = this.context;

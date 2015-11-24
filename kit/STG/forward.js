@@ -2,27 +2,26 @@
 var scene, input, game, player;
 
 
+// 敵キャラ
+var enemies = [];
 
-var ClassCreate = function(_super, property)
-{
+// プレイヤー
+var player;
+
+
+var Class = function (_super, property) {
     return enchant.Class.create(_super, property);
 }
 
 
 
-
-
-var Clone = function(object)
-{
+var Clone = function (object) {
     return $.extend({}, object);
 }
 
 
-
-var SpriteObject = ClassCreate(enchant.Sprite,
-{
-    initialize: function(width, height)
-    {
+var SpriteObject = Class(enchant.Sprite, {
+    initialize: function (width, height) {
         enchant.Sprite.call(this, width, height);
 
 
@@ -31,26 +30,27 @@ var SpriteObject = ClassCreate(enchant.Sprite,
 
         this.Initialize();
     },
-    onenterframe: function()
-    {
-        this.OnEnterFrame();
+    onenterframe: function () {
+        this.Update();
     }
 });
 
 
-var A = ClassCreate(SpriteObject);
+var A = Class(SpriteObject);
 
-A.prototype.Initialize = function()
-{
+A.prototype.Initialize = function () {
 
     SpriteObject.call(this, 1, 1);
+}
+
+A.prototype.Update = function () {
 
 }
 
-A.prototype.OnEnterFrame = function() {
 
-}
 
+// console.log = Hack.log;
+// console.warn = Hack.log;
 
 
 
@@ -58,21 +58,18 @@ A.prototype.OnEnterFrame = function() {
 var Debug = {
     values: [],
 
-    Update: function()
-    {
+    Update: function () {
         $('#debug').val('');
 
         var text = '';
-        for (var key in this.values)
-        {
+        for (var key in this.values) {
             text += key + ': ' + this.values[key] + '\n';
         }
 
         $('#debug').val(text);
     },
 
-    Set: function(name, text)
-    {
+    Set: function (name, text) {
         this.values[name] = text;
     }
 

@@ -1,6 +1,5 @@
 // 弾幕を組み合わせてスペルを創造する
-var Spell = function()
-{
+var Spell = function() {
     this.name = '';
 
     this.barrages = [];
@@ -8,10 +7,8 @@ var Spell = function()
 }
 
 // [[deprecated]]
-Spell.prototype.CreateCount = function()
-{
-    return Array.apply(null,
-    {
+Spell.prototype.CreateCount = function() {
+    return Array.apply(null, {
         length: this.barrages.length
     }).map(Boolean).map(Number);
 }
@@ -19,31 +16,25 @@ Spell.prototype.CreateCount = function()
 
 
 // [[deprecated]]
-Spell.prototype.resetCount = function()
-{
+Spell.prototype.resetCount = function() {
     this.count = 0;
-    this.barrages.forEach(function(barrage)
-    {
+    this.barrages.forEach(function(barrage) {
         barrage.count = 0;
     });
 }
 
 
 // オブジェクトのプロパティをコピー
-Spell.prototype.attribute = function(object)
-{
-    for (var key in object)
-    {
+Spell.prototype.attribute = function(object) {
+    for (var key in object) {
         this[key] = object[key];
     }
     return this;
 }
 
 // オブジェクトのプロパティを全ての弾幕にコピー
-Spell.prototype.attributeAll = function(object)
-{
-    this.barrages.forEach(function(barrage)
-    {
+Spell.prototype.attributeAll = function(object) {
+    this.barrages.forEach(function(barrage) {
         barrage.attribute(object);
     });
 }
@@ -52,28 +43,23 @@ Spell.prototype.attributeAll = function(object)
 
 // 弾幕を追加する
 // [[deprecated]]
-Spell.prototype.addBarrage = function(barrage)
-{
+Spell.prototype.addBarrage = function(barrage) {
 
-    var barrage2 = $.extend(
-    {}, barrage);
+    var barrage2 = $.extend({}, barrage);
 
     this.barrages.push(barrage2);
 }
 
 // 弾幕を追加する
-Spell.prototype.pushBarrage = function(barrage)
-{
+Spell.prototype.pushBarrage = function(barrage) {
     this.barrages.push(barrage);
 }
 
 
 
 // カウントを初期化する
-Spell.prototype.ResetCount = function(creator)
-{
-    this.barrages.forEach(function(barrage)
-    {
+Spell.prototype.ResetCount = function(creator) {
+    this.barrages.forEach(function(barrage) {
         creator.barrage_count[barrage.handle] = 0;
     });
 }
@@ -81,11 +67,9 @@ Spell.prototype.ResetCount = function(creator)
 
 
 // 更新する
-Spell.prototype.Update = function(creator)
-{
+Spell.prototype.Update = function(creator) {
 
-    this.barrages.forEach(function(barrage, index)
-    {
+    this.barrages.forEach(function(barrage, index) {
 
         barrage.creator = creator;
         barrage.count = creator.barrage_count[barrage.handle]++;
@@ -98,20 +82,17 @@ Spell.prototype.Update = function(creator)
 
 
 // 複製する
-Spell.prototype.Clone = function()
-{
+Spell.prototype.Clone = function() {
 
     var spell = new Spell();
 
     spell.name = this.name;
 
     // 闇の処理
-    this.barrages.forEach(function(barrage)
-    {
-        spell.barrages.push($.extend(
-        {}, barrage));
+    this.barrages.forEach(function(barrage) {
+        spell.barrages.push($.extend({}, barrage));
 
-//        spell.barrages.push( /*Clone*/ (__Barrage.Get(barrage.asset_name)));
+        //        spell.barrages.push( /*Clone*/ (__Barrage.Get(barrage.asset_name)));
 
     });
 
@@ -119,8 +100,7 @@ Spell.prototype.Clone = function()
 }
 
 // 技の名前とか表示するやつ
-Spell.prototype.statusRender = function()
-{
+Spell.prototype.statusRender = function() {
     /* default */
 };
 
@@ -138,11 +118,9 @@ var Asset = {
     asset: [],
     name: '',
 
-    Get: function(name)
-    {
+    Get: function(name) {
 
-        if (this.asset[name] === undefined)
-        {
+        if (this.asset[name] === undefined) {
             console.warn(this.name + ' "' + name + '" は存在しません');
         }
 
@@ -164,11 +142,9 @@ var __Spell = {
 
 
     // スペルを取得する
-    Get: function(name)
-    {
+    Get: function(name) {
 
-        if (spell_asset[name] === undefined)
-        {
+        if (spell_asset[name] === undefined) {
             console.warn('スペル "' + name + '" は存在しません')
         }
 
@@ -176,25 +152,20 @@ var __Spell = {
     },
 
 
-    Reload: function()
-    {
+    Reload: function() {
 
-        scene.childNodes.forEach(function(character)
-        {
+        scene.childNodes.forEach(function(character) {
 
-            if(character.ReloadSpell !== undefined)
-            {
+            if (character.ReloadSpell !== undefined) {
                 character.ReloadSpell();
             }
         });
     },
 
-    UpdateAll: function()
-    {
+    UpdateAll: function() {
 
 
-        CharacterList.Each('enemy', function()
-        {
+        CharacterList.Each('enemy', function() {
             this.UpdateSpell();
         })
     },
@@ -203,8 +174,7 @@ var __Spell = {
 
 
     // 技を作成する
-    Make: function(name, property)
-    {
+    Make: function(name, property) {
 
 
         // Spell.Make('name')('b1', 'b2', 'b3');
@@ -214,17 +184,14 @@ var __Spell = {
 
         spell.__name = name;
 
-        if (property)
-        {
+        if (property) {
             spell.attribute(property);
         }
 
-        return function(Args___)
-        {
+        return function(Args___) {
 
 
-            Array.prototype.forEach.call(arguments, function(name)
-            {
+            Array.prototype.forEach.call(arguments, function(name) {
                 spell.pushBarrage(__Barrage.Get(name));
             });
 

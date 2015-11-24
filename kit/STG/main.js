@@ -1,5 +1,4 @@
-window.addEventListener('load', function()
-{
+window.addEventListener('load', function () {
 
 
 
@@ -7,9 +6,8 @@ window.addEventListener('load', function()
     InitializeGlobalVariable();
 
 
-    var KeyBind = function(keyCode, name)
-    {
-        game.keybind(keyCode, name);
+    var KeyBind = function (key_code, name) {
+        game.keybind(key_code, name);
     }
 
     KeyBind(16, 'shift');
@@ -22,8 +20,7 @@ window.addEventListener('load', function()
     Assets.Add('background', 'tenonno-graphic/background/dot-background.png');
 
 
-    Material.New('normal',
-    {
+    Material.New('normal', {
         source: 'tenonno-graphic/shot-normal-min.png',
         width: 32,
         height: 32,
@@ -35,15 +32,17 @@ window.addEventListener('load', function()
 
     Assets.Preload();
 
-    game.onload = function()
-    {
+
+    game.onload = function () {
+
+
+
 
         // 背景（仮）
         var background = new Sprite(scene.width, scene.height);
         var surface = background.image = new Surface(scene.width, scene.height);
         background.scroll = 0.0;
-        background.onenterframe = function()
-        {
+        background.onenterframe = function () {
 
             var texture = Assets.Get('background');
 
@@ -53,8 +52,8 @@ window.addEventListener('load', function()
             surface.draw(texture, 0, (this.scroll - 1.0) * scene.height * ratio, scene.width, scene.height * ratio);
 
 
-            if ((this.scroll += 0.01) >= 1.0)
-            {
+
+            if ((this.scroll += 0.01) >= 1.0) {
                 this.scroll -= 1.0;
             }
 
@@ -85,8 +84,7 @@ window.addEventListener('load', function()
         /*
             50px の間隔で 2 つの弾を 0.0 度に放つ
         */
-        __Barrage.New('player-normal',
-        {
+        __Barrage.New('player-normal', {
             material: 'normal',
             create_time: 0.1,
             way: 1,
@@ -100,22 +98,19 @@ window.addEventListener('load', function()
 
 
 
-        __Barrage.New('10way弾',
-        {
+        __Barrage.New('10way弾', {
             material: 'normal',
             way: 10,
             speed: 5,
             size: 20,
             space: 50
-        }).shotControl(function()
-        {
+        }).shotControl(function () {
 
             this.angle.add(2);
         });
 
 
-        __Barrage.New('ホーミング弾',
-        {
+        __Barrage.New('ホーミング弾', {
             material: 'normal',
             range_angle: 10,
             createTime: 10.2,
@@ -123,8 +118,7 @@ window.addEventListener('load', function()
             speed: 10,
 
             size: 5,
-        }).control(function()
-        {
+        }).control(function () {
 
             // 一番近い標的を見つける
             var target = CharacterList.GetNear(this.creator, this.targetType);
@@ -146,22 +140,19 @@ window.addEventListener('load', function()
             target_type: 'enemy'
             にすると同士討ちをするアレができる
         */
-        __Barrage.New('自機狙い',
-        {
+        __Barrage.New('自機狙い', {
             material: 'normal',
             create_time: 0.1,
             speed: 8,
             way: 1,
-        }).control(function()
-        {
+        }).control(function () {
 
             // 一番近い敵を狙う
             this.AxisFromNearTarger();
 
 
 
-            if (this.count % 30 === 0)
-            {
+            if (this.count % 30 === 0) {
                 this.frame++;
             }
 
@@ -173,8 +164,7 @@ window.addEventListener('load', function()
         /*
             10 方向に 6 度の間隔を開けた 3 つの弾を放つ
         */
-        __Barrage.New('10way-r3',
-        {
+        __Barrage.New('10way-r3', {
             material: 'normal',
             way: 15,
             create_time: 0.5,
@@ -182,8 +172,7 @@ window.addEventListener('load', function()
             repeat: 3,
             repeat_angle: 3,
             pos_type: 'absolute'
-        }).Random(
-        {
+        }).Random({
             axis_angle: [0, 360],
             way: [6, 18],
             speed: [5, 10],
@@ -196,8 +185,7 @@ window.addEventListener('load', function()
         });
 
 
-        __Barrage.New('aaaaaaaa',
-        {
+        __Barrage.New('aaaaaaaa', {
             material: 'normal',
             way: 1,
 
@@ -206,17 +194,14 @@ window.addEventListener('load', function()
 
             create_time: 1.05,
             speed: 5,
-        }).Random(
-        {
+        }).Random({
 
 
-        }).control(function()
-        {
+        }).control(function () {
 
             this.AxisFromNearTarget();
 
-        }).shotControl(function()
-        {
+        }).shotControl(function () {
 
             this.angle += 2;
 
@@ -226,13 +211,12 @@ window.addEventListener('load', function()
         });
 
 
-        __Barrage.Get('aaaaaaaa').control(function() {
+        __Barrage.Get('aaaaaaaa').control(function () {
 
         });
 
 
-        __Barrage.New('上から下',
-        {
+        __Barrage.New('上から下', {
             material: 'normal',
             way: 1,
             axis_angle: 180,
@@ -265,67 +249,48 @@ window.addEventListener('load', function()
 
 
 
-
-        /*
-
-        // 移動モーションを作成
-        Motion.New('m-1').MoveBy(30, 30)(1.0).MoveBy(-30, 30)(1.0).easing(quad).Move(50, 20)(1.0).Move(-50, 20)(1.0).easing(linear).Move(20, 50)(2.0).Move(-20, 50)(2.0).remove();
-
-
-        Motion.New('ボス登場').Move(0, 100)(1.0).Call('Active');
-
-
-        // 右から左に
-        Motion.New('RtoL').Move(-scene.width, 0)(2).remove();
-
-
-        // loop に対応
-        Motion.New('ボス反復').MoveBy(-200, 0)(1).MoveBy(400, 0)(2).Move(-200, 0)(1).Loop();
-
-        */
-        /*
-        Stage.Make('ステージ',
-        {
-            1.0: function() {},
-            2.0: function() {},
-            3.0: function() {},
-        });
-        */
-
-
-
         Motion.New('不動');
 
-        __Barrage.New('弾幕２２',
-        {
-            way: 8,
-            speed: 5,
-
-        }).control(function()
-        {
 
 
-            if (this.time >= 3)
-            {
-                this.color = 102;
-            }
+        __Barrage.New('aaa', {
+
+
 
         });
+
+
+
+
+
+        __Barrage.New('弾幕２２', {
+            way: 18,
+            speed: 5,
+
+            create_time: 0.05,
+
+            space: 50,
+            target_type: 'enemy',
+
+            pos_target_type: 'player',
+
+        }).Wave({
+
+            axis_angle: {
+                cycle: 5,
+                min: 0,
+                max: 360,
+            },
+
+        });
+
 
 
         __Spell.Make('弾幕１')('弾幕２２');
 
 
-        Stage.Make('ステージ').AddEnemy(0,
-        {
+        Stage.Make('ステージ').AddEnemy(0, {
             pos: [240, 100],
-            spell: '弾幕１',
-            motion: '不動',
-        });
-
-        Stage.Get('ステージ').AddEnemy(5,
-        {
-            pos: [340, 100],
             spell: '弾幕１',
             motion: '不動',
         });
@@ -338,17 +303,9 @@ window.addEventListener('load', function()
 
 
 
-        /*
-        var NET = new NewEasyTimeline();
-        NET.MoveBy(-100, 30)(13).MoveBy(100, -30)(13).Loop();
-        */
-
-
-
 
         // 現在のステージを更新する
-        game.addEventListener('enterframe', function()
-        {
+        game.addEventListener('enterframe', function () {
             Stage.GetActive().Update();
 
             Debug.Set('stage-count', Stage.GetActive().count);
@@ -358,7 +315,11 @@ window.addEventListener('load', function()
 
         EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");
         EnchantBook.PushHint("b.speed = 20;");
-        EnchantBook.PushHint("__Spell.Reload();");
+
+
+        Hack.oneditend = function () {
+            __Spell.Reload();
+        }
 
 
     }
