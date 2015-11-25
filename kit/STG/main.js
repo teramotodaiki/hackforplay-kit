@@ -254,17 +254,7 @@ window.addEventListener('load', function () {
 
 
 
-        __Barrage.New('aaa', {
-
-
-
-        });
-
-
-
-
         Reflect.Range([0, 0], [480, 320]);
-
 
 
         Reflect.Circle([240, 160], 100);
@@ -274,9 +264,9 @@ window.addEventListener('load', function () {
             way: 3,
             speed: 5,
 
-            create_time: 0.05,
+            create_time: 1.05,
 
-            space: 50,
+            space: 10,
             target_type: 'enemy',
 
             pos_target_type: 'player',
@@ -330,8 +320,7 @@ window.addEventListener('load', function () {
 
         { // デバッグ用
             var RequestAnimationFrame = window.requestAnimationFrame;
-            var canvas_override = false;
-
+            var canvas_override = true;
             var input_count = 0;
 
             window.requestAnimationFrame = function () {
@@ -339,6 +328,7 @@ window.addEventListener('load', function () {
 
                 if ((input_count = Key.Escape ? input_count + 1 : 0) === 1) {
                     canvas_override = !canvas_override;
+                    OverrideRenderFunctions = [];
                 }
 
 
@@ -352,6 +342,9 @@ window.addEventListener('load', function () {
 
 
                 var context = game.rootScene._layers.Canvas.context;
+                OverrideRenderFunctions.forEach(function (render) {
+                    render(context);
+                });
 
 
 
@@ -361,7 +354,7 @@ window.addEventListener('load', function () {
 
                 setTimeout(function () {
                     RequestAnimationFrame.apply(this, args);
-                }, 50);
+                }, 30);
 
             }
 

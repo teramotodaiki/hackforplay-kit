@@ -3,17 +3,43 @@ var reflect_line_list = [];
 
 
 
-var calcReflectVector = function (front, normal) {
 
-    var f_n = front.Clone().Normalize();
+var GetReflectRadian = function (front, normal) {
+
+    var f_n = front; ///.Clone().Normalize();
 
 
 
     // var normal_n = normal.Clone().Normalize();
+    /*
     var normal_n = Angle(ToAngle(normal.ToRadian() + Math.PI / 2)).ToVec2();
 
+    var normal_n = normal.Clone().Normalize();
+        */
 
-    return f_n.Sub(Math.Dot(f_n, normal_n).Scale(2).Mul(normal_n)).Normalize().ToRadian();
+    // var normal2 = normal.Clone().Normalize();
+
+    var normal2 = normal.Clone().Reverse().Normalize();;
+
+    var normal_n = normal2.ToNormal();
+
+
+
+    var a = (function (spd, nor) {
+        var t = -(nor.x * spd.x + nor.y * spd.y) /
+            (nor.x * nor.x + nor.y * nor.y);
+        return Vec2(
+            spd.x + t * nor.x * 2.0,
+            spd.y + t * nor.y * 2.0
+        );
+    })(f_n, normal_n);
+
+    return a.Normalize().ToRadian();
+
+
+
+    // バグってた
+    // return f_n.Sub(Math.Dot(f_n, normal_n).Scale(2).Mul(normal_n)).ToRadian();
 
 }
 
@@ -21,22 +47,20 @@ var calcReflectVector = function (front, normal) {
 var Reflect = {
 
     // [[deprecated]]
+    // 全ての反射ラインを描画する
     __Render: function (context) {
 
+        context.lineWidth = 3;
+        context.strokeStyle = '#fff';
 
-        reflect_line_list.forEach(function(line){
+        reflect_line_list.forEach(function (line) {
 
-
-            context.beginPath();     // 1.Pathで描画を開始する
-            context.moveTo(line.pos.x,line.pos.y); // 2.描画する位置を指定する
-            context.lineTo(line.pos.x + line.vec.x,line.pos.y + line.vec.y); // 3.指定座標まで線を引く
-            context.stroke();        // 4.Canvas上に描画する
-
+            context.beginPath();
+            context.moveTo(line.pos.x, line.pos.y);
+            context.lineTo(line.pos.x + line.vec.x, line.pos.y + line.vec.y);
+            context.stroke();
 
         });
-
-
-
     },
 
 
@@ -74,16 +98,19 @@ var Reflect = {
 
         this.Clear();
 
-        var b_pos = Vec2(size, 0);
-
+        // var b_pos = Vec2(0, size);
 
 
         for (var index in Range(R)) {
-            index++;
 
-            console.log(index);
+            var angle = Math.PI2 / R * ++index;
 
-            var angle = Math.PI2 / R * index;
+
+            var b_pos_angle = Math.PI2 / R * --index;
+            var b_x = Math.sin(b_pos_angle) * size;
+            var b_y = Math.cos(b_pos_angle) * size;
+            var b_pos = Vec2(b_x, b_y);
+
 
             var x = Math.sin(angle) * size;
             var y = Math.cos(angle) * size;
@@ -91,12 +118,15 @@ var Reflect = {
             var v = Vec2(x, y);
 
 
-            var v2 = Math.Sub(b_pos, v);
+            var pos = Math.Add(center, b_pos);
+
+            var v3 = Math.Sub(v, b_pos);
 
 
-            this.Push(Line(Math.Add(center, b_pos), v2.Scale(1.1)));
 
-            b_pos = v;
+            this.Push(Line(pos, v3));
+
+            // b_pos = v;
         }
 
 
@@ -104,11 +134,16 @@ var Reflect = {
 
     Check: function (line, shot) {
 
+        var reflect_indices = [];
+
         // 冷静に考えたら forEach で ブロックの外に return できないの不便すぎる
         for (var index = 0; index < reflect_line_list.length; index++) {
 
-            // 連続して同じ壁で反射しないように
-            if (shot.before_reflect_index === index) continue;
+
+            // 前回反射した
+            if (shot.before_reflect_indices.indexOf(index) >= 0) {
+                continue;
+            }
 
             var line2 = reflect_line_list[index];
 
@@ -116,11 +151,15 @@ var Reflect = {
 
             if (collision) {
 
-                shot.before_reflect_index = index;
-                shot.angle = ToAngle(calcReflectVector(line.vec, line2.vec));
+                reflect_indices.push(index);
+
+                shot.angle = ToAngle(GetReflectRadian(line.vec, line2.vec));
 
                 shot.pos = collision.pos;
-                shot.remove();
+
+                // 判定サイズだけ戻す（これしとかないとすり抜けることがある）
+                shot.pos.Sub(line.vec.Clone().Normalize().Scale(shot.collision_size / 2));
+
                 shot.color++;
 
                 // 一定回数反射したら崩壊
@@ -128,11 +167,19 @@ var Reflect = {
                     shot.remove();
                 }
 
-                return;
+
+                // 浅い反射処理なら 1 回判定を取った時点で抜ける
+                var shallow = false;
+                if (shallow) {
+                    return;
+                }
+
 
                 // 再帰的な反射は速度的に逆効果な気がするから無視
 
                 /*
+                // 壁にハマらないように押し出す（あまりよくない方法な気がする）
+                // shot.pos.Add(Angle(shot.angle).ToVec2().Scale(1));
                 // 反射地点までの距離
                 var length = c_r.pos.Clone().Sub(line.begin).Length();
                 // 残っている距離
@@ -142,12 +189,11 @@ var Reflect = {
                 var x = Math.sin(angle) * n_length;
                 var y = Math.cos(angle) * n_length;
                 */
+
             }
-
-
         }
 
-
+        shot.before_reflect_indices = reflect_indices;
         // return line.begin.Clone().Add(line.end);
     }
 

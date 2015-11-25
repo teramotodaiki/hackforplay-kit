@@ -99,6 +99,15 @@ var Line = function (begin, end) {
 }
 
 
+var Circle = function (pos, r) {
+    return {
+        pos: pos.ToVec2(),
+        r: r,
+    }
+}
+
+
+
 var __Collision = {};
 
 
@@ -114,7 +123,7 @@ __Collision.Line = function (l1, l2) {
 
     // var v = s2.Clone().Sub(s1);
 
-    var v = s2.Sub(s1);
+    var v = Math.Sub(s2, s1);
 
     var Crs_v1_v2 = Math.Cross(v1, v2);
 
@@ -126,7 +135,6 @@ __Collision.Line = function (l1, l2) {
 
     var Crs_v_v1 = Math.Cross(v, v1);
     var Crs_v_v2 = Math.Cross(v, v2);
-
 
     var t1 = Crs_v_v2 / Crs_v1_v2;
     var t2 = Crs_v_v1 / Crs_v1_v2;
@@ -143,7 +151,7 @@ __Collision.Line = function (l1, l2) {
         return null;
     }
 
-    var outPos = s1.Add(v1).Scale(t1);
+    var outPos = s1.Add(v1.Scale(t1));
 
     return {
         pos: outPos
@@ -214,6 +222,12 @@ _Vec2.prototype.ToRadian = function () {
 }
 
 
+// 法線ベクトルに変換する
+_Vec2.prototype.ToNormal = function () {
+    return Vec2(-this.y, this.x);
+}
+
+
 // 複製
 _Vec2.prototype.Clone = function () {
     return new _Vec2(this.x, this.y);
@@ -254,6 +268,12 @@ _Vec2.prototype.Scale = function (value) {
     return this;
 }
 
+
+_Vec2.prototype.Reverse = function () {
+    this.x *= -1;
+    this.y *= -1;
+    return this;
+}
 
 
 // operator+=

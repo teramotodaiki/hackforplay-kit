@@ -17,6 +17,8 @@ var Class = function (_super, property) {
 }
 
 
+var OverrideRenderFunctions = [];
+
 
 var Clone = function (object) {
     return $.extend({}, object);
