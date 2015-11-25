@@ -8,6 +8,10 @@ var InitializeGlobalVariable = function()
     game = enchant.Core.instance;
 
 
+
+    var Game = game;
+
+
     sceneSize.width = game.width;
     sceneSize.height = game.height;
 
@@ -22,6 +26,7 @@ var InitializeGlobalVariable = function()
     input = game.input;
 
 
+    Key = game.input;
 
     game.addEventListener('enterframe', function()
     {
@@ -102,7 +107,7 @@ var CreatePad = function()
         _pad.y = this.vy;
 
         // 必ず 0.0 ～ 1.0 の範囲
-        var aPadLength = _pad.length();
+        var aPadLength = _pad.Length();
 
         // キー入力を APad に対応する
         var keys = [input.down, input.right, input.up, input.left];

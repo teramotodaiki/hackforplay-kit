@@ -13,6 +13,7 @@ window.addEventListener('load', function () {
     KeyBind(16, 'shift');
     KeyBind(90, 'z');
 
+    KeyBind(84, 'Escape');
 
     Assets.Add('shot-none', 'tenonno-graphic/shot-none.png');
     Assets.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
@@ -262,9 +263,15 @@ window.addEventListener('load', function () {
 
 
 
+        Reflect.Range([0, 0], [480, 320]);
+
+
+
+        Reflect.Circle([240, 160], 100);
+
 
         __Barrage.New('弾幕２２', {
-            way: 18,
+            way: 3,
             speed: 5,
 
             create_time: 0.05,
@@ -274,16 +281,18 @@ window.addEventListener('load', function () {
 
             pos_target_type: 'player',
 
+            reflect: true,
+            reflect_count: 10,
+
         }).Wave({
 
             axis_angle: {
-                cycle: 5,
+                cycle_time: 5,
                 min: 0,
                 max: 360,
             },
 
         });
-
 
 
         __Spell.Make('弾幕１')('弾幕２２');
@@ -304,6 +313,10 @@ window.addEventListener('load', function () {
 
 
 
+
+
+
+
         // 現在のステージを更新する
         game.addEventListener('enterframe', function () {
             Stage.GetActive().Update();
@@ -311,6 +324,48 @@ window.addEventListener('load', function () {
             Debug.Set('stage-count', Stage.GetActive().count);
 
         });
+
+
+
+
+        { // デバッグ用
+            var RequestAnimationFrame = window.requestAnimationFrame;
+            var canvas_override = false;
+
+            var input_count = 0;
+
+            window.requestAnimationFrame = function () {
+
+
+                if ((input_count = Key.Escape ? input_count + 1 : 0) === 1) {
+                    canvas_override = !canvas_override;
+                }
+
+
+
+                // ESC キーを押していない場合は通常通りの処理
+                if (!canvas_override) {
+                    return RequestAnimationFrame.apply(this, arguments);
+                }
+
+                var args = arguments;
+
+
+                var context = game.rootScene._layers.Canvas.context;
+
+
+
+                Reflect.__Render(context);
+
+                // context.clearRect(10, 10, 300, 0300);
+
+                setTimeout(function () {
+                    RequestAnimationFrame.apply(this, args);
+                }, 50);
+
+            }
+
+        }
 
 
         EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");

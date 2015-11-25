@@ -3,7 +3,6 @@ var Canvas = function(surface)
     this.element = surface._element;
     this.context = surface.context;
 
-
     this.width = surface.width;
     this.height = surface.height;
 }
@@ -18,7 +17,7 @@ Canvas.prototype.Clear = function()
 Canvas.prototype.Stroke = function(color)
 {
 
-    
+
 }
 
 

@@ -55,51 +55,99 @@ Math.PI2 = Math.PI * 2;
 Math.ZERO = 1e-5;
 
 
+// Vec2 の外積
 Math.Cross = function (v1, v2) {
     return v1.x * v2.y - v1.y * v2.x;
+}
+
+
+// Vec2 の内積
+Math.Dot = function (v1, v2) {
+    return Vec2(v1.x * v2.x, v1.y * v2.y);
+}
+
+
+
+// Math.Add(v1, v2) === v1.Clone().Add(v2)
+// Math.Sub(v1, v2) === v1.Clone().Sub(v2)
+
+
+Math.Add = function (v1, v2) {
+    return Vec2(v1.x + v2.x, v1.y + v2.y);
+}
+
+Math.Sub = function (v1, v2) {
+    return Vec2(v1.x - v2.x, v1.y - v2.y);
+}
+
+
+var _Line = function (begin, end) {
+    this.begin = begin;
+    this.end = end;
+
+
+    // 始点
+    this.pos = begin;
+    // ベクトル
+    this.vec = end;
+}
+
+
+
+var Line = function (begin, end) {
+    return new _Line(begin, end);
 }
 
 
 var __Collision = {};
 
 
-__Collision.Line = function (s1, v1, s2, v2) {
+__Collision.Line = function (l1, l2) {
+
+    var s1 = l1.pos.Clone();
+    var s2 = l2.pos.Clone();
+
+    var v1 = l1.vec.Clone(); // ToVec2();
+    var v2 = l2.vec.Clone(); // ToVec2();
 
     // var v = s2 - s1;
 
-    var v = s2.Clone.Sub(s1);
+    // var v = s2.Clone().Sub(s1);
 
-    var Crs_v2tov1tov3 = Vec(0, 1, 2);
-
+    var v = s2.Sub(s1);
 
     var Crs_v1_v2 = Math.Cross(v1, v2);
 
-    if (Crs_v1_v2 < Math.ZERO) {
-        return false;
+    // 平行
+    if (Math.abs(Crs_v1_v2) < Math.ZERO) {
+        return null;
     }
 
-    var Crs_v_v1 = D3DXVec2Cross(v, v1);
-    var Crs_v_v2 = D3DXVec2Cross(v, v2);
+
+    var Crs_v_v1 = Math.Cross(v, v1);
+    var Crs_v_v2 = Math.Cross(v, v2);
 
 
     var t1 = Crs_v_v2 / Crs_v1_v2;
     var t2 = Crs_v_v1 / Crs_v1_v2;
 
 
-
-var outT1 = Crs_v_v2 / Crs_v1_v2;
-var outT2 = Crs_v_v1 / Crs_v1_v2;
-
+    /*
+    var outT1 = Crs_v_v2 / Crs_v1_v2;
+    var outT2 = Crs_v_v1 / Crs_v1_v2;
+    */
 
     var eps = Math.ZERO;
 
     if (t1 + eps < 0 || t1 - eps > 1 || t2 + eps < 0 || t2 - eps > 1) {
-        return false;
+        return null;
     }
 
-    var outPos = s1 + v1 * t1;
+    var outPos = s1.Add(v1).Scale(t1);
 
-    return true;
+    return {
+        pos: outPos
+    };
 }
 
 /*
@@ -114,6 +162,11 @@ bool ColSegments(
 ) {
 
 */
+
+
+
+
+
 
 
 
@@ -161,7 +214,6 @@ _Vec2.prototype.ToRadian = function () {
 }
 
 
-
 // 複製
 _Vec2.prototype.Clone = function () {
     return new _Vec2(this.x, this.y);
@@ -170,7 +222,7 @@ _Vec2.prototype.Clone = function () {
 
 
 // 長さ
-_Vec2.prototype.length = function () {
+_Vec2.prototype.Length = function () {
     return Math.sqrt(this.x * this.x + this.y * this.y);
 }
 
@@ -179,11 +231,11 @@ _Vec2.prototype.length = function () {
 // 正規化
 _Vec2.prototype.Normalize = function () {
 
-    var length = this.length();
+    var length = this.Length();
 
     // 無効値
     if (length < Math.ZERO) {
-        console.warn('Vec2 の正規化に失敗しました');
+        // console.warn('Vec2 の正規化に失敗しました');
         return this;
     }
 
@@ -215,6 +267,13 @@ _Vec2.prototype.Add = function (vec) {
 _Vec2.prototype.Sub = function (vec) {
     this.x -= vec.x;
     this.y -= vec.y;
+    return this;
+}
+
+
+_Vec2.prototype.Mul = function (vec) {
+    this.x *= vec.x;
+    this.y *= vec.y;
     return this;
 }
 

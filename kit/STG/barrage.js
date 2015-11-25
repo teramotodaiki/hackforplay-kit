@@ -269,9 +269,7 @@ Barrage.prototype.__Wave = function () {
 
         var p = this.wave[key];
 
-        console.log(key);
-
-        var v = p.min +Math.sin(Math.PI2 / p.cycle * this.time) *    (p.max - p.min) / 2
+        var v = p.min +Math.sin(Math.PI2 / p.cycle_time * this.time) *    (p.max - p.min) / 2
 
         this[key] = v;
 
@@ -372,10 +370,10 @@ Barrage.prototype.Fire = function () {
                     property.target_type = this.target_type;
                     property.__control = this.__shotControl;
                     property.hit_self = this.hit_self;
-                    property.power = this.power;
+                    property.power = this.creator.power;
                     property.color = this.color;
                     property.reflect = this.reflect;
-
+                    property.reflect_count = this.reflect_count;
 
                     // once プロパティを上書き
                     for (var key in property) {

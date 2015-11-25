@@ -205,6 +205,10 @@ var Shot = enchant.Class.create(enchant.Sprite, {
         this.count = 0;
 
 
+        // 反射番号
+        this.before_reflect_index = -1;
+
+        this.reflect_count = 1;
 
         this.__control = null;
 
@@ -235,15 +239,15 @@ var Shot = enchant.Class.create(enchant.Sprite, {
         this.y = this.pos.y - this.height / 2;
 
 
+        var screen_margin = 30;
 
         // 画面外に出た場合
-        if (this.outScreenRemove) {
-            if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height) {
+        if (this.outScreenRemove /*&& !this.reflect*/) {
+            if (this.pos.x < -screen_margin || this.pos.x > scene.width + screen_margin || this.pos.y < -screen_margin || this.pos.y > scene.height + screen_margin) {
                 this.remove();
                 return;
             }
         }
-
 
 
 
@@ -278,10 +282,17 @@ var Shot = enchant.Class.create(enchant.Sprite, {
     // シンプルな弾制御
     move: function () {
 
-        this.pos.Add(Angle(this.angle).ToVec2().Scale(this.speed));
+
+        var pos = this.pos.Clone();
+        var vec = Angle(this.angle).ToVec2().Scale(this.speed);
+
+
+        this.pos.Add(vec);
 
         // 反射
         if (this.reflect) {
+
+                Reflect.Check(Line(pos, vec), this);
 
         }
 

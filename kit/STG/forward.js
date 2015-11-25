@@ -2,6 +2,9 @@
 var scene, input, game, player;
 
 
+var Key;
+
+
 // 敵キャラ
 var enemies = [];
 
