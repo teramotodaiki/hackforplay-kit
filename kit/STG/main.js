@@ -31,6 +31,18 @@ window.addEventListener('load', function () {
     });
 
 
+    CharacterDesign.New('RIM', {
+        source: 'tenonno-graphic/RIM-2.png',
+        animation_time: 0.1,
+        animation_row: 4,
+        width: 64,
+        height: 64,
+        default_width: 32,
+        default_height: 32,
+        collision_size: 10,
+    });
+
+
     Assets.Preload();
 
 
@@ -75,12 +87,15 @@ window.addEventListener('load', function () {
 
 
         // プレイヤーを召喚
-        player = new Player(20, 20);
+        player = new Player('RIM');
+
         scene.addChild(player);
 
-        player.backgroundColor = '#f00';
+        // player.backgroundColor = '#f00';
         player.locate(sceneSize.width / 2, sceneSize.height / 2);
         player.speed = 5;
+
+
 
         /*
             50px の間隔で 2 つの弾を 0.0 度に放つ
@@ -272,7 +287,7 @@ window.addEventListener('load', function () {
             pos_target_type: 'player',
 
             reflect: true,
-            reflect_count: 10,
+            reflect_count: 1,
 
         }).Wave({
 

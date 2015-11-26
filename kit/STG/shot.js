@@ -49,7 +49,57 @@ var Collision = function (o1, o2) {
 
 
 
+var character_design_asset = {};
+
+var CharacterDesign = {
+
+    Get: function (name) {
+        return character_design_asset[name];
+    },
+
+    New: function (name, property) {
+        var design = character_design_asset[name] = {};
+
+
+        (function () {
+
+            this.name = 'character-' + name;
+
+            this.width = property.width;
+            this.height = property.height;
+            this.animation_row =  property.animation_row;
+            this.animation_time = property.animation_time;
+
+            // 比率を計算する
+            this.scale_width = property.default_width === undefined ? 0 : property.default_width / this.width;
+            this.scale_height = property.default_height === undefined ? 0 : property.default_height / this.height;
+
+            this.collision_size = property.collision_size;
+
+        }).call(design);
+
+
+        // テクスチャを登録する
+        Assets.Add(design.name, property.source);
+
+    },
+
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
 var shot_material_asset = {};
+
 
 var Material = {
 

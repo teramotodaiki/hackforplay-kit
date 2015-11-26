@@ -41,7 +41,11 @@ var SpriteObject = Class(enchant.Sprite, {
 });
 
 
-var A = Class(SpriteObject);
+var A = Class(SpriteObject, {
+
+
+    
+});
 
 A.prototype.Initialize = function () {
 

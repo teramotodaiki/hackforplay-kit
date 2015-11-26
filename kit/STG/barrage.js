@@ -93,6 +93,8 @@ var Barrage = function () {
     this.next_repeat = null;
 
 
+
+
     //----------// 固定互換 //----------//
 
 
@@ -174,8 +176,6 @@ Barrage.prototype.Random = function (values) {
 var lv1 = ['create_time', 'way', 'repeat', 'repeat_x', 'repeat_y'];
 
 Barrage.prototype.RandomizeFirst = function () {
-
-
 
 
     // aa
@@ -269,7 +269,7 @@ Barrage.prototype.__Wave = function () {
 
         var p = this.wave[key];
 
-        var v = p.min +Math.sin(Math.PI2 / p.cycle_time * this.time) *    (p.max - p.min) / 2
+        var v = p.min + Math.sin(Math.PI2 / p.cycle_time * this.time) * (p.max - p.min) / 2
 
         this[key] = v;
 

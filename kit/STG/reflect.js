@@ -39,7 +39,10 @@ var GetReflectRadian = function (front, normal) {
 
 
     // バグってた
-    // return f_n.Sub(Math.Dot(f_n, normal_n).Scale(2).Mul(normal_n)).ToRadian();
+
+
+
+    return front.Sub(Math.Dot(front, normal).Scale(2).Mul(normal)).ToRadian();
 
 }
 
@@ -162,10 +165,6 @@ var Reflect = {
 
                 shot.color++;
 
-                // 一定回数反射したら崩壊
-                if (shot.reflect_count-- <= 0) {
-                    shot.remove();
-                }
 
 
                 // 浅い反射処理なら 1 回判定を取った時点で抜ける
@@ -194,6 +193,17 @@ var Reflect = {
         }
 
         shot.before_reflect_indices = reflect_indices;
+
+
+        if (reflect_indices.length) {
+            // 一定回数反射したら崩壊
+            if (shot.reflect_count-- <= 0) {
+                shot.remove();
+            }
+
+        }
+
+
         // return line.begin.Clone().Add(line.end);
     }
 
