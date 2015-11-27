@@ -5,11 +5,7 @@ var InitializeGlobalVariable = function()
 {
 
 
-    game = enchant.Core.instance;
-
-
-
-    var Game = game;
+    Game = game = enchant.Core.instance;
 
 
     sceneSize.width = game.width;
@@ -88,11 +84,6 @@ var CreatePad = function()
 
 
 
-
-
-
-
-
     var padMargin = 10;
 
     //アナログパッドの生成
@@ -139,7 +130,6 @@ var CreatePad = function()
         {
             _pad.Scale(0.5);
         }
-
 
 
     }

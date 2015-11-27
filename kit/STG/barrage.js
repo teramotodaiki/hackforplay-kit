@@ -1,16 +1,3 @@
-var SpriteObject = enchant.Class.create(enchant.Sprite, {
-    initialize: function () {
-
-        this.pos = Vec2(0, 0);
-
-
-        this.Initialize();
-    },
-    onenterframe: function () {
-        this.Update();
-    }
-});
-
 
 
 var Barrage = function () {
@@ -394,6 +381,9 @@ Barrage.prototype.Fire = function () {
                         if (target.length) {
                             // とりあえず 0 番目に（というより 1 以上だと用途に合わない）
                             shot.pos = target[0].pos.Clone();
+                        }
+                        else{
+                            console.log('対象がいない' + this.pos_target_type);
                         }
                     }
 

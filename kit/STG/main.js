@@ -5,20 +5,15 @@ window.addEventListener('load', function () {
     // 前方宣言した変数の初期化とか
     InitializeGlobalVariable();
 
-
-    var KeyBind = function (key_code, name) {
-        game.keybind(key_code, name);
-    }
-
     KeyBind(16, 'shift');
     KeyBind(90, 'z');
-
     KeyBind(84, 'Escape');
 
-    Assets.Add('shot-none', 'tenonno-graphic/shot-none.png');
-    Assets.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
-    Assets.Add('effect', 'tenonno-graphic/effect/effect.jpg');
-    Assets.Add('background', 'tenonno-graphic/background/dot-background.png');
+
+    Asset.Add('shot-none', 'tenonno-graphic/shot-none.png');
+    Asset.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
+    Asset.Add('effect', 'tenonno-graphic/effect/effect.jpg');
+    Asset.Add('background', 'tenonno-graphic/background/dot-background.png');
 
 
     Material.New('normal', {
@@ -30,34 +25,35 @@ window.addEventListener('load', function () {
         collision_size: 10,
     });
 
-
     CharacterDesign.New('RIM', {
-        source: 'tenonno-graphic/RIM-2.png',
+        source: 'tenonno-graphic/RIM-3.png',
         animation_time: 0.1,
-        animation_row: 4,
+        animation_row: 1,
         width: 64,
         height: 64,
-        default_width: 32,
-        default_height: 32,
+        center_x: 32,
+        center_y:  32,
+
+        default_width: 40,
+        default_height: 40,
         collision_size: 10,
     });
 
 
-    Assets.Preload();
+    Asset.Preload();
 
 
     game.onload = function () {
 
 
 
-
         // 背景（仮）
-        var background = new Sprite(scene.width, scene.height);
-        var surface = background.image = new Surface(scene.width, scene.height);
+        var background = new enchant.Sprite(scene.width, scene.height);
+        var surface = background.image = new enchant.Surface(scene.width, scene.height);
         background.scroll = 0.0;
         background.onenterframe = function () {
 
-            var texture = Assets.Get('background');
+            var texture = Asset.Get('background');
 
             var ratio = texture.width / scene.width;
 
@@ -89,11 +85,13 @@ window.addEventListener('load', function () {
         // プレイヤーを召喚
         player = new Player('RIM');
 
+
         scene.addChild(player);
 
         // player.backgroundColor = '#f00';
-        player.locate(sceneSize.width / 2, sceneSize.height / 2);
+        player.MoveTo(sceneSize.width / 2, sceneSize.height / 2);
         player.speed = 5;
+
 
 
 
@@ -298,6 +296,7 @@ window.addEventListener('load', function () {
             },
 
         });
+        var c2 = new Character2('RIM');
 
 
         __Spell.Make('弾幕１')('弾幕２２');
@@ -314,9 +313,6 @@ window.addEventListener('load', function () {
         Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
 
         ////////////////////////////////////////////////////
-
-
-
 
 
 
@@ -359,6 +355,19 @@ window.addEventListener('load', function () {
                 var context = game.rootScene._layers.Canvas.context;
                 OverrideRenderFunctions.forEach(function (render) {
                     render(context);
+                });
+
+
+
+                // 当たり判定を描画
+                scene.childNodes.forEach(function (node) {
+
+                    if (node.collision_size !== undefined) {
+                        context.beginPath();
+                        context.arc(node.pos.x, node.pos.y, node.GetCollisionSize() / 2, 0, Math.PI2);
+                        context.stroke();
+                    }
+
                 });
 
 

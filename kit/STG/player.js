@@ -1,19 +1,18 @@
-var Player = enchant.Class.create(Character, {
-    initialize: function (design_name) {
+var Player = Class(Character2, {
+
+    Initialize: function (name) {
 
 
         // Player
 
-        var design = CharacterDesign.Get(design_name);
+        var design = CharacterDesign.Get(name);
 
-        console.log(design);
 
-        Character.call(this, design.width, design.height);
+        // Character.call(this, design.width, design.height);
 
-        this.image = Assets.Get(design.name);
 
-        this.scale_width = design.scale_width;
-        this.scale_height = design.scale_height;
+        this.Base(name);
+
 
         this.animation_time = design.animation_time;
         this.animation_row = design.animation_row;
@@ -22,7 +21,6 @@ var Player = enchant.Class.create(Character, {
 
         this.attackSpell;
 
-        this.count = 0;
         this.attackSpellCount = 0;
         this.bombSpellCount = 0;
 
@@ -30,10 +28,6 @@ var Player = enchant.Class.create(Character, {
 
         this.escape_count = 0;
         this.escape_time = 0.0;
-
-        this.scale_x = 1;
-        this.scale_y = 1;
-        this.scale = null;
 
 
         this.animation_type = 'center';
@@ -55,27 +49,14 @@ var Player = enchant.Class.create(Character, {
 
 
 
-
         this.frame = this.animation_frame;
 
 
         this.frame += ['center', 'left', 'right'].indexOf(this.animation_type) * this.animation_row;
 
 
-        console.log(this.animation_type);
-
     },
 
-    UpdateScale: function () {
-
-        if (this.scale !== null) {
-            this.scale_x = this.scale_y = this.scale;
-        }
-
-        this.scaleX = this.scale_width * this.scale_x;
-        this.scaleY = this.scale_height * this.scale_y;
-
-    },
 
     // 通常攻撃スペルを設定する
     SetAttackSpell: function (name) {
@@ -114,34 +95,24 @@ var Player = enchant.Class.create(Character, {
         this.attackSpell = spell;
     },
 
-    __set_attackSpell: function (name) {
-        //        this.attackSpell = __Barrage.Get(name);
-    },
 
-    // ◆初級◆ 通常攻撃を設定する
-    updateAttackBarrage: function () {
-
-
-        barrage.creator = this;
-
-        var spell = new Spell();
-
-        spell.name = '通常攻撃';
-
-        spell.addBarrage(barrage);
-
-
-        this.attackSpell = spell;
-
-
-
-
+    // 移動する
+    Move: function (vec) {
+        this.pos.Add(vec.Normalize().Scale(this.speed));
     },
 
 
-    onenterframe: function () {
+    // 座標を画面内に収める
+    PosClamp: function () {
+        this.pos.x = this.pos.x < 0 ? 0 : this.pos.x > sceneSize.width ? sceneSize.width : this.pos.x;
+        this.pos.y = this.pos.y < 0 ? 0 : this.pos.y > sceneSize.height ? sceneSize.height : this.pos.y;
+    },
 
-        this.time = CountToTime(this.count++);
+
+    Update: function () {
+
+        this.Chrono();
+
 
         this.UpdateAnimation();
         this.UpdateScale();
@@ -161,19 +132,10 @@ var Player = enchant.Class.create(Character, {
 
 
 
+        this.Move(_pad);
+        this.PosClamp();
+        this.PosToXY();
 
-
-        this.vec = _pad;
-
-
-        //		console.log('pos: ' + this.pos.x + ' / ' + this.pos.y)
-
-
-        this.move();
-
-
-
-        this._test();
 
 
         this.escape_time = CountToTime(this.escape_count++);
@@ -184,6 +146,8 @@ var Player = enchant.Class.create(Character, {
         if (this.previous_pos) {
             this.animation_type = this.previous_pos.x > this.pos.x ? 'left' : this.previous_pos.x < this.pos.x ? 'right' : 'center';
         }
+
+
 
 
         this.previous_pos = this.pos.Clone();

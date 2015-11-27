@@ -1,4 +1,4 @@
-// 東方みたいな HP ゲージ
+ // 東方みたいな HP ゲージ
 var HP = enchant.Class.create(enchant.Sprite, {
     initialize: function (enemy) {
         Sprite.call(this, 100, 100);
@@ -116,10 +116,12 @@ var CreateEnemy = function (property) {
 
     console.log('敵を追加します');
 
-    var enemy = new Enemy(20, 20);
+    var enemy = new Enemy('RIM');
 
     if (property.pos) {
-        enemy.locate(property.pos[0], property.pos[1]);
+        enemy.MoveTo(property.pos[0], property.pos[1]);
+        enemy.PosToXY();
+
     }
 
     if (property.motion) {
@@ -132,6 +134,7 @@ var CreateEnemy = function (property) {
     }
 
 
+    enemy.Update();
 
 
     scene.addChild(enemy);

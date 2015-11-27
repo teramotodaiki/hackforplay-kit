@@ -9,10 +9,6 @@ var Size = function (width, height) {
 
 var sceneSize = new Size();
 
-/*
-
-*/
-
 
 var EnumBlendMode = {
     Add: 'lighter',
@@ -20,18 +16,49 @@ var EnumBlendMode = {
 };
 
 
-var Palette = {
 
-    Red: 0,
-    Green: 1,
-    Blue: 2,
-    Yellow: 3,
-    White: 6
-
-};
+var Character2 = Class(Sprite, {
 
 
-// キャラクター
+    Initialize: function (name) {
+
+
+        var CD = CharacterDesign.Get(name);
+
+
+        this.SpriteConstructor(CD);
+
+
+        this.collision_size = CD.collision_size;
+
+
+        this.type = 'character';
+
+
+        this.speed = 1.0;
+        this.power = 1.0;
+        this.hp = 1.0;
+        this.hp_max = 1.0;
+
+
+        this.barrage_count = {};
+
+    },
+
+
+
+    HP: function (hp) {
+        this.hp = this.hp_max = hp;
+    },
+
+
+
+
+});
+
+// 後々使う可能性もあるので念の為に削除はしない
+/*
+
 var Character = enchant.Class.create(enchant.Sprite, {
     initialize: function (width, height) {
         enchant.Sprite.call(this, width, height);
@@ -39,6 +66,7 @@ var Character = enchant.Class.create(enchant.Sprite, {
         this.type = 'character';
 
         this.collision_size = 15.0;
+
 
 
 
@@ -139,17 +167,6 @@ Character.prototype.EventTrigger = function (name) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 Character.prototype.SetHP = function (hp) {
     this.hp = this.hp_max = hp;
 }
@@ -158,3 +175,4 @@ Character.prototype.SetHP = function (hp) {
 Character.prototype.TEST_ALERT = function () {
     alert('test');
 }
+*/

@@ -4,6 +4,30 @@ var scene, input, game, player;
 
 var Key;
 
+var Game;
+
+
+var KeyBind = function (key_code, name) {
+    Game.keybind(key_code, name);
+}
+
+
+// 秒をフレームカウントに変換する
+var TimeToCount = function (time) {
+    return Math.round(time * game.fps);
+}
+
+// フレームカウントを病に変換する
+var CountToTime = function (count) {
+    return count / game.fps;
+}
+
+
+var Select = function (a, b) {
+    return a === undefined ? b : a;
+}
+
+
 
 // 敵キャラ
 var enemies = [];
@@ -12,50 +36,22 @@ var enemies = [];
 var player;
 
 
-var Class = function (_super, property) {
-    return enchant.Class.create(_super, property);
-}
+
+var OverrideRenderer = {
+
+
+};
 
 
 var OverrideRenderFunctions = [];
 
 
+
+
+
 var Clone = function (object) {
     return $.extend({}, object);
 }
-
-
-var SpriteObject = Class(enchant.Sprite, {
-    initialize: function (width, height) {
-        enchant.Sprite.call(this, width, height);
-
-
-        // this.pos = Vec2(0, 0);
-
-
-        this.Initialize();
-    },
-    onenterframe: function () {
-        this.Update();
-    }
-});
-
-
-var A = Class(SpriteObject, {
-
-
-    
-});
-
-A.prototype.Initialize = function () {
-
-    SpriteObject.call(this, 1, 1);
-}
-
-A.prototype.Update = function () {
-
-}
-
 
 
 // console.log = Hack.log;

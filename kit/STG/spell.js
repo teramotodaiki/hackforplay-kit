@@ -112,7 +112,7 @@ var spell_asset = {};
 
 
 
-
+/*
 var Asset = {
 
     asset: [],
@@ -128,14 +128,9 @@ var Asset = {
 
     }
 
-
 }
+*/
 
-
-var Class = function(base, extend) {
-
-
-}
 
 
 var __Spell = {

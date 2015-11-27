@@ -1,139 +1,18 @@
-var preload_textures = {};
-
-var preload_sources = [];
-
-preload_sources.push('hackforplay/enchantbook.png', 'enchantjs/x2/map2.png', 'hackforplay/dot_syuj.png', 'enchantjs/x2/icon0.png', 'enchantjs/font2.png', 'enchantjs/monster1.gif',
-    'dots_design/bg10_3.gif', 'dot_art_world/SC-Door-Entce03.png', 'rengoku-teien/asa_no_komorebi.mp3', 'etolier/01sougen.jpg');
-
-var Assets = {
-    Add: function (name, source) {
-
-        preload_sources.push(source);
-
-        preload_textures[name] = source;
-
-    },
-
-    Preload: function () {
-        game.preload(preload_sources);
-    },
-
-    Get: function (name) {
-        return game.assets[preload_textures[name]];
-    }
-
-};
-
-
-
-// 秒をフレームカウントに変換する
-var TimeToCount = function (time) {
-    return Math.round(time * game.fps);
-}
-
-// フレームカウントを病に変換する
-var CountToTime = function (count) {
-    return count / game.fps;
-}
-
-
-
 /*
     円同士の衝突判定
     pos.x, pos.y, collision_size
 */
 
 var Collision = function (o1, o2) {
-    return Math.pow(o1.pos.x - o2.pos.x, 2) + Math.pow(o1.pos.y - o2.pos.y, 2) <= Math.pow((o1.collision_size + o2.collision_size) / 2, 2);
+
+
+    // 当たり判定は小さい方のスケールを参照して拡大
+    c1 = o1.GetCollisionSize();
+    c2 = o2.GetCollisionSize();
+
+
+    return Math.pow(o1.pos.x - o2.pos.x, 2) + Math.pow(o1.pos.y - o2.pos.y, 2) <= Math.pow((c1 + c2), 2);
 }
-
-
-
-var character_design_asset = {};
-
-var CharacterDesign = {
-
-    Get: function (name) {
-        return character_design_asset[name];
-    },
-
-    New: function (name, property) {
-        var design = character_design_asset[name] = {};
-
-
-        (function () {
-
-            this.name = 'character-' + name;
-
-            this.width = property.width;
-            this.height = property.height;
-            this.animation_row =  property.animation_row;
-            this.animation_time = property.animation_time;
-
-            // 比率を計算する
-            this.scale_width = property.default_width === undefined ? 0 : property.default_width / this.width;
-            this.scale_height = property.default_height === undefined ? 0 : property.default_height / this.height;
-
-            this.collision_size = property.collision_size;
-
-        }).call(design);
-
-
-        // テクスチャを登録する
-        Assets.Add(design.name, property.source);
-
-    },
-
-
-
-
-
-};
-
-
-
-
-
-
-
-
-
-var shot_material_asset = {};
-
-
-var Material = {
-
-    New: function (name, property) {
-        var material = shot_material_asset[name] = {};
-
-
-        (function () {
-
-            this.name = 'material-' + name;
-
-            this.width = property.width;
-            this.height = property.height;
-
-            // 比率を計算する
-            this.scale_width = property.default_width === undefined ? 0 : property.default_width / this.width;
-            this.scale_height = property.default_height === undefined ? 0 : property.default_height / this.height;
-
-
-            this.collision_size = property.collision_size;
-
-        }).call(material);
-
-
-        // テクスチャを登録する
-        Assets.Add(material.name, property.source);
-
-    },
-
-    Get: function (name) {
-        return shot_material_asset[name];
-    }
-
-};
 
 
 
@@ -146,7 +25,7 @@ var CharacterList = {
 
 
     GetType: function (type) {
-        return character_list.filter(function (character) {
+        return scene.childNodes.filter(function (character) {
             return character.type === type;
         });
     },
@@ -191,17 +70,20 @@ var CharacterList = {
 
 
 // 弾
-var Shot = enchant.Class.create(enchant.Sprite, {
-    initialize: function (creator, material) {
+var Shot = Class(Sprite, {
+    Initialize: function (creator, material) {
 
         if (!material) {
             console.log('マテリアルが存在しません');
         }
 
-        Sprite.call(this, material.width, material.height);
+
+        // Sprite.call(this, material.width, material.height);
 
 
-        this.image = Assets.Get(material.name);
+        // this.image = Asset.Get(material.name);
+
+        this.SpriteConstructor(material);
 
         this.material = material;
 
@@ -239,7 +121,6 @@ var Shot = enchant.Class.create(enchant.Sprite, {
         // 能力の使用者
         this.creator = creator;
 
-        this.pos = Vec2(0, 0);
 
         this.pos.x = creator.pos.x;
         this.pos.y = creator.pos.y;
@@ -251,8 +132,6 @@ var Shot = enchant.Class.create(enchant.Sprite, {
 
         // 仮
         this.target_type = 'enemy';
-
-        this.count = 0;
 
 
         // 反射番号
@@ -355,10 +234,14 @@ var Shot = enchant.Class.create(enchant.Sprite, {
 
     },
 
-    onenterframe: function () {
+    Update: function () {
 
+        this.Chrono();
 
         this.resize();
+
+        this.UpdateScale();
+
         this.updatePos();
 
 
@@ -399,7 +282,6 @@ var Shot = enchant.Class.create(enchant.Sprite, {
 
 
 
-        this.time = CountToTime(this.count);
 
     }
 

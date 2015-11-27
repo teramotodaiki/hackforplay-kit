@@ -1,13 +1,17 @@
 
 
 // 敵キャラ
-var Enemy = enchant.Class.create(Character,
+var Enemy = Class(Character2,
 {
-    initialize: function(width, height)
+    Initialize: function(name)
     {
-        Character.call(this, width, height);
 
-        enemies.push(this);
+
+        // Character.call(this, width, height);
+
+        this.Base(name);
+
+        // enemies.push(this);
 
 
         this.type = 'enemy';
@@ -37,10 +41,6 @@ var Enemy = enchant.Class.create(Character,
     },
 
 
-    ReloadMotion: function()
-    { // tl.clear だとイベントが破棄されないっぽいから初期化（物理）
-        this.tl = new enchant.Timeline(this);
-    },
 
     // 移動処理を設定する
     setMotion: function(name)
@@ -51,25 +51,25 @@ var Enemy = enchant.Class.create(Character,
         Motion.Use(name, this);
     },
 
-    onenterframe: function()
+    Update: function()
     {
         // this.move();
 
-        this.time = CountToTime(this.count);
+        // this.time = CountToTime(this.count);
 
-        // TL を使用するから x, y から pos に逆輸入
+        this.Chrono();
 
-        /*
-        this.pos.x = this.x + this.width / 2;
-        this.pos.y = this.y + this.height / 2;
-
-        */
+        this.UpdateScale();
 
         if (this.timeline !== undefined)
         {
             this.timeline.Update(this);
-            this.convertPos();
+            // this.convertPos();
         }
+
+
+        this.PosToXY();
+
 
         // this.spell.counts = this.spellCounts;
 
@@ -83,9 +83,6 @@ var Enemy = enchant.Class.create(Character,
 
         }
 
-
-
-        this.count++;
 
     }
 });
