@@ -17,6 +17,75 @@ var Collision = function (o1, o2) {
 
 
 
+var SpriteList = {
+
+    TypeEach: function (type, callback) {
+
+        RootScene.childNodes.forEach(function (sprite) {
+            if (sprite.type === type) {
+                callback.call(sprite, sprite);
+            }
+        });
+    },
+
+    __RemoveTypeEach: function (type) {
+
+
+        RootScene.childNodes.filter(function (node) {
+
+            return (node.type === type && node.__remove);
+
+        }).forEach(function (node) {
+
+            node.Remove();
+        })
+
+    },
+
+
+
+
+
+};
+
+
+
+
+// 範囲の弾を消す
+var RemoveRangeShot = function (sprite, range) {
+
+    SpriteList.TypeEach('shot', function (shot) {
+
+        if (shot !== sprite && Math.Length(sprite.pos, shot.pos) <= range) {
+
+
+            shot.Remove();
+
+
+        }
+
+    });
+
+
+}
+
+// 全ての弾を消す
+RemoveAllShot = function () {
+    SpriteList.TypeEach('shot', function (shot) {
+
+        //shot.Remove();
+        shot.__remove = true;
+
+        console.log('remove all');
+
+    });
+
+    SpriteList.__RemoveTypeEach('shot');
+
+}
+
+
+
 
 // キャラクター管理
 var character_list = [];
@@ -147,6 +216,8 @@ var Shot = Class(Sprite, {
         this.scale_x = 1.0;
         this.scale_y = 1.0;
 
+
+
     },
 
     // 色を変更する
@@ -155,41 +226,25 @@ var Shot = Class(Sprite, {
         this.frame = color;
     },
 
-    resize: function () {
 
+    // 画面外
+    OutScreen: function () {
 
-        this.scaleX = this.material.scale_width;
-        this.scaleY = this.material.scale_height;
-
-
-    },
-
-    // (pos) を (x, y) に反映する
-    updatePos: function () {
-        this.x = this.pos.x - this.width / 2;
-        this.y = this.pos.y - this.height / 2;
-
+        if (!this.outScreenRemove) return;
 
         var screen_margin = 30;
 
-        // 画面外に出た場合
-        if (this.outScreenRemove /*&& !this.reflect*/ ) {
-            if (this.pos.x < -screen_margin || this.pos.x > scene.width + screen_margin || this.pos.y < -screen_margin || this.pos.y > scene.height + screen_margin) {
-                this.remove();
-                return;
-            }
+
+
+        if (this.pos.x < -screen_margin || this.pos.x > scene.width + screen_margin || this.pos.y < -screen_margin || this.pos.y > scene.height + screen_margin) {
+            this.Remove();
+            return;
         }
 
 
-
-
     },
 
 
-    // 自身を削除する
-    remove: function () {
-        scene.removeChild(this);
-    },
 
     // 衝突
     hit: function (target) {
@@ -205,13 +260,13 @@ var Shot = Class(Sprite, {
 
 
             target.Damage(this.power);
-            this.remove();
+            this.Remove();
         }
 
     },
 
-    // シンプルな弾制御
-    move: function () {
+    // 移動
+    Move: function () {
 
 
         var pos = this.pos.Clone();
@@ -238,11 +293,18 @@ var Shot = Class(Sprite, {
 
         this.Chrono();
 
-        this.resize();
 
         this.UpdateScale();
 
-        this.updatePos();
+
+
+        // 移動
+        this.Move();
+
+
+
+        this.PosToXY();
+        this.OutScreen();
 
 
         this.frame = this.color;
@@ -262,18 +324,32 @@ var Shot = Class(Sprite, {
 
 
 
-        // 移動
-        this.move();
-
 
 
 
         // 攻撃対象に被弾判定
-        CharacterList.Each(this.target_type, function () {
+        SpriteList.TypeEach(this.target_type, function () {
 
             self.hit(this);
 
         });
+
+
+
+        // 衝突した他の弾を打ち消す
+        if (this.destroyer) {
+            SpriteList.TypeEach('shot', function (shot) {
+                if (self.creator !== shot.creator) {
+                    if (Collision(self, shot)) {
+                        shot.Remove();
+                    };
+                }
+            });
+        }
+
+
+
+
 
         // 寿命
         if (this.count++ >= this.life) {
@@ -293,12 +369,4 @@ Shot.prototype.attribute = function (object) {
         this[key] = object[key];
     }
     return this;
-}
-
-
-// 初期化後に呼ぶ
-Shot.prototype.InitializeUpdate = function () {
-
-    this.updatePos();
-    this.resize();
 }

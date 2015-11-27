@@ -5,100 +5,128 @@ var Player = Class(Character2, {
 
         // Player
 
-        var design = CharacterDesign.Get(name);
-
-
-        // Character.call(this, design.width, design.height);
-
-
         this.Base(name);
 
 
-        this.animation_time = design.animation_time;
-        this.animation_row = design.animation_row;
-
         this.type = 'player';
 
-        this.attackSpell;
 
-        this.attackSpellCount = 0;
-        this.bombSpellCount = 0;
+        this.attack_spell = null;
+        this.bomb_spell = null;
 
-        this.power = 10;
+        // ボムを撃っているか
+        this.bombing = false;
+
+
 
         this.escape_count = 0;
         this.escape_time = 0.0;
 
 
-        this.animation_type = 'center';
+        this.life = 1;
+        this.bomb = 2;
 
 
-        this.animation_frame = 0;
+        // 無敵状態
+        this.invincible = false;
+        this.invincible_time = 5.0;
+        this.invincible_end_time = null;
 
-        this.previous_pos = null;
+        this.AddEvent('damage', function () {
+
+            if (this.invincible) return;
+
+
+            // 被弾したら無敵になり画面の弾を全て消去
+            this.Invincible();
+            RemoveAllShot();
+
+
+            // 残機がマイナスになったらゲームオーバー
+            if (--this.life < 0) {
+                this.Remove();
+                Hack.gameover();
+            }
+
+            this.escape_count = 0;
+        });
+
+
+        this.AddEvent('player-bomb-end', function () {
+            this.bombing = false;
+            this.bomb_spell.ResetCount(this);
+        });
 
     },
 
-    UpdateAnimation: function () {
+    // 無敵状態になる
+    Invincible: function(){
 
-
-        if (this.count % TimeToCount(this.animation_time) === 0) {
-            this.animation_frame = (this.animation_frame + 1) % this.animation_row;
-        }
-
-
-
-
-        this.frame = this.animation_frame;
-
-
-        this.frame += ['center', 'left', 'right'].indexOf(this.animation_type) * this.animation_row;
-
+        this.invincible = true;
+        this.invincible_end_time = this.time + this.invincible_time;
 
     },
 
 
     // 通常攻撃スペルを設定する
-    SetAttackSpell: function (name) {
-
+    SetAttackSpell: function (name, overwrite) {
 
 
         // this.spell = __Spell.Get(name);
 
+        this.attack_spell = __Spell.Get(name);
+        // this.attack_spell_name = name;
 
-        this.attackSpell = __Spell.Get(name);
+
+        // barrage_count を初期化しない
+        if (overwrite) return;
 
 
         // barrage_count を初期化する
-        this.attackSpell.barrages.forEach(function (barrage) {
+        this.attack_spell.barrages.forEach(function (barrage) {
             this.barrage_count[barrage.handle] = 0;
         }, this);
 
+
+
     },
 
 
+    SetBombSpell: function (name, overwrite) {
 
+        this.bomb_spell = __Spell.Get(name);
 
-    // 弾幕から通常攻撃を登録
-    __set_attackSpellFromBarrage: function (name) {
+        if (overwrite) return;
 
-        var barrage = __Barrage.Get(name).attribute({
-            creator: this,
-        });
-
-
-        var spell = CreateSpell();
-        spell.addBarrage(barrage);
-
-        spell.name = 'w';
-
-        this.attackSpell = spell;
+        this.bomb_spell.barrages.forEach(function (barrage) {
+            this.barrage_count[barrage.handle] = 0;
+        }, this);
     },
+
+
+    ReloadSpell: function () {
+        if (this.attack_spell) {
+            this.SetAttackSpell(this.attack_spell.asset_name, true);
+        }
+        if (this.bomb_spell) {
+            this.SetBombSpell(this.bomb_spell.asset_name, true);
+        }
+    },
+
+
+    // 弾幕からボムスペルを登録する
+    SetBombSpellFromBarrage: function (name) {
+
+        __Spell.Make(name)(name);
+        this.SetBombSpell(name);
+
+    },
+
 
 
     // 移動する
     Move: function (vec) {
-        this.pos.Add(vec.Normalize().Scale(this.speed));
+        this.pos.Add(vec.Scale(this.speed));
     },
 
 
@@ -114,21 +142,44 @@ var Player = Class(Character2, {
         this.Chrono();
 
 
-        this.UpdateAnimation();
         this.UpdateScale();
 
 
         // 通常攻撃
-        if (this.attackSpell) {
-
-            // 攻撃する
+        if (this.attack_spell) {
             if (input.z) {
-                // console.log('z');
-                this.attackSpell.Update(this);
+                this.attack_spell.Update(this);
             } else {
-                this.attackSpell.ResetCount(this);
+                this.attack_spell.ResetCount(this);
             }
         }
+
+
+        // ボムを発動
+        if (this.bomb > 0 && this.bomb_spell && !this.bombing && Key.X) {
+            this.bomb--;
+            this.bombing = true;
+            this.Invincible();
+        }
+
+        // ボムを更新
+        if (this.bombing) {
+            this.bomb_spell.Update(this);
+        }
+
+
+        // 無敵なら点滅
+        if (this.invincible) {
+
+            this.opacity = Math.sin(this.count) * 0.5 + 0.5;
+
+
+            if (this.time >= this.invincible_end_time) {
+                this.invincible = false;
+            }
+
+        } else this.opacity = 1;
+
 
 
 
@@ -138,26 +189,73 @@ var Player = Class(Character2, {
 
 
 
+        this.Animation();
+
+
+
+
+
         this.escape_time = CountToTime(this.escape_count++);
+
+
         Debug.Set('escape-time', this.escape_time.toFixed(2));
 
 
-        //
-        if (this.previous_pos) {
-            this.animation_type = this.previous_pos.x > this.pos.x ? 'left' : this.previous_pos.x < this.pos.x ? 'right' : 'center';
-        }
 
 
-
-
-        this.previous_pos = this.pos.Clone();
     }
 
 });
 
 
-// 被弾
-Player.prototype.Damage = function (damage) {
-    this.escape_count = 0;
-    this.hp -= damage;
+
+
+
+
+var PlayerStatus = function (player) {
+
+    this.label = new enchant.Label();
+
+    this.player = player;
+
+    this.label.onenterframe = this.Update;
+
+
+    console.log(this.label);
+
+};
+
+PlayerStatus.prototype.Update = function () {
+
+
+
+    this.text = player.life + ' / ' + player.bomb;
+
+    Debug.Set('player.life', player.life);
+    Debug.Set('player.bomb', player.bomb);
+
+
 }
+
+
+var __PlayerStatus = PlayerStatus;
+
+
+var PlayerStatus = {
+
+
+    New: function (player) {
+
+        var status = new __PlayerStatus(player);
+
+        RootScene.addChild(status.label);
+
+
+
+
+    }
+
+
+
+
+};

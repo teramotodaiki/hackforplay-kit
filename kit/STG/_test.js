@@ -6,15 +6,13 @@ var InitializeGlobalVariable = function()
 
 
     Game = game = enchant.Core.instance;
-
+    RootScene = scene = game.rootScene;
 
     sceneSize.width = game.width;
     sceneSize.height = game.height;
 
 
 
-    scene = game.rootScene;
-    scene.backgroundColor = '#666';
 
 
 
@@ -55,7 +53,7 @@ var EnchantBook = {
         Hack.enchantBookIcon = Hack.createSprite(64, 64,
         {
             image: game.assets['hackforplay/enchantbook.png'],
-            defaultParentNode: game.rootScene,
+            defaultParentNode: RootScene,
             ontouchend: function()
             {
                 Hack.openEditor();

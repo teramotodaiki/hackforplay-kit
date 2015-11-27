@@ -41,9 +41,55 @@ var Sprite = Class(enchant.Sprite, {
 
         this.collision_size = 0.0;
 
+        this.event_listener = [];
+
+
     },
 
-    GetCollisionSize : function(){
+
+    // 初期化後に呼ぶ
+    InitializeUpdate: function () {
+        this.UpdateScale();
+        this.PosToXY();
+    },
+
+    // シーンから削除する
+    Remove: function () {
+        RootScene.removeChild(this);
+        this.RunEvent('remove');
+    },
+
+    // シーンに追加する
+    Entry: function (parent) {
+
+        if (parent) {
+            RootScene.insertBefore(this, parent);
+        } else RootScene.addChild(this);
+
+        this.RunEvent('entry');
+    },
+
+    // イベントを追加する
+    AddEvent: function (name, listener) {
+        this.event_listener.push({
+            name: name,
+            listener: listener
+        });
+    },
+
+    // イベントを発火する
+    RunEvent: function (name) {
+
+
+        this.event_listener.forEach(function (event) {
+            if (event.name === name) {
+                event.listener.call(this);
+            }
+        }, this);
+    },
+
+    // 衝突判定を取得する
+    GetCollisionSize: function () {
         var scale = Math.min(this.scale_x, this.scale_y);
         return this.collision_size * scale / 2;
     },
@@ -79,6 +125,7 @@ var Sprite = Class(enchant.Sprite, {
         this.time = CountToTime(this.count++);
     },
 
+    // 座標を設定する
     MoveTo: function (x, y) {
         this.pos.x = x;
         this.pos.y = y;

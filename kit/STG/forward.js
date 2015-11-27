@@ -5,6 +5,7 @@ var scene, input, game, player;
 var Key;
 
 var Game;
+var RootScene;
 
 
 var KeyBind = function (key_code, name) {

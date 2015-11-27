@@ -1,10 +1,6 @@
-
-
 // 敵キャラ
-var Enemy = Class(Character2,
-{
-    Initialize: function(name)
-    {
+var Enemy = Class(Character2, {
+    Initialize: function (name) {
 
 
         // Character.call(this, width, height);
@@ -33,26 +29,34 @@ var Enemy = Class(Character2,
 
 
         this.spell = null;
+        this.spell_name = '';
 
 
         this.motion_name = '';
 
 
+
+
+        this.AddEvent('death', function () {
+            this.Remove();
+        });
+
+
+
     },
 
+    SetMotion: function (name) {
 
-
-    // 移動処理を設定する
-    setMotion: function(name)
-    {
         this.motion_name = name;
 
-
         Motion.Use(name, this);
+
+        return this;
     },
 
-    Update: function()
-    {
+
+
+    Update: function () {
         // this.move();
 
         // this.time = CountToTime(this.count);
@@ -61,8 +65,7 @@ var Enemy = Class(Character2,
 
         this.UpdateScale();
 
-        if (this.timeline !== undefined)
-        {
+        if (this.timeline) {
             this.timeline.Update(this);
             // this.convertPos();
         }
@@ -71,68 +74,49 @@ var Enemy = Class(Character2,
         this.PosToXY();
 
 
+
+        this.Animation();
+
         // this.spell.counts = this.spellCounts;
 
 
 
         // 攻撃する
-        if (this.spell && (this.attack_begin_time === null || this.attack_begin_time <= this.time) && (this.attack_end_time === null || this.attack_end_time >= this.time))
-        {
+        if (this.spell && (this.attack_begin_time === null || this.attack_begin_time <= this.time) && (this.attack_end_time === null || this.attack_end_time >= this.time)) {
 
             this.spell.Update(this);
 
         }
 
 
+    },
+
+
+    ReloadSpell: function () {
+        if (this.spell_name && this.spell) {
+            this.SetSpell(this.spell_name, true);
+
+            console.log('スペル "' + this.spell_name + '" を更新しました');
+        }
     }
+
 });
 
 
 
 // スペルを登録する
-Enemy.prototype.SetSpell = function(name, aaaaa)
-{
+Enemy.prototype.SetSpell = function (name, overwrite) {
     this.spell_name = name;
     this.spell = __Spell.Get(name).Clone();
 
+    // barrage_count を初期化しない
+    if (overwrite) return;
 
-    if(aaaaa) return;
 
     // barrage_count を初期化する
-    this.spell.barrages.forEach(function(barrage)
-    {
+    this.spell.barrages.forEach(function (barrage) {
         this.barrage_count[barrage.handle] = 0;
     }, this);
 
-
-}
-
-Enemy.prototype.ReloadSpell = function()
-{
-    if (this.spell_name && this.spell)
-    {
-        this.SetSpell(this.spell_name, true);
-
-        console.log('スペル "' + this.spell_name + '" を更新しました');
-    }
-}
-
-
-
-
-
-// 被弾
-Enemy.prototype.Damage = function(damage)
-{
-
-    console.log('hp: ' + this.hp);
-
-    this.hp -= damage;
-
-
-    if (this.hp <= 0)
-    {
-        this.remove();
-    }
 
 }

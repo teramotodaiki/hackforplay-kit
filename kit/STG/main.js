@@ -7,6 +7,7 @@ window.addEventListener('load', function () {
 
     KeyBind(16, 'shift');
     KeyBind(90, 'z');
+    KeyBind(88, 'X');
     KeyBind(84, 'Escape');
 
 
@@ -22,7 +23,7 @@ window.addEventListener('load', function () {
         height: 32,
         default_width: 15,
         default_height: 15,
-        collision_size: 10,
+        collision_size: 15,
     });
 
     CharacterDesign.New('RIM', {
@@ -32,65 +33,100 @@ window.addEventListener('load', function () {
         width: 64,
         height: 64,
         center_x: 32,
-        center_y:  32,
-
+        center_y: 32,
         default_width: 40,
         default_height: 40,
-        collision_size: 10,
+        collision_size: 6,
     });
 
 
     Asset.Preload();
 
 
-    game.onload = function () {
-
+    Game.onload = function () {
 
 
         // 背景（仮）
-        var background = new enchant.Sprite(scene.width, scene.height);
-        var surface = background.image = new enchant.Surface(scene.width, scene.height);
-        background.scroll = 0.0;
-        background.onenterframe = function () {
+        {
+            var background = new enchant.Sprite(scene.width, scene.height);
+            var surface = background.image = new enchant.Surface(scene.width, scene.height);
+            background.scroll = 0.0;
+            background.onenterframe = function () {
 
-            var texture = Asset.Get('background');
+                var texture = Asset.Get('background');
 
-            var ratio = texture.width / scene.width;
+                var ratio = texture.width / scene.width;
 
-            surface.draw(texture, 0, this.scroll * scene.height * ratio, scene.width, scene.height * ratio);
-            surface.draw(texture, 0, (this.scroll - 1.0) * scene.height * ratio, scene.width, scene.height * ratio);
+                surface.draw(texture, 0, this.scroll * scene.height * ratio, scene.width, scene.height * ratio);
+                surface.draw(texture, 0, (this.scroll - 1.0) * scene.height * ratio, scene.width, scene.height * ratio);
 
 
 
-            if ((this.scroll += 0.01) >= 1.0) {
-                this.scroll -= 1.0;
+                if ((this.scroll += 0.01) >= 1.0) {
+                    this.scroll -= 1.0;
+                }
+
             }
-
+            scene.addChild(background);
         }
-        scene.addChild(background);
-
-
-
-        // Pad を生成する
-        CreatePad();
-
-        // 魔道書
-        EnchantBook.Create();
-
 
 
         //----------// ここからステージ制作 //----------//
+
+
+
+
+
+        __Barrage.New('プレイヤーボム', {
+            material: 'normal',
+            create_time: 0.2,
+            way: 20,
+            speed: 5,
+            scale: 3,
+            destroyer: true,
+            target_type: 'enemy',
+        }).Random({
+            color: [0, 7],
+        }).Wave({
+
+            speed: [1, [1, 5]],
+
+        }).ShotControl(function () {
+
+
+            this.speed += 0.2;
+
+        }).Control(function () {
+
+            // 2 秒でボム終了
+            if (this.time >= 2) {
+                this.RunEvent('player-bomb-end');
+            }
+
+        });
+
+
+
+
+
+
 
 
         // プレイヤーを召喚
         player = new Player('RIM');
 
 
-        scene.addChild(player);
-
-        // player.backgroundColor = '#f00';
         player.MoveTo(sceneSize.width / 2, sceneSize.height / 2);
+
+
         player.speed = 5;
+
+        player.SetBombSpellFromBarrage('プレイヤーボム');
+
+        player.Entry();
+
+
+        PlayerStatus.New(player);
 
 
 
@@ -110,37 +146,6 @@ window.addEventListener('load', function () {
             power: 100
         });
 
-
-
-        __Barrage.New('10way弾', {
-            material: 'normal',
-            way: 10,
-            speed: 5,
-            size: 20,
-            space: 50
-        }).shotControl(function () {
-
-            this.angle.add(2);
-        });
-
-
-        __Barrage.New('ホーミング弾', {
-            material: 'normal',
-            range_angle: 10,
-            createTime: 10.2,
-            way: 8,
-            speed: 10,
-
-            size: 5,
-        }).control(function () {
-
-            // 一番近い標的を見つける
-            var target = CharacterList.GetNear(this.creator, this.targetType);
-
-            // 軸を標的の方向に
-            this.AxisFromTarget(target);
-
-        });
 
 
 
@@ -215,17 +220,12 @@ window.addEventListener('load', function () {
 
             this.AxisFromNearTarget();
 
-        }).shotControl(function () {
+        }).ShotControl(function () {
 
             this.angle += 2;
 
             // this.angle += 2;
 
-
-        });
-
-
-        __Barrage.Get('aaaaaaaa').control(function () {
 
         });
 
@@ -250,7 +250,6 @@ window.addEventListener('load', function () {
         __Spell.Make('10way-r3')('aaaaaaaa' /*, '上から下'*/ );
 
 
-        __Spell.Make('プレイヤースペル')('10way弾', 'ホーミング弾');
         __Spell.Make('player-spell')('player-normal');
 
 
@@ -279,38 +278,55 @@ window.addEventListener('load', function () {
 
             create_time: 1.05,
 
-            space: 10,
-            target_type: 'enemy',
+            space: 20,
 
-            pos_target_type: 'player',
+            // pos_target_type: 'player',
 
             reflect: true,
             reflect_count: 1,
 
         }).Wave({
 
+            /*
+            /*
+            test: [0, [0, 10]],
             axis_angle: {
                 cycle_time: 5,
                 min: 0,
                 max: 360,
             },
-
+            */
         });
-        var c2 = new Character2('RIM');
 
 
         __Spell.Make('弾幕１')('弾幕２２');
 
 
-        Stage.Make('ステージ').AddEnemy(0, {
-            pos: [240, 100],
-            spell: '弾幕１',
-            motion: '不動',
-        });
 
         //
         Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(1.0);
         Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
+
+
+
+
+        var enemy = new Enemy('RIM');
+        enemy.MoveTo(240, 100);
+        enemy.SetMotion('ボス反復').SetSpell('弾幕１');
+
+
+        enemy.AddEvent('remove', function () {
+
+            Hack.gameclear();
+
+        });
+
+
+
+
+
+        Stage.Make('ステージ').AddEnemyFromInstance(0, enemy);
+
 
         ////////////////////////////////////////////////////
 
@@ -319,7 +335,7 @@ window.addEventListener('load', function () {
 
 
         // 現在のステージを更新する
-        game.addEventListener('enterframe', function () {
+        Game.addEventListener('enterframe', function () {
             Stage.GetActive().Update();
 
             Debug.Set('stage-count', Stage.GetActive().count);
@@ -357,15 +373,21 @@ window.addEventListener('load', function () {
                     render(context);
                 });
 
-
+                context.lineWidth = 2;
+                context.strokeStyle = '#000';
+                context.fillStyle = 'rgba(255, 255, 255, .5)';
 
                 // 当たり判定を描画
                 scene.childNodes.forEach(function (node) {
 
                     if (node.collision_size !== undefined) {
                         context.beginPath();
-                        context.arc(node.pos.x, node.pos.y, node.GetCollisionSize() / 2, 0, Math.PI2);
+                        context.arc(node.pos.x, node.pos.y, node.GetCollisionSize(), 0, Math.PI2);
+
+                        context.fill();
+
                         context.stroke();
+
                     }
 
                 });
@@ -385,13 +407,20 @@ window.addEventListener('load', function () {
         }
 
 
-        EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");
-        EnchantBook.PushHint("b.speed = 20;");
-
 
         Hack.oneditend = function () {
             __Spell.Reload();
         }
+
+
+        // 魔道書
+        EnchantBook.Create();
+
+        // Pad を生成する
+        CreatePad();
+
+        EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");
+        EnchantBook.PushHint("b.speed = 20;");
 
 
     }

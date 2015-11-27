@@ -1,5 +1,3 @@
-
-
 var Barrage = function () {
 
 
@@ -70,14 +68,25 @@ var Barrage = function () {
 
     // 待機
     this.wait_time = 0;
-
+    this.wait_end_time = null;
     this.wait = false;
+
+
 
     // 弾幕変化形
     this.next_barrage = '';
 
     // 何回で次の弾幕に移行するか
     this.next_repeat = null;
+
+
+
+    this.scale_x = 1.0;
+    this.scale_y = 1.0;
+    this.scale = null;
+
+
+    this.destroyer = false;
 
 
 
@@ -136,7 +145,7 @@ var Barrage = function () {
 
 
     this.__control = null;
-    this.__shotControl = null;
+    this.shot_control = null;
 
 
     // this.axis = Vec2(0, 0);
@@ -247,6 +256,8 @@ Barrage.prototype.AddShotEvent = function (time, property) {
 // sin 波
 Barrage.prototype.Wave = function (property) {
     this.wave = property;
+
+    return this;
 }
 
 
@@ -256,11 +267,18 @@ Barrage.prototype.__Wave = function () {
 
         var p = this.wave[key];
 
-        var v = p.min + Math.sin(Math.PI2 / p.cycle_time * this.time) * (p.max - p.min) / 2
+        var v =p[1][0] + Math.sin(Math.PI2 / p[0] * this.time) * (p[1][0] - p[1][1]) / 2
 
         this[key] = v;
 
     }
+}
+
+
+// 弾幕を自由に制御できる関数を設定
+Barrage.prototype.Control = function (control) {
+    this.__control = control;
+    return this;
 }
 
 
@@ -271,9 +289,11 @@ Barrage.prototype.control = function (control) {
     return this;
 }
 
+
+
 // 弾を自由に制御できる関数を設定
-Barrage.prototype.shotControl = function (control) {
-    this.__shotControl = control;
+Barrage.prototype.ShotControl = function (control) {
+    this.shot_control = control;
     return this;
 }
 
@@ -349,18 +369,30 @@ Barrage.prototype.Fire = function () {
                     }
 
 
+                    if (this.scale !== null) {
+                        this.scale_x = this.scale_y = this.scale;
+                    }
+
+
+
                     var property = {};
 
                     property.speed = this.speed;
                     property.angle = angle;
                     property.life = this.life;
                     property.target_type = this.target_type;
-                    property.__control = this.__shotControl;
+                    property.__control = this.shot_control;
                     property.hit_self = this.hit_self;
                     property.power = this.creator.power;
                     property.color = this.color;
                     property.reflect = this.reflect;
                     property.reflect_count = this.reflect_count;
+                    property.destroyer = this.destroyer;
+                    property.scale_x = this.scale_x;
+                    property.scale_y = this.scale_y;
+
+
+
 
                     // once プロパティを上書き
                     for (var key in property) {
@@ -381,11 +413,9 @@ Barrage.prototype.Fire = function () {
                         if (target.length) {
                             // とりあえず 0 番目に（というより 1 以上だと用途に合わない）
                             shot.pos = target[0].pos.Clone();
-                        }
-                        else{
-                            console.log('対象がいない' + this.pos_target_type);
-                        }
+                        } else console.warn('次の生成対象は存在しません: ' + this.pos_target_type);
                     }
+
 
 
                     // pos を適用する
@@ -418,8 +448,13 @@ Barrage.prototype.Fire = function () {
 
                     // 弾を登録する
                     shot.InitializeUpdate();
+
+                    /*
                     scene.addChild(shot);
                     this.shots.push(shot);
+                    */
+
+                    shot.Entry(this.creator);
 
 
                 }
@@ -441,19 +476,6 @@ Barrage.prototype.Fire = function () {
 
 
 
-Barrage.prototype.ShotControl = function (property) {
-    this.shots.forEach(function (shot) {
-        shot.attribute(property);
-    });
-}
-
-
-// [[deprecated]]
-Barrage.prototype.Restart = function () {
-    this.creator.barrage_count[this.handle] = 0;
-}
-
-
 Barrage.prototype.NextColor = function () {
     this.color++;
 }
@@ -470,10 +492,25 @@ Barrage.prototype.Update = function () {
     this.create_count = TimeToCount(this.create_time);
 
 
+
+
+
+    // 待機処理
+    if (this.wait) {
+        if (this.wait_end_time <= this.time) {
+            this.wait = false;
+            this.creator.barrage_count[this.handle] = 0;
+        }
+        return;
+    }
+
+
+
     // 完全に自由な制御
     if (this.__control) {
         this.__control.call(this);
     }
+
 
 
     // 一定時間に達したら弾を生成する
@@ -499,11 +536,34 @@ Barrage.prototype.AxisFromTarget = function (target) {
 }
 
 
+Barrage.prototype.Restart = function (wait) {
+    this.wait_end_time = this.time + wait;
+}
+
+
+
+Barrage.prototype.End = function () {
+    this.creator.RunEvent('barrage-end');
+}
+
+
+Barrage.prototype.RunEvent = function (name) {
+    this.creator.RunEvent(name);
+}
+
+
+
 
 
 var barrage_asset = {};
 
 var barrage_handle = 0;
+
+
+
+var ___Barrage = Barrage;
+
+
 
 var __Barrage = {
 

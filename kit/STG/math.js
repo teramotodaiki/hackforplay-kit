@@ -51,6 +51,14 @@ var distance = function (x1, y1) {
 }
 
 
+
+// Vec2 の距離
+Math.Length = function (v1, v2) {
+    return distance(v1.x, v1.y)(v2.x, v2.y);
+}
+
+
+
 Math.PI2 = Math.PI * 2;
 Math.ZERO = 1e-5;
 

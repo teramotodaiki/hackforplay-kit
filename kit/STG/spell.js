@@ -42,15 +42,6 @@ Spell.prototype.attributeAll = function(object) {
 
 
 // 弾幕を追加する
-// [[deprecated]]
-Spell.prototype.addBarrage = function(barrage) {
-
-    var barrage2 = $.extend({}, barrage);
-
-    this.barrages.push(barrage2);
-}
-
-// 弾幕を追加する
 Spell.prototype.pushBarrage = function(barrage) {
     this.barrages.push(barrage);
 }
@@ -178,6 +169,10 @@ var __Spell = {
         var spell = spell_asset[name] = new Spell();
 
         spell.__name = name;
+
+        spell.asset_name = name;
+
+
 
         if (property) {
             spell.attribute(property);

@@ -30,6 +30,9 @@ var Character2 = Class(Sprite, {
 
 
         this.collision_size = CD.collision_size;
+        this.animation_count = 0;
+        this.animation_time = CD.animation_time;
+        this.animation_row = CD.animation_row;
 
 
         this.type = 'character';
@@ -41,11 +44,51 @@ var Character2 = Class(Sprite, {
         this.hp_max = 1.0;
 
 
+        this.previous_pos = null;
+
+
         this.barrage_count = {};
+
+        this.direction = 'center';
+
+    },
+
+    Animation: function () {
+
+        // 向きを計算する
+        if (this.previous_pos) {
+            this.direction = this.previous_pos.x > this.pos.x ? 'left' : this.previous_pos.x < this.pos.x ? 'right' : 'center';
+        }
+        this.previous_pos = this.pos.Clone();
+
+        // アニメーション
+
+        if (this.count % TimeToCount(this.animation_time) === 0) {
+            this.animation_count = ++this.animation_count  % this.animation_row;
+        }
+
+
+        this.frame = this.animation_count;
+        this.frame += ['center', 'left', 'right'].indexOf(this.direction) * this.animation_row;
 
     },
 
 
+    Damage: function (damage) {
+
+
+        this.RunEvent('damage');
+
+
+        this.hp -= damage;
+
+        if (this.hp <= 0.0) {
+
+            this.RunEvent('death');
+            // this.Remove();
+        }
+
+    },
 
     HP: function (hp) {
         this.hp = this.hp_max = hp;
