@@ -323,14 +323,12 @@ function _Angle(value) {
     this.value = value;
 }
 
-// [[deprecated]]
-_Angle.prototype.add = function (value) {
+_Angle.prototype.Add = function (value) {
     this.value += value;
     return this;
 }
 
-// [[deprecated]]
-_Angle.prototype.sub = function (value) {
+_Angle.prototype.Sub = function (value) {
     this.value -= value;
     return this;
 }

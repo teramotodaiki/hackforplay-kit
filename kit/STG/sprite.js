@@ -26,7 +26,7 @@ var Sprite = Class(enchant.Sprite, {
         this.pos = Vec2(0, 0);
 
         this.count = 0;
-        this.time = 0;
+        this.time = 0.0;
 
         this.image_scale_x = source.image_scale_x || 1.0;
         this.image_scale_y = source.image_scale_y || 1.0;
@@ -61,8 +61,8 @@ var Sprite = Class(enchant.Sprite, {
 
     // シーンから削除する
     Remove: function () {
-        RootScene.removeChild(this);
         this.RunEvent('remove');
+        RootScene.removeChild(this);
     },
 
     // シーンに追加する

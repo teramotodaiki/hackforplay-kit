@@ -163,7 +163,7 @@ var Reflect = {
                 // 判定サイズだけ戻す（これしとかないとすり抜けることがある）
                 shot.pos.Sub(line.vec.Clone().Normalize().Scale(shot.collision_size / 2));
 
-                shot.color++;
+                // shot.color++;
 
 
 

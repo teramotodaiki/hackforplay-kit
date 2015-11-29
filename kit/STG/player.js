@@ -2,9 +2,7 @@ var Player = Class(Character2, {
 
     Initialize: function (name) {
 
-
         // Player
-
         this.Base(name);
 
 
@@ -116,7 +114,6 @@ var Player = Class(Character2, {
         var css = 'font-size:16px;background:#E0E4CC;border-left: solid 6px #A7DBD8;padding:3px;';
 
 
-
         if (this.attack_spell) {
 
             console.log('%cプレイヤー通常スペル "' + this.attack_spell.asset_name + '" を更新しました', css);
@@ -160,8 +157,8 @@ var Player = Class(Character2, {
 
     // 座標を画面内に収める
     PosClamp: function () {
-        this.pos.x = this.pos.x < 0 ? 0 : this.pos.x > sceneSize.width ? sceneSize.width : this.pos.x;
-        this.pos.y = this.pos.y < 0 ? 0 : this.pos.y > sceneSize.height ? sceneSize.height : this.pos.y;
+        this.pos.x = this.pos.x < 0 ? 0 : this.pos.x > Game.width ? Game.width : this.pos.x;
+        this.pos.y = this.pos.y < 0 ? 0 : this.pos.y > Game.height ? Game.height : this.pos.y;
     },
 
 
@@ -199,8 +196,12 @@ var Player = Class(Character2, {
         // 無敵なら点滅
         if (this.invincible) {
 
-            this.opacity = Math.sin(this.count) * 0.5 + 0.5;
 
+            // 終了に近づく程速く点滅するように
+            var invincible_end_progress = (this.invincible_end_time - this.time) / this.invincible_time;
+
+            // 0 to 1
+            this.opacity = Math.sin(this.count * invincible_end_progress) * 0.5 + 0.5;
 
             if (this.time >= this.invincible_end_time) {
                 this.invincible = false;

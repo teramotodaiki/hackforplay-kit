@@ -7,7 +7,6 @@ var Size = function (width, height) {
 }
 
 
-var sceneSize = new Size();
 
 
 var EnumBlendMode = {

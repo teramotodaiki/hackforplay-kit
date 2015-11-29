@@ -8,12 +8,11 @@ var InitializeGlobalVariable = function()
     Game = game = enchant.Core.instance;
     RootScene = scene = game.rootScene;
 
-    sceneSize.width = game.width;
-    sceneSize.height = game.height;
 
 
 
-
+    RootScene.background_layer = new enchant.Sprite(0, 0);
+    RootScene.addChild(RootScene.background_layer);
 
 
     /* var */
@@ -50,7 +49,7 @@ var EnchantBook = {
     GetSprite: function(){
         return Hack.enchantBookIcon;
     },
-    
+
 
     Create: function()
     {

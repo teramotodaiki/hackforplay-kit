@@ -227,12 +227,11 @@ Barrage.prototype.RandomizeName = function (name) {
     // 整数値
     var int_keys = ['repeat', 'repeat_x', 'repeat_y', 'color'];
 
-
     // 検索する時は once を削除
     var name2 = name.replace(/^once_/, '');
 
     // 乱数生成器
-    var _Random = int_keys.indexOf(name2) >= 0 ? Random2 : Random;
+    var _Random = int_keys.indexOf(name2) >= 0 ?  Random: Random2;
 
 
 

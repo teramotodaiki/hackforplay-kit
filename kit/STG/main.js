@@ -13,7 +13,11 @@ window.addEventListener('load', function () {
 
     Asset.Add('shot-none', 'tenonno-graphic/shot-none.png');
     Asset.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
-    Asset.Add('effect', 'tenonno-graphic/effect/effect.jpg');
+
+
+    Asset.Add('弾消滅エフェクト', 'tenonno-graphic/effect/effect-min.jpg');
+
+
     Asset.Add('background', 'tenonno-graphic/background/dot-background2.png');
 
 
@@ -22,7 +26,7 @@ window.addEventListener('load', function () {
 
 
     Material.New('normal', {
-        source: 'tenonno-graphic/shot-normal-min.png',
+        source: 'tenonno-graphic/shot-normal-min - コピー.png',
         width: 32,
         height: 32,
         default_width: 15,
@@ -85,7 +89,7 @@ window.addEventListener('load', function () {
 
 
 
-        Background.Set('背景１', '背景２');
+        // Background.Set('背景１', '背景２');
 
 
 
@@ -162,7 +166,7 @@ window.addEventListener('load', function () {
         // プレイヤーを召喚
         player = new Player('RIM');
 
-        player.MoveTo(sceneSize.width / 2, sceneSize.height / 2);
+        player.MoveTo(Game.width / 2, Game.height / 2);
 
 
         player.speed = 5;
@@ -187,9 +191,11 @@ window.addEventListener('load', function () {
 
 
         Reflect.Range([0, 0], [480, 320]);
+        // Reflect.Circle([240, 160], 100);
 
 
-        Reflect.Circle([240, 160], 100);
+
+
 
 
         __Barrage.New('弾幕２２', {
@@ -204,6 +210,11 @@ window.addEventListener('load', function () {
 
             reflect: true,
             reflect_count: 1,
+
+        }).Random({
+
+            color: [0, 10],
+
 
         }).Wave({
 
@@ -227,20 +238,6 @@ window.addEventListener('load', function () {
         Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(2.0);
         Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
 
-
-
-        /*
-        var enemy = new Enemy('RIM');
-        enemy.MoveTo(240, 100);
-        enemy.SetMotion('ボス反復').SetSpell('弾幕１');
-
-
-        enemy.AddEvent('remove', function () {
-
-            Hack.gameclear();
-
-        });
-        */
 
 
         //----------//----------//----------// ボス 1 //----------//----------//----------//
@@ -283,7 +280,10 @@ window.addEventListener('load', function () {
 
         Stage.New('ステージ１', {
 
-        }).AddBoss2(0, 'ボス１').DrawTitle(1.0, 'ステージ１', 'STAGE 1');
+            background: ['背景１', '背景２'],
+
+
+        }).AddBoss2(3.0, 'ボス１').DrawTitle(1.0, 'ステージ１', 'STAGE 1');
 
 
         //----------//----------//----------// ステージ 2 //----------//----------//----------//
@@ -291,6 +291,7 @@ window.addEventListener('load', function () {
 
         Stage.New('ステージ２', {
 
+                        background: [ '背景２'],
         }).DrawTitle(1.0, 'ステージ２', 'STAGE 2');
         /*
 
@@ -309,7 +310,8 @@ window.addEventListener('load', function () {
 
         // 現在のステージを更新する
         Game.addEventListener('enterframe', function () {
-            Stage.GetActive().Update();
+            Stage.Update();
+
             Debug.Set('stage-count', Stage.GetActive().count);
         });
 

@@ -26,7 +26,9 @@ var Boss = Class(Enemy, {
             console.log('ボスの HP が 0.0 以下になりました');
 
 
-            RemoveAllShot();
+            // RemoveAllShot();
+
+            RemoveAllEnemyShot();
 
             this.NextSpell();
 

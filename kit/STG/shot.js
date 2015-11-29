@@ -58,7 +58,7 @@ var RemoveRangeShot = function (sprite, range) {
     });
 
 
-}
+};
 
 // 全ての弾を消す
 RemoveAllShot = function () {
@@ -67,7 +67,16 @@ RemoveAllShot = function () {
         node.Remove();
     })
 
-}
+};
+
+
+RemoveAllEnemyShot = function () {
+    SpriteList.TypeFilter('shot').forEach(function (node) {
+        if (node.creator.type === 'enemy') {
+            node.Remove();
+        }
+    })
+};
 
 
 
@@ -120,7 +129,60 @@ var CharacterList = {
 }
 
 
+// 弾
+var ShotEffect = Class(Sprite, {
+    Initialize: function (shot) {
 
+
+        // 定数に近いやつ
+        this.row = 13;
+        this.remove_time = 0.3;
+
+        this.shot = shot;
+
+        this.SpriteConstructor({
+
+            name: '弾消滅エフェクト',
+
+            width: 128,
+            height: 128,
+
+            image_scale_x: 0.5,
+            image_scale_y: 0.5,
+
+            blend: 'lighter'
+        });
+
+
+        this.pos = this.shot.pos;
+
+
+        this.PosToXY();
+        this.UpdateScale();
+
+    },
+    Update: function () {
+
+
+        if (this.time >= this.remove_time) {
+            this.Remove();
+        }
+
+
+        this.frame = (this.time / this.remove_time) * (this.row - 1);
+        this.frame += (this.shot.frame % 10) * this.row;
+
+
+        this.PosToXY();
+        this.UpdateScale();
+
+
+
+        this.Chrono();
+    }
+
+
+});
 
 
 // 弾
@@ -186,6 +248,10 @@ var Shot = Class(Sprite, {
         this.angle = 0;
 
 
+
+        this.remove_effect = true;
+
+
         // 仮
         this.target_type = 'enemy';
 
@@ -203,6 +269,18 @@ var Shot = Class(Sprite, {
         this.scale_x = 1.0;
         this.scale_y = 1.0;
 
+
+
+
+        this.AddEvent('remove', function () {
+
+            if (!this.remove_effect) return;
+
+            var effect = new ShotEffect(this);
+
+            effect.Entry();
+
+        });
 
 
     },
@@ -224,6 +302,10 @@ var Shot = Class(Sprite, {
 
 
         if (this.pos.x < -screen_margin || this.pos.x > scene.width + screen_margin || this.pos.y < -screen_margin || this.pos.y > scene.height + screen_margin) {
+
+            // 画面外に出て消滅した場合はエフェクトなし
+            this.remove_effect = false;
+
             this.Remove();
             return;
         }

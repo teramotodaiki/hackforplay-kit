@@ -14,6 +14,9 @@ var HP = Class(enchant.Sprite, {
         }
 
 
+
+
+
         // this.compositeOperation = 'lighter';
 
 
@@ -29,6 +32,17 @@ var HP = Class(enchant.Sprite, {
         this.opacity = 0.0;
 
         this.updatePos();
+
+
+        enemy.AddEvent('death', function(){
+
+
+            RootScene.removeChild(this);
+
+            console.log('HPゲージを破棄します');
+
+        })
+
     },
 
     Update: function () {
@@ -37,9 +51,6 @@ var HP = Class(enchant.Sprite, {
         this.updatePos();
 
 
-        if (this.enemy.death) {
-            return scene.removeChild(this);
-        }
 
 
         var op = 1.0;
@@ -89,7 +100,7 @@ var HP = Class(enchant.Sprite, {
 
         // 枠
         ctx.lineWidth = 7;
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#f04';
         ctx.stroke();
 
         // 背景

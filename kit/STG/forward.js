@@ -1,5 +1,5 @@
 // 前方宣言
-var scene, input, game, player;
+var scene, input, game;
 
 
 var Key;

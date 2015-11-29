@@ -90,10 +90,10 @@ _Stage.prototype.AddBoss2 = function (time, name) {
 
 
 
-                RootScene.addChild(new HP(boss));
+        RootScene.addChild(new HP(boss));
 
 
-                
+
 
         this.__boss = true;
         // (new HP(boss)).Entry();
@@ -275,8 +275,8 @@ _Stage.prototype.AddEvent = function (time, event) {
 
     var count = TimeToCount(time);
 
-    if (stage.events[count] === undefined) {
-        stage.events[count] = event;
+    if (this.events[count] === undefined) {
+        this.events[count] = event;
     }
     // 多分ないだろうけど time が小さすぎて count が重複した場合
     else {
@@ -284,11 +284,11 @@ _Stage.prototype.AddEvent = function (time, event) {
 
         // イベントを合成する
 
-        var _event = stage.events[count];
+        var _event = this.events[count];
 
-        delete stage.events[count];
+        delete this.events[count];
 
-        stage.events[count] = function () {
+        this.events[count] = function () {
 
             _event.call(this);
             event.call(this);
@@ -304,64 +304,99 @@ _Stage.prototype.AddEvent = function (time, event) {
 
 _Stage.prototype.Attribute = Spell.prototype.attribute;
 
-var stage_asset = {};
-var active_stage = null;
 
-
-var stage_list = [];
 
 
 var Stage = {
 
+    asset: {},
+    list: [],
+    index: -1,
+
+
+    // 現在のステージを更新する
+    Update: function () {
+
+        // 初回なら this.list[0] に設定
+        if (this.index < 0) {
+            this.Next();
+        }
+
+        this.GetActive().Update();
+    },
+
+
+
     Get: function (name) {
 
-        if (stage_asset[name] === undefined) {
+        if (this.asset[name] === undefined) {
             console.warn('ステージ "' + name + '" は存在しません');
         }
 
-        return stage_asset[name];
+        return this.asset[name];
     },
 
     // 現在のステージを取得する
     GetActive: function () {
-        return active_stage;
+        return this.list[this.index];
     },
 
     // 次のステージに
     Next: function () {
 
 
-        active_stage = stage_list[active_stage.index + 1]
-
-        if (active_stage === undefined) {
-            console.error('次のステージは存在しません');
+        // 現在の背景を削除
+        var previous_stage = this.GetActive();
+        if (previous_stage) {
+            Background.Pop(previous_stage.background.length);
         }
 
 
 
-        return active_stage;
+        this.index++;
+
+        var stage = this.GetActive();
+
+        if (stage === undefined) {
+            console.error('次のステージは存在しません');
+        }
+
+        // console.log(stage.background);
+
+        // Background.Set.apply(Background, stage.background);
+
+        Background.Push.apply(Background, stage.background);
+
+        return stage;
     },
 
-    New: function (name, property) {
+    New: function (name, property, events) {
 
-        stage = stage_asset[name] = new _Stage();
+        var stage = this.asset[name] = new _Stage();
 
 
-        if (property) {
+        // 背景を統一する為に配列化（どちらも可能）
+        // background: '1'
+        // background: ['1', '2', '3']
+        if (!Array.isArray(property.background)) {
+            property.background = [property.background];
+        }
 
-            // 時間をカウントに変換する
-            for (var key in property) {
 
-                stage.AddEvent(key, property[key]);
+        stage.background = property.background;
+
+        if (events) {
+
+            for (var key in events) {
+
+                stage.AddEvent(key, events[key]);
 
             }
 
         }
 
-        stage.index = stage_list.length;
-        stage_list.push(stage);
 
-        active_stage = stage_list[0];
+        this.list.push(stage);
 
 
         return stage;

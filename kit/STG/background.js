@@ -40,6 +40,10 @@ var Background = Class(enchant.Sprite, {
 
     },
 
+    Remove: function(){
+        RootScene.removeChild(this);
+    },
+
     Update: function () {
 
 
@@ -90,9 +94,14 @@ var Background = Class(enchant.Sprite, {
 var __Background = Background;
 
 
+
+
+
 var Background = {
 
     asset: {},
+
+    list: [],
 
     New: function (name, option) {
 
@@ -110,16 +119,42 @@ var Background = {
         return this.asset[name];
     },
 
+
+    Push: function () {
+        Array.prototype.slice.call(arguments).forEach(function (name) {
+
+
+            console.log(name);
+
+            var background = this.Get(name);
+            RootScene.insertBefore(this.Get(name), RootScene.background_layer);
+
+            this.list.push(background);
+
+        }, this);
+    },
+
+    Pop: function(number){
+
+        for(var index in Range(number)){
+
+            (this.list.pop()).Remove();
+
+        }
+
+    },
+
     Set: function () {
+
+
+        console.warn('Background.Set は非推奨です');
 
         Array.prototype.slice.call(arguments).forEach(function (name) {
 
 
-            RootScene.addChild(this.Get(name));
+            RootScene.insertBefore(this.Get(name), RootScene.background_layer);
 
         }, this);
-
-
 
     }
 
