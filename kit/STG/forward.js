@@ -13,6 +13,15 @@ var KeyBind = function (key_code, name) {
 }
 
 
+var BindKeys = function () {
+    Array.prototype.forEach.call(arguments, function (key) {
+        Game.keybind(key[0], key[1]);
+    });
+}
+
+
+
+
 // 秒をフレームカウントに変換する
 var TimeToCount = function (time) {
     return Math.round(time * game.fps);
@@ -27,26 +36,6 @@ var CountToTime = function (count) {
 var Select = function (a, b) {
     return a === undefined ? b : a;
 }
-
-
-
-// 敵キャラ
-var enemies = [];
-
-// プレイヤー
-var player;
-
-
-
-var OverrideRenderer = {
-
-
-};
-
-
-var OverrideRenderFunctions = [];
-
-
 
 
 

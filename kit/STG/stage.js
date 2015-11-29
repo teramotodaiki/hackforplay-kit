@@ -35,6 +35,7 @@ var _Stage = function () {
     this.events = {};
 
     this.count = 0;
+    this.time = 0.0;
 
 
     this.index = null;
@@ -54,6 +55,8 @@ _Stage.prototype.AddEnemyFromInstance = function (time, enemy) {
 
         RootScene.addChild(enemy);
     });
+
+    return this;
 }
 
 
@@ -74,6 +77,35 @@ _Stage.prototype.AddBossFromInstance = function (time, boss) {
 }
 
 
+_Stage.prototype.AddBoss2 = function (time, name) {
+
+
+
+    this.AddEvent(time, function () {
+
+
+        var boss = __Boss.Get(name);
+
+        boss.Entry();
+
+
+
+                RootScene.addChild(new HP(boss));
+
+
+                
+
+        this.__boss = true;
+        // (new HP(boss)).Entry();
+
+
+    });
+
+
+    return this;
+}
+
+
 // ボスを追加する
 _Stage.prototype.AddBoss = function (time, property) {
     this.AddEvent(time, function () {
@@ -82,7 +114,7 @@ _Stage.prototype.AddBoss = function (time, property) {
 
         RemoveAllShot();
 
-        var boss = new Boss(20, 20);
+        // var boss = new Boss(20, 20);
 
 
         boss.SetHP(100);
@@ -112,17 +144,6 @@ _Stage.prototype.AddBoss = function (time, property) {
 
 
 
-        var self = this;
-
-        // ボスを倒したらカウントを再開
-        boss.death_event = function () {
-            self.__boss = false;
-
-
-
-
-        }
-
     });
     return this;
 }
@@ -139,10 +160,96 @@ _Stage.prototype.Update = function () {
             console.log('stage: event');
         }
 
-        ++this.count;
+
+
+
+
+        this.time = TimeToCount(++this.count);
+
+
     }
 
 }
+
+
+
+_Stage.prototype.DrawTitle = function (time, title, sub_title) {
+
+    this.AddEvent(time, function () {
+
+
+
+        if (sub_title) {
+
+            sub_title = new enchant.Label(sub_title);
+            sub_title.font = 　'16px "Times New Roman", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, serif';
+            sub_title.cvsRender = function (ctx) {
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 6;
+                enchant.Label.prototype.cvsRender.call(this, ctx);
+                ctx.shadowBlur = 0;
+            };
+            sub_title.moveTo((game.width - sub_title._boundWidth) / 2, 50);
+
+
+            sub_title.tl.delay(20).fadeIn(30, E).delay(30).fadeOut(30, E).removeFromScene();
+
+
+            sub_title.color = '#fff';
+
+
+            sub_title.opacity = 0;
+            RootScene.addChild(sub_title);
+        }
+
+
+
+
+
+
+        var sampleLabel = new enchant.Label();
+        sampleLabel.font = 　'30px "Times New Roman", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, serif';
+        sampleLabel.text = title;
+        // 以下で中央の座標を計算し、指定します
+        sampleLabel.moveTo((game.width - sampleLabel._boundWidth) / 2, 120);
+
+
+        var E = enchant.Easing.QUAD_EASEOUT;
+
+
+        sampleLabel.opacity = 0;
+
+        sampleLabel.tl.fadeIn(30, E).and().moveBy(0, -50, 30, E).delay(50).fadeOut(30, E).removeFromScene();
+
+
+
+
+        sampleLabel.color = '#fff';
+
+
+        sampleLabel.cvsRender = function (ctx) {
+
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 10;
+
+
+            enchant.Label.prototype.cvsRender.call(this, ctx);
+
+            ctx.shadowBlur = 0;
+
+
+        };
+
+
+
+        RootScene.addChild(sampleLabel);
+
+    });
+
+
+    return this;
+}
+
 
 
 
@@ -173,7 +280,7 @@ _Stage.prototype.AddEvent = function (time, event) {
     }
     // 多分ないだろうけど time が小さすぎて count が重複した場合
     else {
-        console.log('Stage: イベントが重複しています');
+        console.warn('ステージのイベントが重複しています\n結合しました');
 
         // イベントを合成する
 
@@ -222,12 +329,22 @@ var Stage = {
 
     // 次のステージに
     Next: function () {
-        return (active_stage = stage_list[active_stage.index + 1]);
+
+
+        active_stage = stage_list[active_stage.index + 1]
+
+        if (active_stage === undefined) {
+            console.error('次のステージは存在しません');
+        }
+
+
+
+        return active_stage;
     },
 
-    Make: function (name, property) {
+    New: function (name, property) {
 
-        stage = active_stage = stage_asset[name] = new _Stage();
+        stage = stage_asset[name] = new _Stage();
 
 
         if (property) {
@@ -243,6 +360,9 @@ var Stage = {
 
         stage.index = stage_list.length;
         stage_list.push(stage);
+
+        active_stage = stage_list[0];
+
 
         return stage;
     }

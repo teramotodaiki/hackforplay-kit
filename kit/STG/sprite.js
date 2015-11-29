@@ -3,6 +3,8 @@ var Class = function (base, define) {
     define.initialize = define.Initialize;
     define.onenterframe = define.Update;
 
+
+
     define.Base = function () {
         base.apply(this, arguments);
     }
@@ -34,6 +36,10 @@ var Sprite = Class(enchant.Sprite, {
         this.center_y = Select(source.center_y, this.height / 2);
 
 
+        this.compositeOperation = source.blend || 'source-over';
+
+
+
         this.scale_x = 1.0;
         this.scale_y = 1.0;
         this.scale = null;
@@ -62,9 +68,12 @@ var Sprite = Class(enchant.Sprite, {
     // シーンに追加する
     Entry: function (parent) {
 
-        if (parent) {
-            RootScene.insertBefore(this, parent);
-        } else RootScene.addChild(this);
+
+
+        var _p = parent || RootScene.front_sprite;
+
+
+            RootScene.insertBefore(this, _p);
 
         this.RunEvent('entry');
     },
@@ -75,6 +84,11 @@ var Sprite = Class(enchant.Sprite, {
             name: name,
             listener: listener
         });
+    },
+
+    // イベントを初期化する
+    ClearEvent: function() {
+        this.event_listener = [];
     },
 
     // イベントを発火する

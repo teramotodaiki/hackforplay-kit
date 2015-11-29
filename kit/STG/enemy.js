@@ -5,7 +5,9 @@ var Enemy = Class(Character2, {
 
         // Character.call(this, width, height);
 
-        this.Base(name);
+        // this.Base.call(this, name);
+
+        Character2.call(this, name);
 
         // enemies.push(this);
 
@@ -35,9 +37,10 @@ var Enemy = Class(Character2, {
         this.motion_name = '';
 
 
-
-
-        this.AddEvent('death', function () {
+        // HP が 0.0 以下になったらそのまま死亡
+        this.AddEvent('dying', function () {
+            this.RunEvent('death');
+            this.death = true;
             this.Remove();
         });
 

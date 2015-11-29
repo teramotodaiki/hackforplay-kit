@@ -1,7 +1,7 @@
 // 東方みたいな HP ゲージ
-var HP = Class(Sprite, {
+var HP = Class(enchant.Sprite, {
     Initialize: function (enemy) {
-        Sprite.call(this, 100, 100);
+        enchant.Sprite.call(this, 100, 100);
 
         this.enemy = enemy;
         this.image = new Surface(this.width, this.height);
@@ -14,7 +14,7 @@ var HP = Class(Sprite, {
         }
 
 
-        this.compositeOperation = 'lighter';
+        // this.compositeOperation = 'lighter';
 
 
         this.before_value = 0.0;
@@ -45,7 +45,7 @@ var HP = Class(Sprite, {
         var op = 1.0;
 
         // 対象が準備中なら透過
-        if (this.enemy.entry_motion === true || this.enemy.death) {
+        if (this.enemy.returning === true || this.enemy.death) {
             op = 0.0;
         }
 

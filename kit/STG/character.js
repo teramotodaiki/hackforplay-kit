@@ -46,10 +46,15 @@ var Character2 = Class(Sprite, {
 
         this.previous_pos = null;
 
+        this.death = false;
 
         this.barrage_count = {};
 
         this.direction = 'center';
+
+
+        this.invincible = false;
+
 
     },
 
@@ -64,7 +69,7 @@ var Character2 = Class(Sprite, {
         // アニメーション
 
         if (this.count % TimeToCount(this.animation_time) === 0) {
-            this.animation_count = ++this.animation_count  % this.animation_row;
+            this.animation_count = ++this.animation_count % this.animation_row;
         }
 
 
@@ -76,6 +81,9 @@ var Character2 = Class(Sprite, {
 
     Damage: function (damage) {
 
+        // 無敵状態か既に死亡している場合は無視
+        if (this.invincible || this.death) return;
+
 
         this.RunEvent('damage');
 
@@ -84,7 +92,10 @@ var Character2 = Class(Sprite, {
 
         if (this.hp <= 0.0) {
 
-            this.RunEvent('death');
+            // this.RunEvent('death');
+            this.RunEvent('dying');
+
+
             // this.Remove();
         }
 

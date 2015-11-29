@@ -78,6 +78,7 @@ Spell.prototype.Clone = function() {
     var spell = new Spell();
 
     spell.name = this.name;
+    spell.asset_name = this.asset_name;
 
     // 闇の処理
     this.barrages.forEach(function(barrage) {
@@ -140,12 +141,26 @@ var __Spell = {
 
     Reload: function() {
 
-        scene.childNodes.forEach(function(character) {
 
-            if (character.ReloadSpell !== undefined) {
+
+        var sty = 'font-size:16px;background:#E0E4CC;border-left: solid 6px #A7DBD8;padding:3px;';
+        console.log('%c全てのスペルを更新します', sty);
+
+
+
+//        console.info('spell reload');
+
+        RootScene.childNodes.forEach(function(character) {
+
+            if (character.ReloadSpell) {
+
+
                 character.ReloadSpell();
+
             }
         });
+
+
     },
 
     UpdateAll: function() {
@@ -168,7 +183,6 @@ var __Spell = {
 
         var spell = spell_asset[name] = new Spell();
 
-        spell.__name = name;
 
         spell.asset_name = name;
 

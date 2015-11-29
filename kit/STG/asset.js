@@ -50,6 +50,21 @@ var CharacterDesign = {
             this.center_y = property.center_y;
 
 
+            if (property.center) {
+                this.center_x = property.center[0];
+                this.center_y = property.center[1];
+            }
+
+
+
+            if (property.texture_size) {
+                this.width = property.texture_size[0];
+                this.height = property.texture_size[1];
+            }
+
+
+
+
             // 比率を計算する
             this.image_scale_x = property.default_width === undefined ? 0 : property.default_width / this.width;
             this.image_scale_y = property.default_height === undefined ? 0 : property.default_height / this.height;
@@ -93,6 +108,9 @@ var Material = {
 
             this.width = property.width;
             this.height = property.height;
+
+
+            this.blend = property.blend;
 
             // 比率を計算する
             this.image_scale_x = property.default_width === undefined ? 0 : property.default_width / this.width;

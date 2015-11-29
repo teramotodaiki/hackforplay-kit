@@ -19,6 +19,16 @@ var Collision = function (o1, o2) {
 
 var SpriteList = {
 
+    Filter: function (filter) {
+        return RootScene.childNodes.filter(filter);
+    },
+
+    TypeFilter: function (type) {
+        return RootScene.childNodes.filter(function (node) {
+            return node.type === type;
+        });
+    },
+
     TypeEach: function (type, callback) {
 
         RootScene.childNodes.forEach(function (sprite) {
@@ -27,21 +37,6 @@ var SpriteList = {
             }
         });
     },
-
-    __RemoveTypeEach: function (type) {
-
-
-        RootScene.childNodes.filter(function (node) {
-
-            return (node.type === type && node.__remove);
-
-        }).forEach(function (node) {
-
-            node.Remove();
-        })
-
-    },
-
 
 
 
@@ -54,16 +49,12 @@ var SpriteList = {
 // 範囲の弾を消す
 var RemoveRangeShot = function (sprite, range) {
 
-    SpriteList.TypeEach('shot', function (shot) {
+    SpriteList.Filter(function (shot) {
 
-        if (shot !== sprite && Math.Length(sprite.pos, shot.pos) <= range) {
+        return shot !== sprite && Math.Length(sprite.pos, shot.pos) <= range;
 
-
-            shot.Remove();
-
-
-        }
-
+    }).forEach(function (node) {
+        node.Remove();
     });
 
 
@@ -71,16 +62,10 @@ var RemoveRangeShot = function (sprite, range) {
 
 // 全ての弾を消す
 RemoveAllShot = function () {
-    SpriteList.TypeEach('shot', function (shot) {
 
-        //shot.Remove();
-        shot.__remove = true;
-
-        console.log('remove all');
-
-    });
-
-    SpriteList.__RemoveTypeEach('shot');
+    SpriteList.TypeFilter('shot').forEach(function (node) {
+        node.Remove();
+    })
 
 }
 
@@ -155,6 +140,8 @@ var Shot = Class(Sprite, {
         this.SpriteConstructor(material);
 
         this.material = material;
+
+
 
 
         this.type = 'shot';
@@ -260,7 +247,8 @@ var Shot = Class(Sprite, {
 
 
             target.Damage(this.power);
-            this.Remove();
+
+            if (!this.unbreak) this.Remove();
         }
 
     },
@@ -353,7 +341,7 @@ var Shot = Class(Sprite, {
 
         // 寿命
         if (this.count++ >= this.life) {
-            this.remove();
+            this.Remove();
         }
 
 

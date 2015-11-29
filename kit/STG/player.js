@@ -18,7 +18,6 @@ var Player = Class(Character2, {
         this.bombing = false;
 
 
-
         this.escape_count = 0;
         this.escape_time = 0.0;
 
@@ -28,9 +27,11 @@ var Player = Class(Character2, {
 
 
         // 無敵状態
-        this.invincible = false;
         this.invincible_time = 5.0;
         this.invincible_end_time = null;
+
+
+
 
         this.AddEvent('damage', function () {
 
@@ -44,7 +45,9 @@ var Player = Class(Character2, {
 
             // 残機がマイナスになったらゲームオーバー
             if (--this.life < 0) {
+                this.RunEvent('death');
                 this.Remove();
+
                 Hack.gameover();
             }
 
@@ -60,7 +63,7 @@ var Player = Class(Character2, {
     },
 
     // 無敵状態になる
-    Invincible: function(){
+    Invincible: function () {
 
         this.invincible = true;
         this.invincible_end_time = this.time + this.invincible_time;
@@ -74,8 +77,9 @@ var Player = Class(Character2, {
 
         // this.spell = __Spell.Get(name);
 
-        this.attack_spell = __Spell.Get(name);
+        this.attack_spell = __Spell.Get(name).Clone();
         // this.attack_spell_name = name;
+
 
 
         // barrage_count を初期化しない
@@ -94,7 +98,7 @@ var Player = Class(Character2, {
 
     SetBombSpell: function (name, overwrite) {
 
-        this.bomb_spell = __Spell.Get(name);
+        this.bomb_spell = __Spell.Get(name).Clone();
 
         if (overwrite) return;
 
@@ -104,11 +108,25 @@ var Player = Class(Character2, {
     },
 
 
+
     ReloadSpell: function () {
+
+
+
+        var css = 'font-size:16px;background:#E0E4CC;border-left: solid 6px #A7DBD8;padding:3px;';
+
+
+
         if (this.attack_spell) {
+
+            console.log('%cプレイヤー通常スペル "' + this.attack_spell.asset_name + '" を更新しました', css);
+
             this.SetAttackSpell(this.attack_spell.asset_name, true);
         }
         if (this.bomb_spell) {
+
+            console.log('%cプレイヤーボムスペル "' + this.bomb_spell.asset_name + '" を更新しました', css);
+
             this.SetBombSpell(this.bomb_spell.asset_name, true);
         }
     },
@@ -118,10 +136,20 @@ var Player = Class(Character2, {
     SetBombSpellFromBarrage: function (name) {
 
         __Spell.Make(name)(name);
+
+
+        console.log(__Spell.Get(name));
+
+
         this.SetBombSpell(name);
 
     },
 
+
+    SetAttackSpellFromBarrage: function (name) {
+        __Spell.Make(name)(name);
+        this.SetAttackSpell(name);
+    },
 
 
     // 移動する

@@ -45,6 +45,13 @@ var InitializeGlobalVariable = function()
 // 魔道書
 var EnchantBook = {
 
+
+
+    GetSprite: function(){
+        return Hack.enchantBookIcon;
+    },
+    
+
     Create: function()
     {
 

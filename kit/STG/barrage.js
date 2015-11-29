@@ -387,7 +387,11 @@ Barrage.prototype.Fire = function () {
                     property.color = this.color;
                     property.reflect = this.reflect;
                     property.reflect_count = this.reflect_count;
+
                     property.destroyer = this.destroyer;
+                    property.unbreak = this.unbreak;
+
+
                     property.scale_x = this.scale_x;
                     property.scale_y = this.scale_y;
 

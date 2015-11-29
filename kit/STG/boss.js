@@ -1,20 +1,15 @@
+var Boss = Class(Enemy, {
+    Initialize: function (name) {
 
-var Boss = enchant.Class.create(Enemy,
-{
-    initialize: function(width, height)
-    {
-
-        Enemy.call(this, width, height);
+        this.Base(name);
 
 
         // this.type = 'boss';
 
-        this.type = 'enemy';
 
+        // 復帰中
+        this.returning = true;
 
-        this.entry_motion = true;
-
-        // this.death_event = function() {}
 
         this.spells = [];
 
@@ -22,19 +17,29 @@ var Boss = enchant.Class.create(Enemy,
 
         this.active = false;
 
-        this.death = false;
+
+        this.ClearEvent();
+
+        // HP が 0.0 以下になったら次の行動へ
+        this.AddEvent('dying', function () {
+
+            console.log('ボスの HP が 0.0 以下になりました');
 
 
-        this.initialized = false;
+            RemoveAllShot();
+
+            this.NextSpell();
+
+        });
+
+
 
     },
-    onenterframe: function()
-    {
+    Update: function () {
 
 
         // 初期化
-        if (!this.initialized)
-        {
+        if (!this.initialized) {
             this.NextSpell();
             this.initialized = true;
         }
@@ -42,112 +47,145 @@ var Boss = enchant.Class.create(Enemy,
 
         if (this.death) return;
 
-        this.time = CountToTime(this.count);
+        this.Chrono();
 
-        // TL を使用するから x, y から pos に逆輸入
+        this.UpdateScale();
 
-        /*
-        this.pos.x = this.x + this.width / 2;
-        this.pos.y = this.y + this.height / 2;
-        */
+        // entry motion が終了したら
+        if (this.returning && this.timeline.end) {
 
+            this.returning = this.invincible = false;
 
-        // 準備中
-        if (this.entry_motion)
-        {
-            // 準備終了
-            if (this.timeline.end)
-            {
+            // 戦闘モーションに移行
+            Motion.Use(this.GetActiveSpell().motion, this);
 
+            this.HP(this.GetActiveSpell().hp);
 
-                this.entry_motion = false;
-
-                // 戦闘モーションに移行
-                Motion.Use(this.GetActiveSpell().motion, this);
-
-                this.SetHP(this.GetActiveSpell().hp);
-
-            }
 
         }
 
 
 
-        if (this.timeline !== undefined)
-        {
+        if (this.timeline) {
             this.timeline.Update(this);
-            this.convertPos();
         }
 
+
+
+        this.PosToXY();
+
+        this.Animation();
 
         // 攻撃する
-        if (!this.entry_motion)
-        {
-
-            if (this.spells[this.active_spell_index] === undefined)
-            {
-                console.error('スペルが存在しません');
-                console.error(this.spells);
-            }
-
-
-
+        if (!this.returning) {
             this.spells[this.active_spell_index].Update(this);
         }
 
 
-        this.count++;
-    }
+    },
+
+
+
+
+
+
 });
 
-Boss.prototype.Active = function()
-{
+Boss.prototype.Active = function () {
     this.active = true;
     this.NextSpell();
 }
 
 
-Boss.prototype.SetDeathEvent = function(event)
-{
-    this.death_event = event;
-}
 
 
-
-Boss.prototype.UpdateSpell = function()
-{
+Boss.prototype.ReloadSpell = function () {
     var self = this;
 
-    this.spells.forEach(function(spell)
-    {
-        console.log('スペル "' + spell.__name + '" を更新しました');
+
+    /*
+
+
+        this.spells.forEach(function (spell) {
+            console.log('スペル "' + spell.__name + '" を更新しました');
+
+
+            console.log(spell.barrages[0].speed);
+
+            spell = __Spell.Get(spell.__name).Clone();
+
+            console.log(spell.barrages[0].speed);
+            // option を上書き
+            spell = $.extend(spell, spell.__option);
 
 
 
-        spell = __Spell.Get(spell.__name).Clone();
+            // barrage_count を初期化する
+            spell.barrages.forEach(function (barrage) {
 
 
-        // option を上書き
-        spell = $.extend(spell, spell.__option);
+                this.barrage_count[barrage.handle] = 0;
+            }, self);
 
 
-        // barrage_count を初期化する
-        spell.barrages.forEach(function(barrage)
-        {
+        });
 
-            console.log('SP2: ' + barrage.speed);
 
-            this.barrage_count[barrage.handle] = 0;
-        }, self);
+        this.spells.forEach(function (spell) {
+            console.log('スペル "' + spell.__name + '" を確認します');
 
-    });
+
+            console.log(spell.barrages[0].speed);
+
+        });
+
+    */
+
+
+    for (var index = 0; index < this.spells.length; index++) {
+
+
+        var spell = this.spells[index];
+
+
+        this.spells[index] = __Spell.Get(spell.asset_name).Clone();
+
+
+
+        var css = 'font-size:16px;background:#E0E4CC;border-left: solid 6px #A7DBD8;padding:3px;';
+
+
+
+        console.log('%cボススペル "' + 　spell.asset_name + '" を更新しました', css);
+
+
+        /*
+            this.spells[index] = $.extend(spell, spell.__option);
+            これをすると反映されない
+            参照絡みのバグだろうけど、手動でプロパティをコピーした方が色々楽なので放置
+        */
+
+
+
+        this.spells[index].name = spell.name;
+        // this.spells[index].spell = spell.spell;
+        this.spells[index].hp = spell.hp;
+        this.spells[index].motion = spell.motion;
+        this.spells[index].entry_motion = spell.entry_motion;
+
+        //
+
+
+
+    }
+
+
 
 }
 
 
 // スペルを追加する
-Boss.prototype.AddSpell = function(name, option)
-{
+Boss.prototype.AddSpell = function (name, option) {
 
 
     var spell = __Spell.Get(name).Clone();
@@ -159,8 +197,7 @@ Boss.prototype.AddSpell = function(name, option)
 
 
     // barrage_count を初期化する
-    spell.barrages.forEach(function(barrage)
-    {
+    spell.barrages.forEach(function (barrage) {
         this.barrage_count[barrage.handle] = 0;
     }, this);
 
@@ -174,33 +211,63 @@ Boss.prototype.AddSpell = function(name, option)
 }
 
 
+Boss.prototype.AddAction = function (option) {
 
 
-Boss.prototype.GetActiveSpell = function()
-{
+
+    var spell = __Spell.Get(option.spell).Clone();
+
+
+    // option を上書き
+    spell = $.extend(spell, option);
+
+
+    // barrage_count を初期化する
+    spell.barrages.forEach(function (barrage) {
+        this.barrage_count[barrage.handle] = 0;
+    }, this);
+
+
+    spell.__name = option.spell;
+    spell.__option = option;
+
+
+    this.spells.push(spell);
+
+    return this;
+}
+
+
+Boss.prototype.GetActiveSpell = function () {
+
+    if (this.spells[this.active_spell_index] === undefined) {
+        console.error('スペルが存在しません');
+        console.error(this.spells);
+    }
+
     return this.spells[this.active_spell_index];
 }
 
 
 // 次のスペルに
-Boss.prototype.NextSpell = function()
-{
+Boss.prototype.NextSpell = function () {
     this.active_spell_index++;
 
     // 全てのスペルを使用したら
-    if (this.spells.length <= this.active_spell_index)
-    {
-        console.log('死亡');
+    if (this.spells.length <= this.active_spell_index) {
+        console.log('ボスが死亡しました');
         this.death = true;
 
-        this.EventTrigger('death');
-        // this.death_event();
-    }
-    else
-    {
+
+        this.Remove();
+
+        this.RunEvent('death');
+
+
+    } else {
 
         // 準備移動を登録
-        this.entry_motion = true;
+        this.returning = this.invincible = true;
         Motion.Use(this.GetActiveSpell().entry_motion, this);
 
 
@@ -209,35 +276,40 @@ Boss.prototype.NextSpell = function()
 }
 
 
-Boss.prototype.SetEntryMotion = function(name)
-{
-    this.entry_motion = true;
+Boss.prototype.SetEntryMotion = function (name) {
+    this.returning = this.invincible = true;
 
     // motion を適用
     Motion.Use(name, this);
 }
 
-Boss.prototype.Damage = function(damage)
-{
-
-    // 死体撃ち
-    if (this.death) return;
 
 
-    if (!this.entry_motion)
-    {
-        this.hp -= damage;
+var __Boss = {
 
-        // 次のスペルに
-        if (this.hp <= 0.0)
-        {
+    asset: {},
 
-            console.log('HP が 0.0 以下になりました');
-            this.NextSpell();
+    New: function (name, status) {
 
+        // Required_propatie
 
-
+        if (this.asset[name]) {
+            console.warn('');
         }
+
+        var boss = this.asset[name] = new Boss(status.type);
+
+
+
+
+        return boss;
+    },
+
+    Get: function (name) {
+        return this.asset[name];
     }
 
-}
+
+
+
+};
