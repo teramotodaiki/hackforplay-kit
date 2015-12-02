@@ -125,7 +125,7 @@ window.addEventListener('load', function () {
 			if (Hack.player) this.scene.addChild(Hack.player);
 		},
 		hitTest: function (x, y) {
-			return this.bmap.hitTest(x, y) || this.fmap.hitTest(x, y);
+			return this.bmap.hitTest(x, y);
 		}
 	});
 	Object.defineProperty(window, 'RPGMap', {
@@ -134,7 +134,9 @@ window.addEventListener('load', function () {
 
 	Hack.changeMap = function (mapName){
 		(function (current, next) {
-			if(next && current !== next){
+			if (next === undefined) {
+				Hack.log(mapName + ' は、まだつくられていない');
+			} else if (current !== next) {
 				var r = function(n){ game.rootScene.removeChild(n); };
 				r(Hack.map.bmap);
 				r(Hack.map.scene);
