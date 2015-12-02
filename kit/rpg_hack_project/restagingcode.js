@@ -8,46 +8,17 @@ window.addEventListener('load', function () {
 "\tmap.load(); // Load Map;  Hack.defaultParentNode == map.scene\n"+
 "\n"+
 "\n"+
-"\t// スライム\n"+
-"\tvar blueSlime = new BlueSlime();\n"+
-"\tblueSlime.locate(7, 5);\n"+
-"\tblueSlime.scale(1, 1);\n"+
-"\tblueSlime.hp = 10;\n"+
-"\t// When become dead... たおれたら...\n"+
-"\tblueSlime.onbecomedead = function () {\n"+
-"\t\t// たおしたらクリア\n"+
-"\t\tHack.gameclear();\n"+
-"\t};\n"+
-"\n"+
-"\n"+
-"\t// くだりかいだん\n"+
-"\tvar stair = new MapObject('DownStair');\n"+
-"\tstair.locate(12, 5);\n"+
-"\t// When enter... ふまれたら...\n"+
-"\tstair.onplayerenter = function () {\n"+
-"\t\t// ふんだら room2 にいく\n"+
-"\t\tHack.changeMap('room2');\n"+
-"\t};\n"+
-"\n"+
-"\n"+
-"\t// ワープゆか\n"+
-"\tvar warp = new MapObject('Warp');\n"+
-"\twarp.locate(3, 3);\n"+
-"\t// When enter... ふまれたら...\n"+
-"\twarp.onplayerenter = function () {\n"+
-"\t\t// ふんだらワープ\n"+
-"\t\tHack.player.locate(12, 3);\n"+
-"\t};\n"+
-"\n"+
-"\n"+
-"\t// くだりかいだん２\n"+
-"\tvar stair2 = new MapObject('DownStair');\n"+
-"\tstair2.locate(5, 5, 'room2');\n"+
-"\t// When enter... ふまれたら...\n"+
-"\tstair2.onplayerenter = function () {\n"+
+"\t// ゴール\n"+
+"\tvar item1 = new MapObject(0);\n"+
+"\titem1.locate(14, 5, 'room1');\n"+
+"\titem1.onplayerenter = function () {\n"+
 "\t\t// ゲームクリア\n"+
 "\t\tHack.gameclear();\n"+
+"\t\tHack.player.destroy();\n"+
 "\t};\n"+
+"\n"+
+"\n"+
+"\t// ( Keep this line -- ここはけさないでね ) //\n"+
 "\n"+
 "\n"+
 "\t// プレイヤー（騎士）\n"+
@@ -65,7 +36,10 @@ window.addEventListener('load', function () {
 "\t\t'Box': 420,\t\t\t'Flower': 421,\t\t'DownStair': 422,\n"+
 "\t\t'Trap': 440,\t\t'UsedTrap': 441,\t'Step': 442,\n"+
 "\t\t'Castle': 500,\t\t'Village': 501,\t\t'Cave': 502,\n"+
-"\t\t'Tree': 520,\t\t'Table': 521,\t\t'OpenedBox': 522\n"+
+"\t\t'Tree': 520,\t\t'Table': 521,\t\t'OpenedBox': 522,\n"+
+"\t\t'Beam': 540,\t\t'Diamond': 560,\t\t'Sapphire': 561,\n"+
+"\t\t'Ruby': 562,\t\t'Heart': 563,\t\t'Skull': 564,\n"+
+"\t\t'Coin': 565,\t\t'Star': 566,\t\t'Key': 567\n"+
 "\t};\n"+
 "\n"+
 "\tHack.maps = [];\n"+
@@ -98,33 +72,8 @@ window.addEventListener('load', function () {
 "\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]\n"+
 "\t];\n"+
 "\n"+
-"\t// room1\n"+
-"\tHack.maps['room2'] = new RPGMap(32, 32);\n"+
-"\tHack.maps['room2'].imagePath = 'enchantjs/x2/map1.gif';\n"+
-"\tHack.maps['room2'].bmap.loadData([\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323],\n"+
-"\t\t[323,323,323,323,323,323,323,323,323,323,323,323,323,323,323]\n"+
-"\t]);\n"+
-"\tHack.maps['room2'].cmap = [\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],\n"+
-"\t\t[  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]\n"+
-"\t];\n"+
+"\n"+
+"\t// < Keep this line -- ここはけさないでね > //\n"+
 "\n"+
 "};\n"+
 "\n"+
@@ -133,7 +82,7 @@ window.addEventListener('load', function () {
 "\t\"//  -            =\\n\"+\n"+
 "\t\"// -  BASIC CODE  =\\n\"+\n"+
 "\t\"//  -            =\\n\"+\n"+
-"\t\"Hack.player.locate(6, 5);  // Teleportation\\n\"+\n"+
+"\t\"Hack.player.locate(6, 5, 'room1');  // Teleportation\\n\"+\n"+
 "\t\"Hack.player.direction = 2; // Turn\\n\"+\n"+
 "\t\"Hack.player.atk = 10;      // Power Up\\n\"+\n"+
 "\t\"\\n\"+\n"+
@@ -142,7 +91,7 @@ window.addEventListener('load', function () {
 "\t\"// *  EXTRA CODE  +  Remove // to use.\\n\"+\n"+
 "\t\"//  *            +   // をけして つかおう!\\n\"+\n"+
 "\t\"\\n\"+\n"+
-"\t\"// Hack.changeMap('room2');\\n\"+\n"+
+"\t\"// Hack.changeMap('room1');\\n\"+\n"+
 "\t\"// Hack.log('wwwwwwww');\\n\"+\n"+
 "\t\"\\n\"+\n"+
 "\t\"\\n\";\n"+
