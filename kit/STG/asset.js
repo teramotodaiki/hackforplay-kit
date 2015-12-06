@@ -6,7 +6,19 @@ preload_sources.push('hackforplay/enchantbook.png', 'enchantjs/x2/map2.png', 'ha
     'dots_design/bg10_3.gif', 'dot_art_world/SC-Door-Entce03.png', 'rengoku-teien/asa_no_komorebi.mp3', 'etolier/01sougen.jpg');
 
 var Asset = {
-    Add: function (name, source) {
+
+
+    directory: '',
+
+
+    Add: function (name, source, directory) {
+
+        // ディレクトリを設定
+        if (directory !== undefined) {
+            this.directory = directory;
+        }
+        source = this.directory + source;
+
 
         preload_sources.push(source);
 

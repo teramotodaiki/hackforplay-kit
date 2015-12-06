@@ -17,6 +17,13 @@ var Class = function (base, define) {
 var Sprite = Class(enchant.Sprite, {
 
 
+
+    DrawBorder: function (context) {
+
+
+    },
+
+
     /* { name: '', width: 0, height: 0 } */
     SpriteConstructor: function (source) {
         enchant.Sprite.call(this, source.width, source.height);
@@ -62,6 +69,8 @@ var Sprite = Class(enchant.Sprite, {
     // シーンから削除する
     Remove: function () {
         this.RunEvent('remove');
+
+
         RootScene.removeChild(this);
     },
 
@@ -73,10 +82,13 @@ var Sprite = Class(enchant.Sprite, {
         var _p = parent || RootScene.front_sprite;
 
 
-            RootScene.insertBefore(this, _p);
+        RootScene.insertBefore(this, _p);
 
         this.RunEvent('entry');
     },
+
+
+
 
     // イベントを追加する
     AddEvent: function (name, listener) {
@@ -87,7 +99,7 @@ var Sprite = Class(enchant.Sprite, {
     },
 
     // イベントを初期化する
-    ClearEvent: function() {
+    ClearEvent: function () {
         this.event_listener = [];
     },
 
@@ -146,3 +158,53 @@ var Sprite = Class(enchant.Sprite, {
     },
 
 });
+
+
+
+
+
+
+
+
+var SpriteList = {
+
+
+    Get: function (type) {
+        for (var key in RootScene.childNodes) {
+            var sprite = RootScene.childNodes[key];
+            if (sprite.type === type) {
+                return sprite;
+            }
+        }
+    },
+
+
+    Filter: function (filter) {
+        return RootScene.childNodes.filter(filter);
+    },
+
+    TypeFilter: function (type) {
+        return RootScene.childNodes.filter(function (node) {
+            return node.type === type;
+        });
+    },
+
+    TypeEach: function (type, callback) {
+
+        RootScene.childNodes.forEach(function (sprite) {
+            if (sprite.type === type) {
+                callback.call(sprite, sprite);
+            }
+        });
+    },
+
+
+    Each: function (callback) {
+        RootScene.childNodes.forEach(function (sprite) {
+            callback.call(sprite, sprite);
+        });
+    },
+
+
+
+};

@@ -16,7 +16,6 @@ var HP = Class(enchant.Sprite, {
 
 
 
-
         // this.compositeOperation = 'lighter';
 
 
@@ -34,12 +33,12 @@ var HP = Class(enchant.Sprite, {
         this.updatePos();
 
 
-        enemy.AddEvent('death', function(){
+        enemy.AddEvent('death', function () {
 
 
             RootScene.removeChild(this);
 
-            console.log('HPゲージを破棄します');
+            // console.log('HPゲージを破棄します');
 
         })
 
@@ -88,8 +87,6 @@ var HP = Class(enchant.Sprite, {
 
 
 
-
-
         var ctx = this.image.context;
 
         this.canvas.Clear();
@@ -105,8 +102,8 @@ var HP = Class(enchant.Sprite, {
 
         // 背景
         ctx.lineWidth = 4;
-        ctx.strokeStyle = '#444';
-        ctx.stroke();
+        ctx.strokeStyle = '#b00';
+        // ctx.stroke();
 
         // 対象が既に倒れているなら HP ゲージは表示しなくても OK
         if (this.enemy.hp <= 0) return;
@@ -120,3 +117,112 @@ var HP = Class(enchant.Sprite, {
 
     }
 });
+
+
+
+
+var $PlayerStatus = Class(enchant.Sprite, {
+    Initialize: function () {
+
+        var max = 4;
+        var height = 50;
+        var margin = 4;
+        var size = height / 2 - margin * 1.5;
+        var width = size * max + margin * (max + 1);
+
+
+        enchant.Sprite.call(this, width, height);
+
+        this.image = new Surface(this.width, this.height);
+
+
+        this.player = null;
+
+        this.life = -1;
+        this.bomb = -1;
+
+
+        this.x = 70;
+        this.y = 6;
+
+    },
+
+
+    Rewrite: function () {
+
+        var life = Asset.Get('残機');
+        var life_back = Asset.Get('残機背景');
+
+        var bomb = Asset.Get('ボム');
+        var bomb_back = Asset.Get('ボム背景');
+
+        var ctx = this.image.context;
+
+
+        ctx.clearRect(0, 0, this.width, this.height);
+
+
+        ctx.fillStyle = 'rgba(255, 255, 255, .3)';
+
+        ctx.fillRect(0, 0, this.width, this.height);
+
+
+
+
+
+        var margin = 4;
+
+        var size = this.height / 2 - margin * 1.5;
+
+
+        for (var index in Range(4)) {
+            this.image.draw(life_back, margin + index * (size + margin), margin, size, size)
+            this.image.draw(bomb_back, margin + index * (size + margin), size + margin * 2, size, size)
+        }
+
+
+        if (this.player) {
+            // 残機
+            for (var index in Range(this.life)) {
+                this.image.draw(life, margin + index * (size + margin), margin, size, size)
+            }
+            // ボム
+            for (var index in Range(this.bomb)) {
+                this.image.draw(bomb, margin + index * (size + margin), size + margin * 2, size, size)
+            }
+
+        }
+
+    },
+
+    Update: function () {
+
+
+        // プレイヤーを発見する
+        if (!this.player) {
+            this.player = SpriteList.Get('player');
+            return;
+        }
+
+        // ステータスが変わったら再描画
+        if (this.player.life !== this.life || this.player.bomb !== this.bomb) {
+
+            this.life = this.player.life;
+            this.bomb = this.player.bomb;
+
+            this.Rewrite();
+        }
+
+    },
+
+
+});
+
+
+var PlayerStatus = {
+    instance: null,
+    New: function () {
+        this.instance = new $PlayerStatus();
+        RootScene.addChild(this.instance);
+    },
+};

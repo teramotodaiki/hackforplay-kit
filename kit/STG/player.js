@@ -23,6 +23,8 @@ var Player = Class(Character2, {
         this.life = 1;
         this.bomb = 2;
 
+        this.default_bomb = 2;
+
 
         // 無敵状態
         this.invincible_time = 5.0;
@@ -40,6 +42,7 @@ var Player = Class(Character2, {
             this.Invincible();
             RemoveAllShot();
 
+            this.bomb = this.default_bomb;
 
             // 残機がマイナスになったらゲームオーバー
             if (--this.life < 0) {
@@ -51,6 +54,8 @@ var Player = Class(Character2, {
 
             this.escape_count = 0;
         });
+
+
 
 
         this.AddEvent('player-bomb-end', function () {
@@ -70,12 +75,12 @@ var Player = Class(Character2, {
 
 
     // 通常攻撃スペルを設定する
-    SetAttackSpell: function (name, overwrite) {
+    SetAttack: function (name, overwrite) {
 
 
-        // this.spell = __Spell.Get(name);
+        // this.spell = Spell.Get(name);
 
-        this.attack_spell = __Spell.Get(name).Clone();
+        this.attack_spell = Spell.Get(name).Clone();
         // this.attack_spell_name = name;
 
 
@@ -94,9 +99,9 @@ var Player = Class(Character2, {
     },
 
 
-    SetBombSpell: function (name, overwrite) {
+    SetBomb: function (name, overwrite) {
 
-        this.bomb_spell = __Spell.Get(name).Clone();
+        this.bomb_spell = Spell.Get(name).Clone();
 
         if (overwrite) return;
 
@@ -118,34 +123,14 @@ var Player = Class(Character2, {
 
             console.log('%cプレイヤー通常スペル "' + this.attack_spell.asset_name + '" を更新しました', css);
 
-            this.SetAttackSpell(this.attack_spell.asset_name, true);
+            this.SetAttack(this.attack_spell.asset_name, true);
         }
         if (this.bomb_spell) {
 
             console.log('%cプレイヤーボムスペル "' + this.bomb_spell.asset_name + '" を更新しました', css);
 
-            this.SetBombSpell(this.bomb_spell.asset_name, true);
+            this.SetBomb(this.bomb_spell.asset_name, true);
         }
-    },
-
-
-    // 弾幕からボムスペルを登録する
-    SetBombSpellFromBarrage: function (name) {
-
-        __Spell.Make(name)(name);
-
-
-        console.log(__Spell.Get(name));
-
-
-        this.SetBombSpell(name);
-
-    },
-
-
-    SetAttackSpellFromBarrage: function (name) {
-        __Spell.Make(name)(name);
-        this.SetAttackSpell(name);
     },
 
 
@@ -172,7 +157,7 @@ var Player = Class(Character2, {
 
         // 通常攻撃
         if (this.attack_spell) {
-            if (input.z) {
+            if (Key.Z) {
                 this.attack_spell.Update(this);
             } else {
                 this.attack_spell.ResetCount(this);
@@ -235,56 +220,3 @@ var Player = Class(Character2, {
     }
 
 });
-
-
-
-
-
-
-var PlayerStatus = function (player) {
-
-    this.label = new enchant.Label();
-
-    this.player = player;
-
-    this.label.onenterframe = this.Update;
-
-
-    console.log(this.label);
-
-};
-
-PlayerStatus.prototype.Update = function () {
-
-
-
-    this.text = player.life + ' / ' + player.bomb;
-
-    Debug.Set('player.life', player.life);
-    Debug.Set('player.bomb', player.bomb);
-
-
-}
-
-
-var __PlayerStatus = PlayerStatus;
-
-
-var PlayerStatus = {
-
-
-    New: function (player) {
-
-        var status = new __PlayerStatus(player);
-
-        RootScene.addChild(status.label);
-
-
-
-
-    }
-
-
-
-
-};

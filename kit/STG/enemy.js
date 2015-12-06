@@ -14,7 +14,7 @@ var Enemy = Class(Character2, {
 
         this.type = 'enemy';
 
-        this.backgroundColor = '#00f';
+        // this.backgroundColor = '#00f';
 
 
         this.hp = 10;
@@ -110,7 +110,7 @@ var Enemy = Class(Character2, {
 // スペルを登録する
 Enemy.prototype.SetSpell = function (name, overwrite) {
     this.spell_name = name;
-    this.spell = __Spell.Get(name).Clone();
+    this.spell = Spell.Get(name).Clone();
 
     // barrage_count を初期化しない
     if (overwrite) return;

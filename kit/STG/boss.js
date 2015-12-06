@@ -1,4 +1,4 @@
-var Boss = Class(Enemy, {
+var $Boss = Class(Enemy, {
     Initialize: function (name) {
 
         this.Base(name);
@@ -23,7 +23,7 @@ var Boss = Class(Enemy, {
         // HP が 0.0 以下になったら次の行動へ
         this.AddEvent('dying', function () {
 
-            console.log('ボスの HP が 0.0 以下になりました');
+            // console.log('ボスの HP が 0.0 以下になりました');
 
 
             // RemoveAllShot();
@@ -93,7 +93,7 @@ var Boss = Class(Enemy, {
 
 });
 
-Boss.prototype.Active = function () {
+$Boss.prototype.Active = function () {
     this.active = true;
     this.NextSpell();
 }
@@ -101,7 +101,7 @@ Boss.prototype.Active = function () {
 
 
 
-Boss.prototype.ReloadSpell = function () {
+$Boss.prototype.ReloadSpell = function () {
     var self = this;
 
 
@@ -114,7 +114,7 @@ Boss.prototype.ReloadSpell = function () {
 
             console.log(spell.barrages[0].speed);
 
-            spell = __Spell.Get(spell.__name).Clone();
+            spell = Spell.Get(spell.__name).Clone();
 
             console.log(spell.barrages[0].speed);
             // option を上書き
@@ -150,7 +150,7 @@ Boss.prototype.ReloadSpell = function () {
         var spell = this.spells[index];
 
 
-        this.spells[index] = __Spell.Get(spell.asset_name).Clone();
+        this.spells[index] = Spell.Get(spell.asset_name).Clone();
 
 
 
@@ -187,10 +187,10 @@ Boss.prototype.ReloadSpell = function () {
 
 
 // スペルを追加する
-Boss.prototype.AddSpell = function (name, option) {
+$Boss.prototype.AddSpell = function (name, option) {
 
 
-    var spell = __Spell.Get(name).Clone();
+    var spell = Spell.Get(name).Clone();
 
 
 
@@ -213,11 +213,11 @@ Boss.prototype.AddSpell = function (name, option) {
 }
 
 
-Boss.prototype.AddAction = function (option) {
+$Boss.prototype.AddAction = function (option) {
 
 
 
-    var spell = __Spell.Get(option.spell).Clone();
+    var spell = Spell.Get(option.spell).Clone();
 
 
     // option を上書き
@@ -240,7 +240,7 @@ Boss.prototype.AddAction = function (option) {
 }
 
 
-Boss.prototype.GetActiveSpell = function () {
+$Boss.prototype.GetActiveSpell = function () {
 
     if (this.spells[this.active_spell_index] === undefined) {
         console.error('スペルが存在しません');
@@ -252,12 +252,12 @@ Boss.prototype.GetActiveSpell = function () {
 
 
 // 次のスペルに
-Boss.prototype.NextSpell = function () {
+$Boss.prototype.NextSpell = function () {
     this.active_spell_index++;
 
     // 全てのスペルを使用したら
     if (this.spells.length <= this.active_spell_index) {
-        console.log('ボスが死亡しました');
+        // console.log('ボスが死亡しました');
         this.death = true;
 
 
@@ -278,7 +278,7 @@ Boss.prototype.NextSpell = function () {
 }
 
 
-Boss.prototype.SetEntryMotion = function (name) {
+$Boss.prototype.SetEntryMotion = function (name) {
     this.returning = this.invincible = true;
 
     // motion を適用
@@ -287,7 +287,7 @@ Boss.prototype.SetEntryMotion = function (name) {
 
 
 
-var __Boss = {
+var Boss = {
 
     asset: {},
 
@@ -299,15 +299,18 @@ var __Boss = {
             console.warn('');
         }
 
-        var boss = this.asset[name] = new Boss(status.type);
-
-
+        var boss = this.asset[name] = new $Boss(status.type);
 
 
         return boss;
     },
 
     Get: function (name) {
+
+        if(!this.asset[name] ){
+            console.error('ボス "' + name + '" は存在しません');
+        }
+
         return this.asset[name];
     }
 

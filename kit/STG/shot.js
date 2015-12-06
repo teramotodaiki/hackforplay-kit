@@ -17,35 +17,6 @@ var Collision = function (o1, o2) {
 
 
 
-var SpriteList = {
-
-    Filter: function (filter) {
-        return RootScene.childNodes.filter(filter);
-    },
-
-    TypeFilter: function (type) {
-        return RootScene.childNodes.filter(function (node) {
-            return node.type === type;
-        });
-    },
-
-    TypeEach: function (type, callback) {
-
-        RootScene.childNodes.forEach(function (sprite) {
-            if (sprite.type === type) {
-                callback.call(sprite, sprite);
-            }
-        });
-    },
-
-
-
-
-};
-
-
-
-
 // 範囲の弾を消す
 var RemoveRangeShot = function (sprite, range) {
 
@@ -169,7 +140,7 @@ var ShotEffect = Class(Sprite, {
         }
 
 
-        this.frame = (this.time / this.remove_time) * (this.row - 1);
+        this.frame = (this.time / this.remove_time) * (this.row - 0.5);
         this.frame += (this.shot.frame % 10) * this.row;
 
 
@@ -280,6 +251,8 @@ var Shot = Class(Sprite, {
 
             effect.Entry();
 
+            ShotCount--;
+
         });
 
 
@@ -338,10 +311,15 @@ var Shot = Class(Sprite, {
     // 移動
     Move: function () {
 
+        // 時計回りにする為に角度を反転
+        var angle = Angle(-this.angle);
+
 
         var pos = this.pos.Clone();
-        var vec = Angle(this.angle).ToVec2().Scale(this.speed);
+        var vec = angle.ToVec2().Scale(this.speed);
 
+
+        var before_pos = this.pos.Clone();
 
         this.pos.Add(vec);
 
@@ -349,10 +327,23 @@ var Shot = Class(Sprite, {
         if (this.reflect) {
 
 
+            // var pos2 = this.pos.Clone().Sub(angle.ToVec2().Scale(this.collision_size / 2));
 
-            vec.Add(vec.Clone().Normalize().Scale(this.collision_size / 2));
 
-            Reflect.Check(Line(pos, vec), this);
+
+            // 反射処理
+            for (var index in this.reflect) {
+
+                var name = this.reflect[index];
+
+
+                Reflecter.Get(name).Check(Line(before_pos, this.pos), this);
+
+
+            }
+
+
+            // Reflect.Check(Line(pos, vec), this);
 
         }
 
@@ -361,7 +352,6 @@ var Shot = Class(Sprite, {
 
     Update: function () {
 
-        this.Chrono();
 
 
         this.UpdateScale();
@@ -418,11 +408,12 @@ var Shot = Class(Sprite, {
         }
 
 
+        this.Chrono();
 
 
 
         // 寿命
-        if (this.count++ >= this.life) {
+        if (this.count >= this.life) {
             this.Remove();
         }
 

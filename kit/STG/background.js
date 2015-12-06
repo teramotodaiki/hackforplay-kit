@@ -124,7 +124,7 @@ var Background = {
         Array.prototype.slice.call(arguments).forEach(function (name) {
 
 
-            console.log(name);
+            // console.log(name);
 
             var background = this.Get(name);
             RootScene.insertBefore(this.Get(name), RootScene.background_layer);

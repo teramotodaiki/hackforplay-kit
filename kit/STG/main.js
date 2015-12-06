@@ -1,32 +1,33 @@
 window.addEventListener('load', function () {
 
 
-
     // 前方宣言した変数の初期化とか
     InitializeGlobalVariable();
 
 
-    BindKeys([16, 'shift'], [90, 'z'], [88, 'X'], [84, 'Escape']);
-
-
+    BindKeys([16, 'shift'], [90, 'Z'], [88, 'X'], [32, 'Space'], [67, 'C'], [68, 'D']);
 
 
     Asset.Add('shot-none', 'tenonno-graphic/shot-none.png');
     Asset.Add('shot-normal', 'tenonno-graphic/shot-normal-min.png');
-
-
     Asset.Add('弾消滅エフェクト', 'tenonno-graphic/effect/effect-min.jpg');
-
-
     Asset.Add('background', 'tenonno-graphic/background/dot-background2.png');
-
-
-
     Asset.Add('bg3', 'tenonno-graphic/background/3.png');
+    Asset.Add('bg4', 'tenonno-graphic/background/4.png');
 
+
+    Asset.directory = 'tenonno-graphic/';
+
+    Asset.Add('残機', 'player-life.png');
+    Asset.Add('残機背景', 'player-life-back.png');
+
+    Asset.Add('ボム', 'player-bomb.png');
+    Asset.Add('ボム背景', 'player-bomb-back.png');
+
+    Asset.directory = '';
 
     Material.New('normal', {
-        source: 'tenonno-graphic/shot-normal-min - コピー.png',
+        source: 'tenonno-graphic/shot-normal-min.png',
         width: 32,
         height: 32,
         default_width: 15,
@@ -47,7 +48,7 @@ window.addEventListener('load', function () {
 
 
     CharacterDesign.New('RIM', {
-        source: 'tenonno-graphic/RIM-3.png',
+        source: 'tenonno-graphic/RIM-4.png',
         animation_time: 0.1,
         animation_row: 1,
 
@@ -60,343 +61,348 @@ window.addEventListener('load', function () {
     });
 
 
+
+    CharacterDesign.New('ドラゴン', {
+        source: 'enchantjs/bigmonster1.gif',
+        animation_time: 0.1,
+        animation_row: 2,
+
+        texture_size: [80, 80],
+        center: [40, 40],
+
+        default_width: 40,
+        default_height: 40,
+        collision_size: 6,
+    });
+
+
+
     Asset.Preload();
+
+
+
+    Barrage.New('自機狙い加速', {
+        speed: 0,
+
+        create_time: 0.5,
+
+        repeat: 10,
+
+        __speed_parameter: 50,
+
+        reflect: 'ｂ',
+        reflect_count: 10,
+
+    }).Control(function () {
+
+        this.AxisFromNearTarget();
+
+    }).ShotControl(function () {
+
+        this.speed += (this.create_index + 3) / 10.0 * this.time / this.barrage.__speed_parameter;
+    });
+
+
+
+    Barrage.New('星', {
+
+        speed: 2,
+        create_time: 10,
+
+        star_size: 100,
+        star_accuracy: 20,
+
+        repeat: 5,
+        repeat_angle: 360 / 5,
+
+        blend: 'lighter'
+
+    }).Create(function () {
+        var result = [];
+        for (var index in Range(5)) {
+            var begin = Angle(360 / 5 * index + 180).ToVec2().Scale(this.star_size);
+            // Vec2.Rotate を行列にしたら Scale の処理いらない
+            var end = begin.Clone().Rotate(360 / 5 * 2).Scale(this.star_size);
+            var add = end.Sub(begin).Scale(1 / this.star_accuracy);
+            for (var r in Range(this.star_accuracy)) {
+                result.push(begin.Add(add).Clone());
+            }
+        }
+        return result;
+    }).Random({
+        color: [0, 10]
+    }).ShotControl(function () {
+        // 1 秒経ったら方向をランダムに
+        if (this.count === TimeToCount(1.0)) {
+            this.angle = Random(0, 360);
+
+        }
+
+    });
+
+    Barrage.New('プレイヤー通常', {
+        material: 'normal',
+        create_time: 0.1,
+        way: 1,
+        speed: 15,
+        target_type: 'enemy',
+        repeat_x: 2,
+        repeat_space_x: 50,
+        power: 100
+    });
+
+
+    Barrage.New('プレイヤーボム', {
+        material: 'light',
+        create_time: 0.2,
+        way: 20,
+        speed: 5,
+        scale: 3,
+        destroyer: true,
+        unbreak: true,
+        target_type: 'enemy',
+    }).Random({
+
+        color: [0, 10],
+
+        once_axis_angle: [0, 360],
+
+    }).ShotControl(function () {
+
+        this.speed += 0.2;
+
+    }).Control(function () {
+
+
+        // 2 秒でボム終了
+        if (this.time >= 2) {
+            this.RunEvent('player-bomb-end');
+        }
+
+    });
+
+
+    // onload 互換
+    Game.addEventListener('load', function () {
+
+
+        //----------// 背景の定義 //----------//
+        Background.New('背景１', {
+            texture: 'background',
+            move: [0, -10],
+        });
+
+
+        //----------// 反射の定義 //----------//
+        Reflecter.New('画面端').Range([0, 0], [480, 320]);
+        Reflecter.New('大きな円').Circle([240, 160], 160);
+
+
+        //----------// モーションの定義 //----------//
+        Motion.New('不動');
+
+        Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(2.5);
+        Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
+
+        Motion.New('真っ直ぐ降りてくる').MoveBy(0, 350)(2.0).Remove();
+
+    });
+
 
 
     Game.onload = function () {
 
 
+        //----------//----------// プレイヤー //----------//----------//
 
-
-
-        Background.New('背景１', {
-
-            texture: 'background',
-            move: [0, -10],
-
-        });
-
-
-        Background.New('背景２', {
-
-            texture: 'bg3',
-            move: [-2, -4],
-
-            blend: 'darken',
-
-        });
-
-
-
-
-        // Background.Set('背景１', '背景２');
-
-
-
-        // 背景（仮）
-
-        //----------// ここからステージ制作 //----------//
-
-
-
-
-
-        __Barrage.New('上から下', {
-            material: 'normal',
-            way: 1,
-            axis_angle: 180,
-            create_time: 0.5,
-            speed: 5,
-            repeat_x: 10,
-            repeat_space_x: 480 / 10,
-
-            pos_type: 'absolute',
-            pos: [240, 0],
-
-        });
-
-
-
-
-
-
-        __Barrage.New('プレイヤーボム', {
-            material: 'light',
-            create_time: 0.2,
-            way: 20,
-            speed: 5,
-            scale: 3,
-            destroyer: true,
-            unbreak: true,
-            target_type: 'enemy',
-        }).Random({
-
-            color: [0, 10],
-
-            once_axis_angle: [0, 360],
-
-        }).ShotControl(function () {
-
-            this.speed += 0.2;
-
-        }).Control(function () {
-
-
-            // 2 秒でボム終了
-            if (this.time >= 2) {
-                this.RunEvent('player-bomb-end');
-            }
-
-        });
-
-
-        __Barrage.New('プレイヤー通常', {
-            material: 'normal',
-            create_time: 0.1,
-            way: 1,
-            speed: 15,
-            target_type: 'enemy',
-            repeat_x: 2,
-            repeat_space_x: 50,
-            power: 100
-        });
-
-
-
-        // プレイヤーを召喚
         player = new Player('RIM');
-
         player.MoveTo(Game.width / 2, Game.height / 2);
-
-
         player.speed = 5;
-
-        player.SetAttackSpellFromBarrage('プレイヤー通常');
-        player.SetBombSpellFromBarrage('プレイヤーボム');
+        player.SetAttack('プレイヤー通常');
+        player.SetBomb('プレイヤーボム');
         player.Entry();
 
+        //----------//----------// 弾幕の定義 //----------//----------//
 
 
-        // PlayerStatus.New(player);
-
-
-
-
-        // this.AxisFromNearTarget();
-
-
-
-        Motion.New('不動');
-
-
-
-        Reflect.Range([0, 0], [480, 320]);
-        // Reflect.Circle([240, 160], 100);
-
-
-
-
-
-
-        __Barrage.New('弾幕２２', {
-            way: 3,
-            speed: 1,
-
-            create_time: 1.05,
-
-            space: 20,
-
-            // pos_target_type: 'player',
-
-            reflect: true,
-            reflect_count: 1,
-
+        Barrage.New('新しい反射のテスト', {
+            speed: 2,
+            way: 50,
+            create_time: 0.5,
+            space: 50,
+            reflect: ['画面端', '大きな円'],
+            scale: 0.5,
         }).Random({
-
-            color: [0, 10],
-
-
-        }).Wave({
-
-            /*
-            /*
-            test: [0, [0, 10]],
-            axis_angle: {
-                cycle_time: 5,
-                min: 0,
-                max: 360,
-            },
-            */
+            color: [0, 10]
         });
 
 
-        __Spell.Make('弾幕１')('弾幕２２');
+        Barrage.New('自機狙い', {
+            speed: 5,
+            way: 3,
+            create_time: 0.25,
+            space: 50,
+            range_angle: 20,
+        }).Control(function () {
+            this.AxisFromNearTarget();
+        }).Random({
+            once_color: [0, 10]
+        });;
 
 
-
-        //
-        Motion.New('ボス登場').MoveTo(scene.width / 2, 100)(2.0);
-        Motion.New('ボス反復').MoveBy(-100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(100, 0)(3.0).MoveBy(-100, 0)(3.0).Loop();
+        //----------//----------// スペルの定義 //----------//----------//
 
 
+        Spell.Make('スペル１')('新しい反射のテスト', '自機狙い');
 
-        //----------//----------//----------// ボス 1 //----------//----------//----------//
 
+        //----------//----------// ボス 1 //----------//----------//
 
-        __Boss.New('ボス１', {
+        Boss.New('ボス１', {
 
             type: 'RIM',
-
 
         }).AddAction({
 
             name: '技１',
 
-            spell: '弾幕１',
-            hp: 3,
-            motion: 'ボス反復',
-            entry_motion: 'ボス登場',
-
-        }).AddAction({
-
-            name: '技２',
-            spell: 'プレイヤーボム',
-            hp: 3,
+            spell: 'スペル１',
+            hp: 30,
             motion: 'ボス反復',
             entry_motion: 'ボス登場',
 
         }).AddEvent('death', function () {
 
-            // ボスを倒したら次のステージに
-            Stage.Next();
-            // Hack.gameclear();
-
+            // ボスを倒したらクリア
+            Hack.gameclear();
         });
 
 
-        //----------//----------//----------// ステージ 1 //----------//----------//----------//
 
+        //----------// ステージ 1 //----------//
 
 
         Stage.New('ステージ１', {
-
-            background: ['背景１', '背景２'],
-
-
-        }).AddBoss2(3.0, 'ボス１').DrawTitle(1.0, 'ステージ１', 'STAGE 1');
-
-
-        //----------//----------//----------// ステージ 2 //----------//----------//----------//
-
-
-        Stage.New('ステージ２', {
-
-                        background: [ '背景２'],
-        }).DrawTitle(1.0, 'ステージ２', 'STAGE 2');
-        /*
-
-
-        Stage.Make('ステージ2', {
-
-        }).AddEnemyFromInstance(0, enemy).DrawTitle(1, 'ステージ2', 'STAGE 2');
-
-        */
-
-        ////////////////////////////////////////////////////
-
-
-
-
-
-        // 現在のステージを更新する
-        Game.addEventListener('enterframe', function () {
-            Stage.Update();
-
-            Debug.Set('stage-count', Stage.GetActive().count);
+            background: '背景１',
         });
 
+        var stage = Stage.Get('ステージ１');
+        // タイトルを表示
+        stage.DrawTitle('ステージ１', 'テストステージ').Delay(3.0);
+        // 敵を追加する
+        stage.AddEnemy({
 
+            pos: [240, -30],
+            hp: 10,
+            spell: '星',
+            motion: '真っ直ぐ降りてくる',
+            attack_begin_time: 1.0,
 
-        { // デバッグ用
-            var RequestAnimationFrame = window.requestAnimationFrame;
-            var canvas_override = false;
-            var input_count = 0;
+        }).Delay(1.0);
+        // ボスを追加する
+        stage.AddBoss('ボス１');
 
-            window.requestAnimationFrame = function () {
+        //----------// 魔道書 //----------//
 
-
-                if ((input_count = Key.Escape ? input_count + 1 : 0) === 1) {
-                    canvas_override = !canvas_override;
-                    OverrideRenderFunctions = [];
-                }
-
-
-
-                // ESC キーを押していない場合は通常通りの処理
-                if (!canvas_override) {
-                    return RequestAnimationFrame.apply(this, arguments);
-                }
-
-                var args = arguments;
-
-
-                var context = game.rootScene._layers.Canvas.context;
-
-
-
-                context.lineWidth = 2;
-                context.strokeStyle = '#000';
-                context.fillStyle = 'rgba(255, 255, 255, .5)';
-
-                // 当たり判定を描画
-                scene.childNodes.forEach(function (node) {
-
-                    if (node.collision_size !== undefined) {
-                        context.beginPath();
-                        context.arc(node.pos.x, node.pos.y, node.GetCollisionSize(), 0, Math.PI2);
-
-                        context.fill();
-
-                        context.stroke();
-
-                    }
-
-                });
-
-
-
-                Reflect.__Render(context);
-
-                // context.clearRect(10, 10, 300, 0300);
-
-                setTimeout(function () {
-                    RequestAnimationFrame.apply(this, args);
-                }, 30);
-
-            }
-
-        }
-
-
-
-        Hack.oneditend = function () {
-            __Spell.Reload();
-        }
-
-
-        // 魔道書
         EnchantBook.Create();
 
+        Hack.hint = function () {
 
-        RootScene.front_sprite = EnchantBook.GetSprite();
+            // スペースキーでデバッグ描画
+
+            console.log(player);
+
+            var barrage = Barrage.Get('プレイヤー通常');
+            barrage.way = 3;
+
+        };
+
+    };
+
+
+    // 初期化、更新など
+    Game.addEventListener('load', function () {
+
+
+        PlayerStatus.New();
 
         // Pad を生成する
         CreatePad();
 
-        EnchantBook.PushHint("var b = __Barrage.Get('弾幕２２');");
-        EnchantBook.PushHint("b.speed = 20;");
-        EnchantBook.PushHint("b.way = 120;");
+        Game.addEventListener('enterframe', function () {
 
+            Key.Update();
+            Stage.Update();
+
+            Debug.Set('stage-count', Stage.GetActive().count);
+
+        });
+    });
+
+
+
+    { // デバッグ用
+        var RequestAnimationFrame = window.requestAnimationFrame;
+        var canvas_override = false;
+
+        window.requestAnimationFrame = function () {
+
+
+            if (Key.Space === 1) {
+                canvas_override = !canvas_override;
+
+                $('#debug').toggle();
+
+            }
+
+            // ESC キーを押していない場合は通常通りの処理
+            if (!canvas_override) {
+                return RequestAnimationFrame.apply(this, arguments);
+            }
+
+            var context = RootScene._layers.Canvas.context;
+
+            context.lineWidth = 2;
+            context.strokeStyle = '#000';
+            context.fillStyle = 'rgba(255, 255, 255, .5)';
+
+            // 当たり判定を描画
+            SpriteList.Each(function (node) {
+
+                if (node.collision_size !== undefined) {
+                    context.beginPath();
+                    context.arc(node.pos.x, node.pos.y, node.GetCollisionSize(), 0, Math.PI2);
+
+                    context.fill();
+
+                    context.stroke();
+
+                }
+
+            });
+
+
+            Reflecter.Each(function () {
+
+                this.RenderBorder(context);
+
+            });
+
+
+
+            var args = arguments;
+            setTimeout(function () {
+                RequestAnimationFrame.apply(this, args);
+            }, 30);
+
+        }
+
+    }
+
+
+
+    Hack.oneditend = function () {
+        Spell.Reload();
     }
 
 

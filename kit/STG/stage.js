@@ -1,13 +1,14 @@
 var CreateEnemy = function (property) {
 
-    console.log('敵を追加します');
+    var status = property;
+
+    // console.log('敵を追加します');
 
     var enemy = new Enemy('RIM');
 
     if (property.pos) {
         enemy.MoveTo(property.pos[0], property.pos[1]);
         enemy.PosToXY();
-
     }
 
     if (property.motion) {
@@ -15,15 +16,27 @@ var CreateEnemy = function (property) {
     }
 
 
+
+    if (property.attack_begin_time) {
+        enemy.attack_begin_time = property.attack_begin_time;
+    }
+    if (property.attack_end_time) {
+        enemy.attack_end_time = property.attack_end_time;
+    }
+
+
     if (property.spell) {
         enemy.SetSpell(property.spell);
     }
 
+    enemy.HP(status.hp);
 
-    enemy.Update();
+    // enemy.Update();
 
 
-    scene.addChild(enemy);
+    enemy.Entry();
+
+    // scene.addChild(enemy);
 }
 
 
@@ -43,7 +56,21 @@ var _Stage = function () {
     this.__boss = false;
 
 
+    this.method_chain_time = 0.0;
+
 };
+
+_Stage.prototype.Delay = function (time) {
+    this.method_chain_time += time;
+    return this;
+};
+
+
+_Stage.prototype.Wait = function (time) {
+    this.Delay(time);
+    return this;
+};
+
 
 
 
@@ -77,22 +104,19 @@ _Stage.prototype.AddBossFromInstance = function (time, boss) {
 }
 
 
-_Stage.prototype.AddBoss2 = function (time, name) {
+_Stage.prototype.AddBoss = function (name) {
 
 
+    this.AddEvent(this.method_chain_time, function () {
 
-    this.AddEvent(time, function () {
 
+        RemoveAllEnemyShot();
 
-        var boss = __Boss.Get(name);
+        var boss = Boss.Get(name);
 
         boss.Entry();
 
-
-
         RootScene.addChild(new HP(boss));
-
-
 
 
         this.__boss = true;
@@ -107,9 +131,9 @@ _Stage.prototype.AddBoss2 = function (time, name) {
 
 
 // ボスを追加する
-_Stage.prototype.AddBoss = function (time, property) {
+_Stage.prototype.__AddBoss = function (time, property) {
     this.AddEvent(time, function () {
-        console.log('ボスを追加します');
+        // console.log('ボスを追加します');
 
 
         RemoveAllShot();
@@ -146,7 +170,8 @@ _Stage.prototype.AddBoss = function (time, property) {
 
     });
     return this;
-}
+};
+
 
 _Stage.prototype.Update = function () {
 
@@ -157,7 +182,7 @@ _Stage.prototype.Update = function () {
         // イベントを処理する
         if (this.events[this.count] !== undefined) {
             this.events[this.count].call(this);
-            console.log('stage: event');
+            // console.log('stage: event');
         }
 
 
@@ -173,9 +198,9 @@ _Stage.prototype.Update = function () {
 
 
 
-_Stage.prototype.DrawTitle = function (time, title, sub_title) {
+_Stage.prototype.DrawTitle = function (title, sub_title) {
 
-    this.AddEvent(time, function () {
+    this.AddEvent(this.method_chain_time, function () {
 
 
 
@@ -251,6 +276,16 @@ _Stage.prototype.DrawTitle = function (time, title, sub_title) {
 }
 
 
+_Stage.prototype.GameClear = function (time) {
+
+    this.AddEvent(time, function () {
+
+        Hack.gameclear();
+    });
+
+    return this;
+}
+
 
 
 // 整形用
@@ -260,11 +295,14 @@ _Stage.prototype.Chain = function () {
 
 
 // 敵を追加する
-_Stage.prototype.AddEnemy = function (time, enemy) {
+_Stage.prototype.AddEnemy = function (enemy) {
 
-    this.AddEvent(time, function () {
+    this.AddEvent(this.method_chain_time, function () {
+
         CreateEnemy(enemy);
+
     });
+
 
     return this;
 }
@@ -300,11 +338,6 @@ _Stage.prototype.AddEvent = function (time, event) {
 
     return this;
 }
-
-
-_Stage.prototype.Attribute = Spell.prototype.attribute;
-
-
 
 
 var Stage = {

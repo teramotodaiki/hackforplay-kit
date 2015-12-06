@@ -1,9 +1,3 @@
-var reflect_line_list = [];
-
-
-
-
-
 var GetReflectRadian = function (front, normal) {
 
     var f_n = front; ///.Clone().Normalize();
@@ -24,7 +18,6 @@ var GetReflectRadian = function (front, normal) {
     var normal_n = normal2.ToNormal();
 
 
-
     var a = (function (spd, nor) {
         var t = -(nor.x * spd.x + nor.y * spd.y) /
             (nor.x * nor.x + nor.y * nor.y);
@@ -40,175 +33,233 @@ var GetReflectRadian = function (front, normal) {
 
     // バグってた
 
-
-
     return front.Sub(Math.Dot(front, normal).Scale(2).Mul(normal)).ToRadian();
 
 }
 
 
-var Reflect = {
 
-    // [[deprecated]]
-    // 全ての反射ラインを描画する
-    __Render: function (context) {
+var $Reflecter = function () {
+    this.list = [];
+};
 
-        context.lineWidth = 3;
-        context.strokeStyle = '#fff';
-
-        reflect_line_list.forEach(function (line) {
-
-            context.beginPath();
-            context.moveTo(line.pos.x, line.pos.y);
-            context.lineTo(line.pos.x + line.vec.x, line.pos.y + line.vec.y);
-            context.stroke();
-
-        });
-    },
+$Reflecter.prototype.Clear = function () {
+    this.list.clear();
+};
 
 
-    Clear: function () {
-        reflect_line_list = [];
-        return this;
-    },
-    Push: function (line) {
-        reflect_line_list.push(line);
-        return this;
-    },
+$Reflecter.prototype.Push = function (line) {
+    this.list.push(line);
+    return this;
+};
 
-    Range: function (min, max) {
+$Reflecter.prototype.PushPoints = function () {
 
-        min = min.ToVec2();
-        max = max.ToVec2();
+    var points = Array.prototype.slice.call(arguments);
 
-        this.Clear();
+    for (var index in Range(points.length)) {
 
-        this.Push(Line(min, Vec2(max.x, 0)));
-        this.Push(Line(Vec2(max.x, min.y), Vec2(0, max.y)));
-        this.Push(Line(max, Vec2(-max.x, 0)));
-        this.Push(Line(Vec2(min.x, max.y), Vec2(0, -max.y)));
+        index = Number(index);
 
-    },
+        var next_index = (index === points.length - 1) ? 0 : index + 1;
 
-    Circle: function (center, size, R) {
+        this.Push(Line(points[index], points[next_index]));
 
+    }
 
-        center = center.ToVec2();
+    return this;
+};
 
-        // size /= 2;
+$Reflecter.prototype.Range = function (min, max) {
 
-        R = R || 16;
-
-        this.Clear();
-
-        // var b_pos = Vec2(0, size);
+    min = min.ToVec2();
+    max = max.ToVec2();
 
 
-        for (var index in Range(R)) {
-
-            var angle = Math.PI2 / R * ++index;
-
-
-            var b_pos_angle = Math.PI2 / R * --index;
-            var b_x = Math.sin(b_pos_angle) * size;
-            var b_y = Math.cos(b_pos_angle) * size;
-            var b_pos = Vec2(b_x, b_y);
+    this.PushPoints(
+        min,
+        Vec2(max.x, min.y),
+        max,
+        Vec2(min.x, max.y));
 
 
-            var x = Math.sin(angle) * size;
-            var y = Math.cos(angle) * size;
-
-            var v = Vec2(x, y);
+    return this;
+};
 
 
-            var pos = Math.Add(center, b_pos);
-
-            var v3 = Math.Sub(v, b_pos);
+$Reflecter.prototype.Circle = function (center, size, R) {
 
 
+    center = center.ToVec2();
 
-            this.Push(Line(pos, v3));
+    // size /= 2;
 
-            // b_pos = v;
+    R = R || 16;
+
+
+    var points = [];
+
+    // var b_pos = Vec2(0, size);
+
+
+    for (var index in Range(R)) {
+
+
+        var angle = Math.PI2 / R * index;
+
+
+        var x = Math.sin(angle) * size;
+        var y = Math.cos(angle) * size;
+
+        points.push(Vec2.Add(center, Vec2(x, y)));
+    }
+
+
+    this.PushPoints.apply(this, points);
+
+    return this;
+};
+
+
+
+$Reflecter.prototype.Check = function (line, shot) {
+
+    var reflect_indices = [];
+
+    // 冷静に考えたら forEach で ブロックの外に return できないの不便すぎる
+    for (var index = 0; index < this.list.length; index++) {
+
+
+        // 前回反射した
+        if (shot.before_reflect_indices.indexOf(index) >= 0) {
+            continue;
         }
 
-
-    },
-
-    Check: function (line, shot) {
-
-        var reflect_indices = [];
-
-        // 冷静に考えたら forEach で ブロックの外に return できないの不便すぎる
-        for (var index = 0; index < reflect_line_list.length; index++) {
+        var line2 = this.list[index];
 
 
-            // 前回反射した
-            if (shot.before_reflect_indices.indexOf(index) >= 0) {
-                continue;
+        var collision = __Collision.Line(line, line2);
+
+        if (collision) {
+
+            reflect_indices.push(index);
+
+            shot.angle = 180 - ToAngle(GetReflectRadian(line.V2V1(), line2.V2V1()));
+
+            shot.pos = collision.pos;
+
+            // shot.speed = 0;
+
+            // 判定サイズだけ戻す（これしとかないとすり抜けることがある）
+            // shot.pos.Sub(line.V2V1().Normalize().Scale(shot.collision_size / 2));
+
+            // shot.color++;
+
+
+
+            // 浅い反射処理なら 1 回判定を取った時点で抜ける
+            var shallow = false;
+            if (shallow) {
+                return;
             }
 
-            var line2 = reflect_line_list[index];
 
-            var collision = __Collision.Line(line, line2);
+            // 再帰的な反射は速度的に逆効果な気がするから無視
 
-            if (collision) {
+            /*
+            // 壁にハマらないように押し出す（あまりよくない方法な気がする）
+            // shot.pos.Add(Angle(shot.angle).ToVec2().Scale(1));
+            // 反射地点までの距離
+            var length = c_r.pos.Clone().Sub(line.begin).Length();
+            // 残っている距離
+            var n_length = line.ToVec2().Length() - length;
+            // 次の位置
+            var angle = line.ToVec2().ToRadian() + r_line.ToVec2().ToRadian();
+            var x = Math.sin(angle) * n_length;
+            var y = Math.cos(angle) * n_length;
+            */
 
-                reflect_indices.push(index);
-
-                shot.angle = ToAngle(GetReflectRadian(line.vec, line2.vec));
-
-                shot.pos = collision.pos;
-
-                // 判定サイズだけ戻す（これしとかないとすり抜けることがある）
-                shot.pos.Sub(line.vec.Clone().Normalize().Scale(shot.collision_size / 2));
-
-                // shot.color++;
-
-
-
-                // 浅い反射処理なら 1 回判定を取った時点で抜ける
-                var shallow = false;
-                if (shallow) {
-                    return;
-                }
-
-
-                // 再帰的な反射は速度的に逆効果な気がするから無視
-
-                /*
-                // 壁にハマらないように押し出す（あまりよくない方法な気がする）
-                // shot.pos.Add(Angle(shot.angle).ToVec2().Scale(1));
-                // 反射地点までの距離
-                var length = c_r.pos.Clone().Sub(line.begin).Length();
-                // 残っている距離
-                var n_length = line.ToVec2().Length() - length;
-                // 次の位置
-                var angle = line.ToVec2().ToRadian() + r_line.ToVec2().ToRadian();
-                var x = Math.sin(angle) * n_length;
-                var y = Math.cos(angle) * n_length;
-                */
-
-            }
         }
+    }
+
+    if (reflect_indices.length) {
 
         shot.before_reflect_indices = reflect_indices;
 
-
-        if (reflect_indices.length) {
-            // 一定回数反射したら崩壊
-            if (shot.reflect_count-- <= 0) {
-                shot.remove();
-            }
-
-        }
-
-
-        // return line.begin.Clone().Add(line.end);
     }
 
 
 
+    if (reflect_indices.length) {
+        // 一定回数反射したら崩壊
+        if (shot.reflect_count-- <= 0) {
+            shot.Remove();
+        }
+
+    }
 
 
 };
+
+
+$Reflecter.prototype.RenderBorder = function (context) {
+
+
+
+    this.list.forEach(function (line) {
+        context.beginPath();
+        context.moveTo(line.pos[0].x, line.pos[0].y);
+        context.lineTo(line.pos[1].x, line.pos[1].y);
+        context.closePath();
+        context.stroke();
+    });
+
+
+
+};
+
+
+var MakeAsset = function (new_class) {
+    return {
+
+        asset: {},
+
+        Each: function (callback) {
+
+            for (var key in this.asset) {
+                var object = this.asset[key];
+                callback.call(object, object);
+            }
+
+        },
+
+        New: function (name) {
+
+            if (this.asset[name] !== undefined) {
+
+                console.warn('');
+
+            }
+
+
+            return this.asset[name] = new new_class();
+        },
+
+        Get: function (name) {
+
+            if (this.asset[name] === undefined) {
+
+                console.warn(name);
+
+            }
+
+            return this.asset[name];
+        }
+
+
+    };
+};
+
+
+
+var Reflecter = MakeAsset($Reflecter);

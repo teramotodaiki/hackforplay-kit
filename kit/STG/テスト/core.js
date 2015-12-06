@@ -1,24 +1,34 @@
-
-
-
-var Class = function()
-{
-    this.value = 100;
+function Range(n) {
+    return Array.apply(null, {
+        length: n
+    }).map(Number.call, Number);
 }
 
-Class.prototype.change = function()
-{
-    this.value = 200;
+function Range2(n) {
+    var array = [];
+    for (var i = 0; i < n; ++i) {
+        array.push(i);
+    }
+    return array;
 }
 
 
-var V1 = new Class();
-
-console.log(V1);
-
-V1.change();
-
-var V2 = new Class();
 
 
-console.log(V2);
+console.time('Range');
+for (var i = 0; i < 10000; ++i) {
+
+    Range(10000);
+
+}
+console.timeEnd('Range');
+
+
+
+console.time('Range2');
+for (var i = 0; i < 10000; ++i) {
+
+    Range2(10000);
+
+}
+console.timeEnd('Range2');

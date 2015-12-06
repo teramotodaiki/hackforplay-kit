@@ -1,17 +1,24 @@
 // 前方宣言
-var scene, input, game;
+var scene,  game;
 
 
-var Key;
 
 var Game;
 var RootScene;
+
+var Input;
+
+
+var player;
+
+
+var ShotCount = 0;
+var MaxShotNum = 1000;
 
 
 var KeyBind = function (key_code, name) {
     Game.keybind(key_code, name);
 }
-
 
 var BindKeys = function () {
     Array.prototype.forEach.call(arguments, function (key) {
@@ -20,14 +27,12 @@ var BindKeys = function () {
 }
 
 
-
-
 // 秒をフレームカウントに変換する
 var TimeToCount = function (time) {
     return Math.round(time * game.fps);
 }
 
-// フレームカウントを病に変換する
+// フレームカウントを秒に変換する
 var CountToTime = function (count) {
     return count / game.fps;
 }
