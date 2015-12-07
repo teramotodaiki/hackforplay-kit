@@ -1,164 +1,54 @@
-// 東方みたいな HP ゲージ
-var HP = enchant.Class.create(enchant.Sprite,
-{
-    initialize: function(enemy)
-    {
-        Sprite.call(this, 100, 100);
+var CreateEnemy = function (property) {
 
-        this.enemy = enemy;
-        this.image = new Surface(this.width, this.height);
+    var status = property;
 
+    // console.log('敵を追加します');
 
-        // 位置を更新する
-        this.updatePos = function()
-        {
-            this.x = this.enemy.x + (this.enemy.width - this.width) / 2;
-            this.y = this.enemy.y + (this.enemy.height - this.height) / 2;
-        }
+    var enemy = new Enemy('RIM');
 
-
-this.compositeOperation = 'lighter';
-
-
-
-        this.before_value = 0.0;
-
-
-        this.smooth_value = 10;
-
-        this.canvas = new Canvas(this.image);
-
-        this.value = 0.0;
-
-        this.opacity = 0.0;
-
-        this.updatePos();
-    },
-
-    onenterframe: function()
-    {
-
-        // 位置を合わせる
-        this.updatePos();
-
-
-        if (this.enemy.death)
-        {
-            return scene.removeChild(this);
-        }
-
-
-        var op = 1.0;
-
-        // 対象が準備中なら透過
-        if (this.enemy.entry_motion === true || this.enemy.death)
-        {
-            op = 0.0;
-        }
-
-
-        this.opacity = (this.opacity * this.smooth_value + op) / (this.smooth_value + 1);
-
-
-        // HP を正規化
-        this.value = this.enemy.hp / this.enemy.hp_max;
-
-
-        if (isNaN(this.value))
-        {
-            this.value = 0.0;
-        }
-
-
-        // 簡易スムージング
-        this.value = (this.before_value * this.smooth_value + this.value) / (this.smooth_value + 1);
-
-        this.before_value = this.value;
-
-
-        var hpNorm = this.value * Math.PI2;
-
-
-        (function() {
-
-        }).call(this.image.context);
-
-
-
-
-
-        var ctx = this.image.context;
-
-        this.canvas.Clear();
-
-        // 円
-        this.canvas.ArcPath(this.width / 2, this.height / 2)(40)(Math.PI2);
-
-
-        // 枠
-        ctx.lineWidth = 7;
-        ctx.strokeStyle = '#fff';
-        ctx.stroke();
-
-        // 背景
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = '#444';
-        ctx.stroke();
-
-        // 対象が既に倒れているなら HP ゲージは表示しなくても OK
-        if (this.enemy.hp <= 0) return;
-
-        ctx.lineWidth = 5;
-        // HP ゲージ
-        ctx.beginPath();
-        ctx.arc(this.width / 2, this.height / 2, 40, -Math.PI / 2, -Math.PI / 2 - hpNorm, true);
-        ctx.strokeStyle = '#fff';
-        ctx.stroke();
-
-    }
-});
-
-
-
-var CreateEnemy = function(property)
-{
-
-    console.log('敵を追加します');
-
-    var enemy = new Enemy(20, 20);
-
-    if (property.pos)
-    {
-        enemy.locate(property.pos[0], property.pos[1]);
+    if (property.pos) {
+        enemy.MoveTo(property.pos[0], property.pos[1]);
+        enemy.PosToXY();
     }
 
-    if (property.motion)
-    {
-        enemy.setMotion(property.motion);
+    if (property.motion) {
+        enemy.SetMotion(property.motion);
     }
 
 
-    if (property.spell)
-    {
+
+    if (property.attack_begin_time) {
+        enemy.attack_begin_time = property.attack_begin_time;
+    }
+    if (property.attack_end_time) {
+        enemy.attack_end_time = property.attack_end_time;
+    }
+
+
+    if (property.spell) {
         enemy.SetSpell(property.spell);
     }
 
+    enemy.HP(status.hp);
+
+    // enemy.Update();
 
 
+    enemy.Entry();
 
-    scene.addChild(enemy);
+    // scene.addChild(enemy);
 }
 
 
 
 
 
-var _Stage = function()
-{
+var _Stage = function () {
 
     this.events = {};
 
     this.count = 0;
+    this.time = 0.0;
 
 
     this.index = null;
@@ -166,14 +56,43 @@ var _Stage = function()
     this.__boss = false;
 
 
+    this.method_chain_time = 0.0;
+
+};
+
+_Stage.prototype.Delay = function (time) {
+    this.method_chain_time += time;
+    return this;
 };
 
 
+_Stage.prototype.Wait = function (time) {
+    this.Delay(time);
+    return this;
+};
+
+
+
+
+_Stage.prototype.AddEnemyFromInstance = function (time, enemy) {
+    this.AddEvent(time, function () {
+
+
+        enemy.InitializeUpdate();
+
+        RootScene.addChild(enemy);
+    });
+
+    return this;
+}
+
+
 // 既存のボスを追加する
-_Stage.prototype.AddBossFromInstance = function(time, boss)
-{
-    this.AddEvent(time, function()
-    {
+_Stage.prototype.AddBossFromInstance = function (time, boss) {
+    this.AddEvent(time, function () {
+
+
+        RemoveAllShot();
 
         this.__boss = true;
 
@@ -185,14 +104,41 @@ _Stage.prototype.AddBossFromInstance = function(time, boss)
 }
 
 
-// ボスを追加する
-_Stage.prototype.AddBoss = function(time, property)
-{
-    this.AddEvent(time, function()
-    {
-        console.log('ボスを追加します');
+_Stage.prototype.AddBoss = function (name) {
 
-        var boss = new Boss(20, 20);
+
+    this.AddEvent(this.method_chain_time, function () {
+
+
+        RemoveAllEnemyShot();
+
+        var boss = Boss.Get(name);
+
+        boss.Entry();
+
+        RootScene.addChild(new HP(boss));
+
+
+        this.__boss = true;
+        // (new HP(boss)).Entry();
+
+
+    });
+
+
+    return this;
+}
+
+
+// ボスを追加する
+_Stage.prototype.__AddBoss = function (time, property) {
+    this.AddEvent(time, function () {
+        // console.log('ボスを追加します');
+
+
+        RemoveAllShot();
+
+        // var boss = new Boss(20, 20);
 
 
         boss.SetHP(100);
@@ -205,108 +151,182 @@ _Stage.prototype.AddBoss = function(time, property)
         this.__boss = true;
 
 
-        if (property.pos)
-        {
+        if (property.pos) {
             boss.locate(property.pos.x, property.pos.y);
         }
-        if (property.motion)
-        {
-            boss.setMotion(property.motion);
+        if (property.motion) {
+            boss.SetMotion(property.motion);
         }
-        if (property.spell)
-        {
+        if (property.spell) {
             boss.SetSpell(property.spell);
         }
 
-        if (property.entry_motion)
-        {
+        if (property.entry_motion) {
             boss.SetEntryMotion(property.entry_motion);
         }
 
 
 
 
-        var self = this;
-
-        // ボスを倒したらカウントを再開
-        boss.death_event = function()
-        {
-            self.__boss = false;
-
-
-
-
-        }
-
     });
     return this;
-}
+};
 
-_Stage.prototype.Update = function()
-{
+
+_Stage.prototype.Update = function () {
 
 
     // ボスが出現していない時はカウントを進める
-    if (!this.__boss)
-    {
+    if (!this.__boss) {
 
         // イベントを処理する
-        if (this.events[this.count] !== undefined)
-        {
+        if (this.events[this.count] !== undefined) {
             this.events[this.count].call(this);
-            console.log('stage: event');
+            // console.log('stage: event');
         }
 
-        ++this.count;
+
+
+
+
+        this.time = TimeToCount(++this.count);
+
+
     }
 
 }
 
 
 
+_Stage.prototype.DrawTitle = function (title, sub_title) {
+
+    this.AddEvent(this.method_chain_time, function () {
+
+
+
+        if (sub_title) {
+
+            sub_title = new enchant.Label(sub_title);
+            sub_title.font = 　'16px "Times New Roman", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, serif';
+            sub_title.cvsRender = function (ctx) {
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 6;
+                enchant.Label.prototype.cvsRender.call(this, ctx);
+                ctx.shadowBlur = 0;
+            };
+            sub_title.moveTo((game.width - sub_title._boundWidth) / 2, 50);
+
+
+            sub_title.tl.delay(20).fadeIn(30, E).delay(30).fadeOut(30, E).removeFromScene();
+
+
+            sub_title.color = '#fff';
+
+
+            sub_title.opacity = 0;
+            RootScene.addChild(sub_title);
+        }
+
+
+
+
+
+
+        var sampleLabel = new enchant.Label();
+        sampleLabel.font = 　'30px "Times New Roman", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, serif';
+        sampleLabel.text = title;
+        // 以下で中央の座標を計算し、指定します
+        sampleLabel.moveTo((game.width - sampleLabel._boundWidth) / 2, 120);
+
+
+        var E = enchant.Easing.QUAD_EASEOUT;
+
+
+        sampleLabel.opacity = 0;
+
+        sampleLabel.tl.fadeIn(30, E).and().moveBy(0, -50, 30, E).delay(50).fadeOut(30, E).removeFromScene();
+
+
+
+
+        sampleLabel.color = '#fff';
+
+
+        sampleLabel.cvsRender = function (ctx) {
+
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 10;
+
+
+            enchant.Label.prototype.cvsRender.call(this, ctx);
+
+            ctx.shadowBlur = 0;
+
+
+        };
+
+
+
+        RootScene.addChild(sampleLabel);
+
+    });
+
+
+    return this;
+}
+
+
+_Stage.prototype.GameClear = function (time) {
+
+    this.AddEvent(time, function () {
+
+        Hack.gameclear();
+    });
+
+    return this;
+}
+
+
+
 // 整形用
-_Stage.prototype.Chain = function()
-{
+_Stage.prototype.Chain = function () {
     return this;
 }
 
 
 // 敵を追加する
-_Stage.prototype.AddEnemy = function(time, enemy)
-{
+_Stage.prototype.AddEnemy = function (enemy) {
 
-    this.AddEvent(time, function()
-    {
+    this.AddEvent(this.method_chain_time, function () {
+
         CreateEnemy(enemy);
+
     });
+
 
     return this;
 }
 
 
 // イベントを追加する
-_Stage.prototype.AddEvent = function(time, event)
-{
+_Stage.prototype.AddEvent = function (time, event) {
 
     var count = TimeToCount(time);
 
-    if (stage.events[count] === undefined)
-    {
-        stage.events[count] = event;
+    if (this.events[count] === undefined) {
+        this.events[count] = event;
     }
     // 多分ないだろうけど time が小さすぎて count が重複した場合
-    else
-    {
-        console.log('Stage: イベントが重複しています');
+    else {
+        console.warn('ステージのイベントが重複しています\n結合しました');
 
         // イベントを合成する
 
-        var _event = stage.events[count];
+        var _event = this.events[count];
 
-        delete stage.events[count];
+        delete this.events[count];
 
-        stage.events[count] = function()
-        {
+        this.events[count] = function () {
 
             _event.call(this);
             event.call(this);
@@ -320,61 +340,97 @@ _Stage.prototype.AddEvent = function(time, event)
 }
 
 
-_Stage.prototype.Attribute = Spell.prototype.attribute;
-
-var stage_asset = {};
-var active_stage = null;
-
-
-var stage_list = [];
-
-
 var Stage = {
 
-    Get: function(name)
-    {
+    asset: {},
+    list: [],
+    index: -1,
 
-        if (stage_asset[name] === undefined)
-        {
+
+    // 現在のステージを更新する
+    Update: function () {
+
+        // 初回なら this.list[0] に設定
+        if (this.index < 0) {
+            this.Next();
+        }
+
+        this.GetActive().Update();
+    },
+
+
+
+    Get: function (name) {
+
+        if (this.asset[name] === undefined) {
             console.warn('ステージ "' + name + '" は存在しません');
         }
 
-        return stage_asset[name];
+        return this.asset[name];
     },
 
     // 現在のステージを取得する
-    GetActive: function()
-    {
-        return active_stage;
+    GetActive: function () {
+        return this.list[this.index];
     },
 
     // 次のステージに
-    Next: function()
-    {
-        return (active_stage = stage_list[active_stage.index + 1]);
+    Next: function () {
+
+
+        // 現在の背景を削除
+        var previous_stage = this.GetActive();
+        if (previous_stage) {
+            Background.Pop(previous_stage.background.length);
+        }
+
+
+
+        this.index++;
+
+        var stage = this.GetActive();
+
+        if (stage === undefined) {
+            console.error('次のステージは存在しません');
+        }
+
+        // console.log(stage.background);
+
+        // Background.Set.apply(Background, stage.background);
+
+        Background.Push.apply(Background, stage.background);
+
+        return stage;
     },
 
-    Make: function(name, property)
-    {
+    New: function (name, property, events) {
 
-        stage = active_stage = stage_asset[name] = new _Stage();
+        var stage = this.asset[name] = new _Stage();
 
 
-        if (property)
-        {
+        // 背景を統一する為に配列化（どちらも可能）
+        // background: '1'
+        // background: ['1', '2', '3']
+        if (!Array.isArray(property.background)) {
+            property.background = [property.background];
+        }
 
-            // 時間をカウントに変換する
-            for (var key in property)
-            {
 
-                stage.AddEvent(key, property[key]);
+        stage.background = property.background;
+
+        if (events) {
+
+            for (var key in events) {
+
+                stage.AddEvent(key, events[key]);
 
             }
 
         }
 
-        stage.index = stage_list.length;
-        stage_list.push(stage);
+
+        this.list.push(stage);
+
 
         return stage;
     }

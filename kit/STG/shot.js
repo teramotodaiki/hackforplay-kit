@@ -1,112 +1,55 @@
-
-
-
-var preload_textures = {};
-
-var preload_sources = [];
-
-preload_sources.push('hackforplay/enchantbook.png', 'enchantjs/x2/map2.png', 'hackforplay/dot_syuj.png', 'enchantjs/x2/icon0.png', 'enchantjs/font2.png', 'enchantjs/monster1.gif',
-    'dots_design/bg10_3.gif', 'dot_art_world/SC-Door-Entce03.png', 'rengoku-teien/asa_no_komorebi.mp3', 'etolier/01sougen.jpg');
-
-var Assets = {
-    Add: function(name, source)
-    {
-
-        preload_sources.push(source);
-
-        preload_textures[name] = source;
-
-    },
-
-    Preload: function()
-    {
-        game.preload(preload_sources);
-    },
-
-    Get: function(name)
-    {
-        return game.assets[preload_textures[name]];
-    }
-
-};
-
-
-
-// 秒をフレームカウントに変換する
-var TimeToCount = function(time)
-{
-    return Math.round(time * game.fps);
-}
-
-// フレームカウントを病に変換する
-var CountToTime = function(count)
-{
-    return count / game.fps;
-}
-
-
-
 /*
     円同士の衝突判定
     pos.x, pos.y, collision_size
 */
 
-var Collision = function(o1, o2)
-{
-    return Math.pow(o1.pos.x - o2.pos.x, 2) + Math.pow(o1.pos.y - o2.pos.y, 2) <= Math.pow((o1.collision_size + o2.collision_size) / 2, 2);
+var Collision = function (o1, o2) {
+
+
+    // 当たり判定は小さい方のスケールを参照して拡大
+    c1 = o1.GetCollisionSize();
+    c2 = o2.GetCollisionSize();
+
+
+    return Math.pow(o1.pos.x - o2.pos.x, 2) + Math.pow(o1.pos.y - o2.pos.y, 2) <= Math.pow((c1 + c2), 2);
 }
 
 
 
-var shot_material_asset = {};
 
-var Material = {
+// 範囲の弾を消す
+var RemoveRangeShot = function (sprite, range) {
 
-    New: function(name, property)
-    {
-        var material = shot_material_asset[name] = {};
+    SpriteList.Filter(function (shot) {
 
+        return shot !== sprite && Math.Length(sprite.pos, shot.pos) <= range;
 
-        (function()
-        {
-
-            this.name = 'material-' + name;
-
-            this.width = property.width;
-            this.height = property.height;
-
-            // 比率を計算する
-            this.scale_width = property.default_width === undefined ? 0 : property.default_width / this.width;
-            this.scale_height = property.default_height === undefined ? 0 : property.default_height / this.height;
+    }).forEach(function (node) {
+        node.Remove();
+    });
 
 
-            this.collision_size = property.collision_size;
+};
 
+// 全ての弾を消す
+RemoveAllShot = function () {
 
-        }).call(material);
-
-
-        // テクスチャを登録する
-        Assets.Add(material.name, property.source);
-
-    },
-
-    Get: function(name)
-    {
-        return shot_material_asset[name];
-    }
+    SpriteList.TypeFilter('shot').forEach(function (node) {
+        node.Remove();
+    })
 
 };
 
 
+RemoveAllEnemyShot = function () {
+    SpriteList.TypeFilter('shot').forEach(function (node) {
+        if (node.creator.type === 'enemy') {
+            node.Remove();
+        }
+    })
+};
 
 
-
-// 敵キャラ
-var enemies = [];
-
-// プレイヤー
-var player;
 
 
 // キャラクター管理
@@ -115,37 +58,35 @@ var character_list = [];
 var CharacterList = {
 
 
-    Each: function(type, callback)
-    {
+    GetType: function (type) {
+        return scene.childNodes.filter(function (character) {
+            return character.type === type;
+        });
+    },
 
-        scene.childNodes.forEach(function(character)
-        {
-            if (character.type === type)
-            {
+
+    Each: function (type, callback) {
+
+        scene.childNodes.forEach(function (character) {
+            if (character.type === type) {
                 callback.call(character);
             }
         });
     },
 
     // base に一番近い type のキャラクターを取得する
-    GetNear: function(base, type)
-    {
+    GetNear: function (base, type) {
 
         var target = null;
-        this.Each(type, function()
-        {
+        this.Each(type, function () {
 
             //
 
-            if (base !== this)
-            {
+            if (base !== this) {
 
-                if (!target)
-                {
+                if (!target) {
                     target = this;
-                }
-                else
-                {
+                } else {
                     target = base.pos.near(target, this);
                 }
             }
@@ -159,32 +100,96 @@ var CharacterList = {
 }
 
 
+// 弾
+var ShotEffect = Class(Sprite, {
+    Initialize: function (shot) {
 
+
+        // 定数に近いやつ
+        this.row = 13;
+        this.remove_time = 0.3;
+
+        this.shot = shot;
+
+        this.SpriteConstructor({
+
+            name: '弾消滅エフェクト',
+
+            width: 128,
+            height: 128,
+
+            image_scale_x: 0.5,
+            image_scale_y: 0.5,
+
+            blend: 'lighter'
+        });
+
+
+        this.pos = this.shot.pos;
+
+
+        this.PosToXY();
+        this.UpdateScale();
+
+    },
+    Update: function () {
+
+
+        if (this.time >= this.remove_time) {
+            this.Remove();
+        }
+
+
+        this.frame = (this.time / this.remove_time) * (this.row - 0.5);
+        this.frame += (this.shot.frame % 10) * this.row;
+
+
+        this.PosToXY();
+        this.UpdateScale();
+
+
+
+        this.Chrono();
+    }
+
+
+});
 
 
 // 弾
-var Shot = enchant.Class.create(enchant.Sprite,
-{
-    initialize: function(creator, material)
-    {
+var Shot = Class(Sprite, {
+    Initialize: function (creator, material) {
 
-        if (!material)
-        {
+        if (!material) {
             console.log('マテリアルが存在しません');
         }
 
-        Sprite.call(this, material.width, material.height);
+
+        // Sprite.call(this, material.width, material.height);
 
 
-        this.image = Assets.Get(material.name);
+        // this.image = Asset.Get(material.name);
+
+        this.SpriteConstructor(material);
 
         this.material = material;
+
+
 
 
         this.type = 'shot';
 
         this.collision_size = material.collision_size;
 
+
+        Object.defineProperty(this, "b", {
+            get: function () {
+                return this.compositeOperation;
+            },
+            set: function (type) {
+                this.compositeOperation = type;
+            }
+        });
 
 
 
@@ -205,7 +210,6 @@ var Shot = enchant.Class.create(enchant.Sprite,
         // 能力の使用者
         this.creator = creator;
 
-        this.pos = Vec2(0, 0);
 
         this.pos.x = creator.pos.x;
         this.pos.y = creator.pos.y;
@@ -215,168 +219,215 @@ var Shot = enchant.Class.create(enchant.Sprite,
         this.angle = 0;
 
 
+
+        this.remove_effect = true;
+
+
         // 仮
         this.target_type = 'enemy';
 
-        this.count = 0;
 
+        // 反射番号
+        // this.before_reflect_index = -1;
+        this.before_reflect_indices = [];
 
+        this.reflect_count = 1;
 
         this.__control = null;
 
         this.events = [];
 
+        this.scale_x = 1.0;
+        this.scale_y = 1.0;
 
-        this.Scale_x = 1.0;
-        this.Scale_y = 1.0;
+
+
+
+        this.AddEvent('remove', function () {
+
+            if (!this.remove_effect) return;
+
+            var effect = new ShotEffect(this);
+
+            effect.Entry();
+
+            ShotCount--;
+
+        });
+
 
     },
 
     // 色を変更する
-    Color: function(color)
-    {
+    // [[deprecated]]
+    Color: function (color) {
         this.frame = color;
     },
 
-    resize: function()
-    {
 
+    // 画面外
+    OutScreen: function () {
 
-        this.scaleX = this.material.scale_width;
-        this.scaleY = this.material.scale_height;
+        if (!this.outScreenRemove) return;
 
-
-    },
-
-    // (pos) を (x, y) に反映する
-    updatePos: function()
-    {
-        this.x = this.pos.x - this.width / 2;
-        this.y = this.pos.y - this.height / 2;
+        var screen_margin = 30;
 
 
 
-        // 画面外に出た場合
-        if (this.outScreenRemove)
-        {
-            if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height)
-            {
-                this.remove();
-                return;
-            }
-        }
+        if (this.pos.x < -screen_margin || this.pos.x > scene.width + screen_margin || this.pos.y < -screen_margin || this.pos.y > scene.height + screen_margin) {
 
+            // 画面外に出て消滅した場合はエフェクトなし
+            this.remove_effect = false;
 
-
-
-
-    },
-
-
-    // 自身を削除する
-    remove: function()
-    {
-        scene.removeChild(this);
-    },
-
-    // 衝突
-    hit: function(target)
-    {
-
-
-        // 自滅を回避する
-        if (target === this.creator && !this.hit_self)
-        {
+            this.Remove();
             return;
         }
 
 
-        if (Collision(this, target))
-        {
+    },
+
+
+
+    // 衝突
+    hit: function (target) {
+
+
+        // 自滅を回避する
+        if (target === this.creator && !this.hit_self) {
+            return;
+        }
+
+
+        if (Collision(this, target)) {
 
 
             target.Damage(this.power);
-            this.remove();
+
+            if (!this.unbreak) this.Remove();
         }
 
     },
 
-    // シンプルな弾制御
-    move: function()
-    {
+    // 移動
+    Move: function () {
 
-        this.pos.add(Angle(this.angle).ToVec2().Scale(this.speed));
+        // 時計回りにする為に角度を反転
+        var angle = Angle(-this.angle);
+
+
+        var pos = this.pos.Clone();
+        var vec = angle.ToVec2().Scale(this.speed);
+
+
+        var before_pos = this.pos.Clone();
+
+        this.pos.Add(vec);
+
+        // 反射
+        if (this.reflect) {
+
+
+            // var pos2 = this.pos.Clone().Sub(angle.ToVec2().Scale(this.collision_size / 2));
+
+
+
+            // 反射処理
+            for (var index in this.reflect) {
+
+                var name = this.reflect[index];
+
+
+                Reflecter.Get(name).Check(Line(before_pos, this.pos), this);
+
+
+            }
+
+
+            // Reflect.Check(Line(pos, vec), this);
+
+        }
 
 
     },
 
-    onenterframe: function()
-    {
+    Update: function () {
 
 
-        this.resize();
-        this.updatePos();
+
+        this.UpdateScale();
+
+
+
+        // 移動
+        this.Move();
+
+
+
+        this.PosToXY();
+        this.OutScreen();
+
+
+        this.frame = this.color;
 
         var self = this;
 
         // 完全に自由な制御
-        if (this.__control)
-        {
+        if (this.__control) {
             this.__control.call(this);
         }
 
         // イベントを実行する
-        this.events.forEach(function(event)
-        {
+        this.events.forEach(function (event) {
             event.call(self);
         });
 
 
 
 
-        // 移動
-        this.move();
-
 
 
 
         // 攻撃対象に被弾判定
-        CharacterList.Each(this.target_type, function()
-        {
+        SpriteList.TypeEach(this.target_type, function () {
 
             self.hit(this);
 
         });
 
+
+
+        // 衝突した他の弾を打ち消す
+        if (this.destroyer) {
+            SpriteList.TypeEach('shot', function (shot) {
+                if (self.creator !== shot.creator) {
+                    if (Collision(self, shot)) {
+                        shot.Remove();
+                    };
+                }
+            });
+        }
+
+
+        this.Chrono();
+
+
+
         // 寿命
-        if (this.count++ >= this.life)
-        {
-            this.remove();
+        if (this.count >= this.life) {
+            this.Remove();
         }
 
 
 
-        this.time = CountToTime(this.count);
 
     }
 
 });
 
 
-Shot.prototype.attribute = function(object)
-{
-    for (var key in object)
-    {
+Shot.prototype.attribute = function (object) {
+    for (var key in object) {
         this[key] = object[key];
     }
     return this;
-}
-
-
-// 初期化後に呼ぶ
-Shot.prototype.InitializeUpdate = function()
-{
-
-    this.updatePos();
-    this.resize();
 }

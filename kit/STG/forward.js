@@ -1,56 +1,56 @@
 // 前方宣言
-var scene, input, game, player;
+var scene,  game;
 
 
 
-var ClassCreate = function(_super, property)
-{
-    return enchant.Class.create(_super, property);
+var Game;
+var RootScene;
+
+var Input;
+
+
+var player;
+
+
+var ShotCount = 0;
+var MaxShotNum = 1000;
+
+
+var KeyBind = function (key_code, name) {
+    Game.keybind(key_code, name);
+}
+
+var BindKeys = function () {
+    Array.prototype.forEach.call(arguments, function (key) {
+        Game.keybind(key[0], key[1]);
+    });
+}
+
+
+// 秒をフレームカウントに変換する
+var TimeToCount = function (time) {
+    return Math.round(time * game.fps);
+}
+
+// フレームカウントを秒に変換する
+var CountToTime = function (count) {
+    return count / game.fps;
+}
+
+
+var Select = function (a, b) {
+    return a === undefined ? b : a;
 }
 
 
 
-
-
-var Clone = function(object)
-{
+var Clone = function (object) {
     return $.extend({}, object);
 }
 
 
-
-var SpriteObject = ClassCreate(enchant.Sprite,
-{
-    initialize: function(width, height)
-    {
-        enchant.Sprite.call(this, width, height);
-
-
-        // this.pos = Vec2(0, 0);
-
-
-        this.Initialize();
-    },
-    onenterframe: function()
-    {
-        this.OnEnterFrame();
-    }
-});
-
-
-var A = ClassCreate(SpriteObject);
-
-A.prototype.Initialize = function()
-{
-
-    SpriteObject.call(this, 1, 1);
-
-}
-
-A.prototype.OnEnterFrame = function() {
-
-}
-
+// console.log = Hack.log;
+// console.warn = Hack.log;
 
 
 
@@ -58,21 +58,18 @@ A.prototype.OnEnterFrame = function() {
 var Debug = {
     values: [],
 
-    Update: function()
-    {
+    Update: function () {
         $('#debug').val('');
 
         var text = '';
-        for (var key in this.values)
-        {
+        for (var key in this.values) {
             text += key + ': ' + this.values[key] + '\n';
         }
 
         $('#debug').val(text);
     },
 
-    Set: function(name, text)
-    {
+    Set: function (name, text) {
         this.values[name] = text;
     }
 

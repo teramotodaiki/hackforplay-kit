@@ -1,19 +1,20 @@
-
-
 // 敵キャラ
-var Enemy = enchant.Class.create(Character,
-{
-    initialize: function(width, height)
-    {
-        Character.call(this, width, height);
+var Enemy = Class(Character2, {
+    Initialize: function (name) {
 
-        enemies.push(this);
+
+        // Character.call(this, width, height);
+
+        // this.Base.call(this, name);
+
+        Character2.call(this, name);
+
+        // enemies.push(this);
 
 
         this.type = 'enemy';
 
-
-        this.backgroundColor = '#00f';
+        // this.backgroundColor = '#00f';
 
 
         this.hp = 10;
@@ -30,113 +31,95 @@ var Enemy = enchant.Class.create(Character,
 
 
         this.spell = null;
+        this.spell_name = '';
 
 
         this.motion_name = '';
 
 
+        // HP が 0.0 以下になったらそのまま死亡
+        this.AddEvent('dying', function () {
+            this.RunEvent('death');
+            this.death = true;
+            this.Remove();
+        });
+
+
+
     },
 
+    SetMotion: function (name) {
 
-    ReloadMotion: function()
-    { // tl.clear だとイベントが破棄されないっぽいから初期化（物理）
-        this.tl = new enchant.Timeline(this);
-    },
-
-    // 移動処理を設定する
-    setMotion: function(name)
-    {
         this.motion_name = name;
 
-
         Motion.Use(name, this);
+
+        return this;
     },
 
-    onenterframe: function()
-    {
+
+
+    Update: function () {
         // this.move();
 
-        this.time = CountToTime(this.count);
+        // this.time = CountToTime(this.count);
 
-        // TL を使用するから x, y から pos に逆輸入
+        this.Chrono();
 
-        /*
-        this.pos.x = this.x + this.width / 2;
-        this.pos.y = this.y + this.height / 2;
+        this.UpdateScale();
 
-        */
-
-        if (this.timeline !== undefined)
-        {
+        if (this.timeline) {
             this.timeline.Update(this);
-            this.convertPos();
+            // this.convertPos();
         }
+
+
+        this.PosToXY();
+
+
+
+        this.Animation();
 
         // this.spell.counts = this.spellCounts;
 
 
 
         // 攻撃する
-        if (this.spell && (this.attack_begin_time === null || this.attack_begin_time <= this.time) && (this.attack_end_time === null || this.attack_end_time >= this.time))
-        {
+        if (this.spell && (this.attack_begin_time === null || this.attack_begin_time <= this.time) && (this.attack_end_time === null || this.attack_end_time >= this.time)) {
 
             this.spell.Update(this);
 
         }
 
 
+    },
 
-        this.count++;
 
+    ReloadSpell: function () {
+        if (this.spell_name && this.spell) {
+            this.SetSpell(this.spell_name, true);
+
+            console.log('スペル "' + this.spell_name + '" を更新しました');
+        }
     }
+
 });
 
 
 
 // スペルを登録する
-Enemy.prototype.SetSpell = function(name, aaaaa)
-{
+Enemy.prototype.SetSpell = function (name, overwrite) {
     this.spell_name = name;
-    this.spell = __Spell.Get(name).Clone();
+    this.spell = Spell.Get(name).Clone();
 
+    // barrage_count を初期化しない
+    if (overwrite) return;
 
-    if(aaaaa) return;
 
     // barrage_count を初期化する
-    this.spell.barrages.forEach(function(barrage)
-    {
+    this.spell.barrages.forEach(function (barrage) {
         this.barrage_count[barrage.handle] = 0;
     }, this);
 
-
-}
-
-Enemy.prototype.ReloadSpell = function()
-{
-    if (this.spell_name && this.spell)
-    {
-        this.SetSpell(this.spell_name, true);
-
-        console.log('スペル "' + this.spell_name + '" を更新しました');
-    }
-}
-
-
-
-
-
-// 被弾
-Enemy.prototype.Damage = function(damage)
-{
-
-    console.log('hp: ' + this.hp);
-
-    this.hp -= damage;
-
-
-    if (this.hp <= 0)
-    {
-        this.remove();
-    }
 
 }

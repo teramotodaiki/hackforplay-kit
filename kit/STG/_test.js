@@ -1,30 +1,20 @@
+var InitializeGlobalVariable = function () {
+
+
+    Game = game = enchant.Core.instance;
+    RootScene = scene = game.rootScene;
 
 
 
-var InitializeGlobalVariable = function()
-{
 
-
-    game = enchant.Core.instance;
-
-
-    sceneSize.width = game.width;
-    sceneSize.height = game.height;
-
-
-
-    scene = game.rootScene;
-    scene.backgroundColor = '#666';
-
+    RootScene.background_layer = new enchant.Sprite(0, 0);
+    RootScene.addChild(RootScene.background_layer);
 
 
     /* var */
-    input = game.input;
+    Input = Game.input;
 
-
-
-    game.addEventListener('enterframe', function()
-    {
+    game.addEventListener('enterframe', function () {
 
 
 
@@ -46,44 +36,28 @@ var InitializeGlobalVariable = function()
 // 魔道書
 var EnchantBook = {
 
-    Create: function()
-    {
+    Create: function () {
 
 
         // 魔道書
-        Hack.enchantBookIcon = Hack.createSprite(64, 64,
-        {
+        Hack.enchantBookIcon = Hack.createSprite(64, 64, {
             image: game.assets['hackforplay/enchantbook.png'],
-            defaultParentNode: game.rootScene,
-            ontouchend: function()
-            {
+            defaultParentNode: RootScene,
+            ontouchend: function () {
                 Hack.openEditor();
             }
         });
 
 
-
-        // 魔道書の中身
-        Hack.hint = '';
+        RootScene.front_sprite = Hack.enchantBookIcon;
 
     },
-
-    PushHint: function(text)
-    {
-        Hack.hint += text + '\n';
-    }
 
 
 };
 
 
-var CreatePad = function()
-{
-
-
-
-
-
+var CreatePad = function () {
 
 
 
@@ -96,45 +70,40 @@ var CreatePad = function()
 
 
 
-    pad.onenterframe = function()
-    {
+    pad.onenterframe = function () {
         _pad.x = this.vx;
         _pad.y = this.vy;
 
         // 必ず 0.0 ～ 1.0 の範囲
-        var aPadLength = _pad.length();
+        var aPadLength = _pad.Length();
 
         // キー入力を APad に対応する
-        var keys = [input.down, input.right, input.up, input.left];
+        var keys = [Key.down, Key.right, Key.up, Key.left];
 
         // 方向キー全ての入力
         var keyPad = Vec2(0, 0);
 
-        for (var index in keys)
-        {
-            if (keys[index])
-            {
+        for (var index in keys) {
+            if (keys[index]) {
                 // key[index] の方向
                 var angle = Math.PI2 / 4 * index;
                 var keyVec = Vec2(Math.sin(angle) | 0, Math.cos(angle) | 0);
 
-                keyPad.add(keyVec);
+                keyPad.Add(keyVec);
             }
 
         }
 
 
         // APad に KeyPad を加算して正規化
-        _pad.add(keyPad).normalize();
+        _pad.Add(keyPad).Normalize();
 
 
 
         // 低速キー || APad の押し込みが少ない
-        if (input.shift || (pad.isTouched && aPadLength < 0.5))
-        {
+        if (Key.shift || (pad.isTouched && aPadLength < 0.5)) {
             _pad.Scale(0.5);
         }
-
 
 
     }

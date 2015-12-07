@@ -69,7 +69,26 @@ NewEasyTimeline.prototype.Loop = function()
         }
     });
 
-}
+};
+
+
+// ループする
+NewEasyTimeline.prototype.Remove = function()
+{
+
+    this.events.push(
+    {
+        event: function()
+        {
+            this.target.Remove();
+        }
+    });
+
+};
+
+
+
+
 
 NewEasyTimeline.prototype.Call = function(name)
 {
@@ -97,7 +116,7 @@ NewEasyTimeline.prototype.Next = function()
     this.count = 0;
 
 
-    console.log('event index: ' + this.event_index + ' / ' + this.events.length);
+    // console.log('event index: ' + this.event_index + ' / ' + this.events.length);
 
     var event = this.events[this.event_index];
 
@@ -108,17 +127,17 @@ NewEasyTimeline.prototype.Next = function()
         // 再帰
         if (this.loop)
         {
-            console.log('loop');
+            // console.log('loop');
             this.event_index = -1;
             return this.Next();
         }
         else
         {
-            console.log('no loop');
+            // console.log('no loop');
         }
 
 
-        console.log('再生が終了しました');
+        // console.log('再生が終了しました');
         this.end = true;
         return;
     }
@@ -157,6 +176,7 @@ NewEasyTimeline.prototype.Clone = function()
     {
 
         clone.events.push(Clone(event));
+
 
     });
 

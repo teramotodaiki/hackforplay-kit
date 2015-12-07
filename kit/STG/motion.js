@@ -1,8 +1,3 @@
-
-
-
-
-
 var motion_asset = [];
 
 var Motion = {
@@ -10,23 +5,20 @@ var Motion = {
 
 
     // 新しいモーションを作成
-    New: function(name)
-    {
+    New: function (name) {
         return (motion_asset[name] = new NewEasyTimeline());
     },
 
 
-    Mirror: function() {
+    Mirror: function () {
 
     },
 
 
     // キャラクターに適用する
-    Use: function(name, target)
-    {
+    Use: function (name, target) {
 
-        if (motion_asset[name] === undefined)
-        {
+        if (motion_asset[name] === undefined) {
             console.log(name + ' は存在しないモーションです');
             return;
         }
